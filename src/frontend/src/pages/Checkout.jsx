@@ -31,6 +31,18 @@ export default function Checkout(){
   const submit = async e => {
     e.preventDefault()
     if (selectedCartItems.length === 0) return alert('Vui lòng chọn sản phẩm để thanh toán')
+    
+    // Nếu chọn QR code, hiển thị QR trước
+    if (paymentMethod === 'qr') {
+      setShowQR(true)
+      return
+    }
+    
+    // Xử lý đặt hàng COD
+    await processOrder()
+  }
+
+  const processOrder = async () => {
     setLoading(true)
     try{
       const res = await api.post('/orders', { 
@@ -40,7 +52,9 @@ export default function Checkout(){
         address: address,
         items: selectedCartItems, 
         total: finalTotal, 
-        notes: note 
+        notes: note,
+        paymentMethod: paymentMethod,
+        paymentStatus: paymentMethod === 'cod' ? 'pending' : 'paid'
       })
       // Xóa các items đã checkout khỏi giỏ hàng
       selectedItems.forEach(id => {
@@ -115,12 +129,52 @@ export default function Checkout(){
                 rows="3"
               />
             </div>
+
+            <div className="form-row payment-method-section">
+              <label>Phương thức thanh toán *</label>
+              <div className="payment-methods">
+                <div 
+                  className={`payment-option ${paymentMethod === 'cod' ? 'active' : ''}`}
+                  onClick={() => setPaymentMethod('cod')}
+                >
+                  <div className="payment-radio">
+                    {paymentMethod === 'cod' && <div className="radio-dot"></div>}
+                  </div>
+                  <div className="payment-info">
+                    <div className="payment-icon">💵</div>
+                    <div className="payment-details">
+                      <h4>Tiền mặt khi nhận hàng (COD)</h4>
+                      <p>Thanh toán khi nhận được hàng</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div 
+                  className={`payment-option ${paymentMethod === 'qr' ? 'active' : ''}`}
+                  onClick={() => setPaymentMethod('qr')}
+                >
+                  <div className="payment-radio">
+                    {paymentMethod === 'qr' && <div className="radio-dot"></div>}
+                  </div>
+                  <div className="payment-info">
+                    <div className="payment-icon">📱</div>
+                    <div className="payment-details">
+                      <h4>Chuyển khoản QR Code</h4>
+                      <p>Quét mã QR để thanh toán</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             <button 
               type="submit" 
               className="btn-primary btn-lg btn-block"
               disabled={loading || selectedCartItems.length === 0}
             >
-              {loading ? '⏳ Đang xử lý...' : `🛒 Đặt hàng (${selectedCartItems.length} sản phẩm)`}
+              {loading ? '⏳ Đang xử lý...' : 
+               paymentMethod === 'qr' ? `📱 Xem QR thanh toán` : 
+               `🛒 Đặt hàng (${selectedCartItems.length} sản phẩm)`}
             </button>
           </form>
         </div>
@@ -161,12 +215,64 @@ export default function Checkout(){
           </div>
 
           <div className="checkout-notes">
-            <p>🔒 Thanh toán khi nhận hàng (COD)</p>
             <p>🚚 Giao hàng trong 2-3 ngày</p>
             <p>✅ Miễn phí ship cho đơn từ 500,000₫</p>
+            <p>🔒 Thông tin được bảo mật</p>
           </div>
         </div>
       </div>
+
+      {/* QR Code Modal */}
+      {showQR && (
+        <div className="qr-modal-overlay" onClick={() => setShowQR(false)}>
+          <div className="qr-modal" onClick={e => e.stopPropagation()}>
+            <button className="qr-close" onClick={() => setShowQR(false)}>×</button>
+            <h2>Quét mã QR để thanh toán</h2>
+            <p className="qr-amount">Số tiền: <strong>{finalTotal.toLocaleString('vi-VN')} ₫</strong></p>
+            
+            <div className="qr-code-container">
+              <img 
+                src={`https://img.vietqr.io/image/MB-0372782368-compact2.png?amount=${finalTotal}&addInfo=DH${Date.now().toString().slice(-6)}&accountName=NGUYEN%20TAN%20LOI`}
+                alt="QR Code thanh toán"
+                className="qr-code-image"
+              />
+            </div>
+
+            <div className="qr-instructions">
+              <h3>Hướng dẫn thanh toán:</h3>
+              <ol>
+                <li>Mở app Ngân hàng hoặc ví điện tử</li>
+                <li>Quét mã QR phía trên</li>
+                <li>Kiểm tra thông tin và xác nhận thanh toán</li>
+                <li>Nhấn "Đã thanh toán" bên dưới</li>
+              </ol>
+            </div>
+
+            <div className="qr-bank-info">
+              <p><strong>Ngân hàng:</strong> MB Bank</p>
+              <p><strong>Số tài khoản:</strong> 0372782368</p>
+              <p><strong>Chủ tài khoản:</strong> NGUYEN TAN LOI</p>
+              <p><strong>Nội dung:</strong> DH{Date.now().toString().slice(-6)}</p>
+            </div>
+
+            <div className="qr-actions">
+              <button 
+                className="btn-secondary" 
+                onClick={() => setShowQR(false)}
+              >
+                Hủy
+              </button>
+              <button 
+                className="btn-primary" 
+                onClick={processOrder}
+                disabled={loading}
+              >
+                {loading ? '⏳ Đang xử lý...' : '✅ Đã thanh toán'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

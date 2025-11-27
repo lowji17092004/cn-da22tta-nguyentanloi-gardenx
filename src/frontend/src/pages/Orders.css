@@ -874,6 +874,47 @@
   font-weight: 500;
 }
 
+.payment-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: linear-gradient(135deg, #fef8f0 0%, #ffffff 100%);
+  border: 1.5px solid #f3e5d8;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 13px;
+  color: #92400e;
+}
+
+.payment-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 13px;
+}
+
+.payment-status.paid {
+  background: linear-gradient(135deg, #d1fae5 0%, #ecfdf5 100%);
+  border: 1.5px solid #a7f3d0;
+  color: #065f46;
+}
+
+.payment-status.pending {
+  background: linear-gradient(135deg, #fef3c7 0%, #fffbeb 100%);
+  border: 1.5px solid #fde68a;
+  color: #92400e;
+}
+
+.payment-status.failed {
+  background: linear-gradient(135deg, #fee2e2 0%, #fef2f2 100%);
+  border: 1.5px solid #fecaca;
+  color: #991b1b;
+}
+
 /* Summary Section */
 .summary-section h4 {
   display: flex;

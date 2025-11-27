@@ -599,6 +599,33 @@ const Orders = () => {
                       </div>
                     </div>
 
+                    {/* Payment Info */}
+                    <div className="info-section">
+                      <h4>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          <rect x="1" y="4" width="22" height="16" rx="2" ry="2"/>
+                          <line x1="1" y1="10" x2="23" y2="10"/>
+                        </svg>
+                        Thông tin thanh toán
+                      </h4>
+                      <div className="info-card">
+                        <div className="info-field">
+                          <label>Phương thức</label>
+                          <span className="payment-badge">
+                            {selectedOrder.paymentMethod === 'qr' ? '📱 QR Code' : '💵 COD'}
+                          </span>
+                        </div>
+                        <div className="info-field">
+                          <label>Trạng thái thanh toán</label>
+                          <span className={`payment-status ${selectedOrder.paymentStatus || 'pending'}`}>
+                            {selectedOrder.paymentStatus === 'paid' ? '✓ Đã thanh toán' : 
+                             selectedOrder.paymentStatus === 'failed' ? '✕ Thất bại' : 
+                             '⏳ Chưa thanh toán'}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
                     {/* Order Summary */}
                     <div className="summary-section">
                       <h4>
