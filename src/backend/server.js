@@ -9,6 +9,8 @@ const articleRoutes = require('./routes/articles');
 const uploadRoutes = require('./routes/upload');
 const orderRoutes = require('./routes/orders');
 const userRoutes = require('./routes/users');
+const reviewRoutes = require('./routes/reviews');
+const profileRoutes = require('./routes/profile');
 
 const app = express();
 app.use(cors());
@@ -20,6 +22,8 @@ app.use('/api/articles', articleRoutes);
 app.use('/api/upload', uploadRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/reviews', reviewRoutes);
+app.use('/api/profile', profileRoutes);
 
 // Serve uploaded files
 app.use('/uploads', require('express').static(require('path').join(__dirname, 'uploads')));

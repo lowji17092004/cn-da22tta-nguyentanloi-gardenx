@@ -4,6 +4,10 @@ import Home from './pages/HomeNew'
 import Shop from './pages/Shop'
 import ProductDetail from './pages/ProductDetail'
 import Articles from './pages/Articles'
+import BlogFlorana from './pages/BlogFlorana'
+import BlogInfo from './pages/BlogInfo'
+import BlogCare from './pages/BlogCare'
+import BlogInspiration from './pages/BlogInspiration'
 import Admin from './pages/Admin'
 import Login from './pages/Login'
 import Register from './pages/Register'
@@ -14,6 +18,7 @@ import AdminProducts from './pages/AdminProducts'
 import ProductForm from './pages/ProductForm'
 import AdminArticles from './pages/AdminArticles'
 import ArticleForm from './pages/ArticleForm'
+import ArticleDetail from './pages/ArticleDetail'
 import Cart from './pages/Cart'
 import Checkout from './pages/Checkout'
 import AdminOrders from './pages/AdminOrders'
@@ -22,6 +27,8 @@ import AdminCategories from './pages/AdminCategories'
 import AdminUsers from './pages/AdminUsers'
 import UserForm from './pages/UserForm'
 import Orders from './pages/Orders'
+import AdminReviews from './pages/AdminReviews'
+import Profile from './pages/Profile'
 import { AuthProvider } from './contexts/AuthContext'
 import { CartProvider } from './contexts/CartContext'
 import Header from './components/Header'
@@ -40,6 +47,11 @@ export default function App(){
               <Route path="/shop" element={<Shop/>} />
               <Route path="/product/:id" element={<ProductDetail/>} />
               <Route path="/articles" element={<Articles/>} />
+              <Route path="/articles/about" element={<BlogFlorana/>} />
+              <Route path="/articles/info" element={<BlogInfo/>} />
+              <Route path="/articles/care" element={<BlogCare/>} />
+              <Route path="/articles/inspiration" element={<BlogInspiration/>} />
+              <Route path="/article/:slug" element={<ArticleDetail/>} />
               <Route path="/login" element={<Login/>} />
               <Route path="/register" element={<Register/>} />
               <Route path="/forgot-password" element={<ForgotPassword/>} />
@@ -49,6 +61,7 @@ export default function App(){
               <Route path="/cart" element={<Cart/>} />
               <Route path="/checkout" element={<Checkout/>} />
               <Route path="/orders" element={<ProtectedRoute><Orders/></ProtectedRoute>} />
+              <Route path="/profile" element={<ProtectedRoute><Profile/></ProtectedRoute>} />
 
               <Route path="/admin/products" element={<ProtectedRoute role={'admin'}><AdminProducts/></ProtectedRoute>} />
               <Route path="/admin/products/:id" element={<ProtectedRoute role={'admin'}><ProductForm/></ProtectedRoute>} />
@@ -62,6 +75,8 @@ export default function App(){
               
               <Route path="/admin/users" element={<ProtectedRoute role={'admin'}><AdminUsers/></ProtectedRoute>} />
               <Route path="/admin/users/:id" element={<ProtectedRoute role={'admin'}><UserForm/></ProtectedRoute>} />
+              
+              <Route path="/admin/reviews" element={<ProtectedRoute role={'admin'}><AdminReviews/></ProtectedRoute>} />
 
               <Route path="/admin" element={<ProtectedRoute role={'admin'}><Admin/></ProtectedRoute>} />
             </Routes>

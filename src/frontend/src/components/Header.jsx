@@ -76,31 +76,77 @@ export default function Header(){
                 <span>Trang chủ</span>
               </Link>
               <div className="nav-item nav-dropdown">
-                <button className="nav-dropdown-btn">
+                <Link to="/shop" className="nav-dropdown-btn">
                   <span>Sản phẩm</span>
-                  <span className="dropdown-arrow">▼</span>
-                </button>
-                <div className="nav-dropdown-menu nav-dropdown-grid">
-                  <Link to="/shop?category=hoa-kieng" className="dropdown-item">
-                    <span>Hoa kiểng</span>
+                  <svg className="dropdown-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M6 9l6 6 6-6"/></svg>
+                </Link>
+                <div className="nav-dropdown-menu nav-dropdown-products">
+                  <Link to="/shop?category=hoa-kieng" className="dropdown-product-card">
+                    <div className="product-card-image">
+                      <img src="/images/hoakieng.jpg" alt="Hoa kiểng" />
+                    </div>
+                    <div className="product-card-title">Hoa Kiểng</div>
+                    <div className="product-card-desc">Hoa tươi đẹp, rực rỡ sắc màu</div>
                   </Link>
-                  <Link to="/shop?category=cay-canh" className="dropdown-item">
-                    <span>Cây cảnh</span>
+                  <Link to="/shop?category=cay-canh" className="dropdown-product-card">
+                    <div className="product-card-image">
+                      <img src="/images/caycanh.jpg" alt="Cây cảnh" />
+                    </div>
+                    <div className="product-card-title">Cây Cảnh</div>
+                    <div className="product-card-desc">Cây xanh trang trí trong nhà</div>
                   </Link>
-                  <Link to="/shop?category=cay-thuy-canh" className="dropdown-item">
-                    <span>Cây thủy cảnh</span>
+                  <Link to="/shop?category=cay-thuy-canh" className="dropdown-product-card">
+                    <div className="product-card-image">
+                      <img src="/images/caythuycanh.jpg" alt="Cây thủy canh" />
+                    </div>
+                    <div className="product-card-title">Cây Thủy Canh</div>
+                    <div className="product-card-desc">Cây trồng trong nước tiện lợi</div>
                   </Link>
-                  <Link to="/shop?category=sen-da" className="dropdown-item">
-                    <span>Sen đá</span>
+                  <Link to="/shop?category=sen-da" className="dropdown-product-card">
+                    <div className="product-card-image">
+                      <img src="/images/senda.jpg" alt="Sen đá" />
+                    </div>
+                    <div className="product-card-title">Sen Đá</div>
+                    <div className="product-card-desc">Sen đá mini đủ loại, dễ chăm</div>
                   </Link>
                 </div>
               </div>
-              <Link to="/articles" className="nav-item">
-                <span>Giới thiệu</span>
-              </Link>
-              <Link to="/blog" className="nav-item">
-                <span>Blog</span>
-              </Link>
+              <div className="nav-item nav-dropdown">
+                <Link to="/articles" className="nav-dropdown-btn">
+                  <span>Blog</span>
+                  <svg className="dropdown-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M6 9l6 6 6-6"/></svg>
+                </Link>
+                <div className="nav-dropdown-menu nav-dropdown-blog">
+                  <Link to="/articles/about" className="dropdown-blog-card">
+                    <div className="blog-card-image">
+                      <img src="https://images.unsplash.com/photo-1487530811176-3780de880c2d?w=400" alt="Florana" />
+                    </div>
+                    <div className="blog-card-title">Florana</div>
+                    <div className="blog-card-desc">Giới thiệu về cửa hàng uy tín</div>
+                  </Link>
+                  <Link to="/articles/info" className="dropdown-blog-card">
+                    <div className="blog-card-image">
+                      <img src="https://images.unsplash.com/photo-1501004318641-b39e6451bec6?w=400" alt="Thông tin về cây và hoa" />
+                    </div>
+                    <div className="blog-card-title">Thông Tin Cây Hoa</div>
+                    <div className="blog-card-desc">Đặc điểm các loại cây cảnh</div>
+                  </Link>
+                  <Link to="/articles/care" className="dropdown-blog-card">
+                    <div className="blog-card-image">
+                      <img src="https://images.unsplash.com/photo-1466692476868-aef1dfb1e735?w=400" alt="Kiến thức chăm sóc" />
+                    </div>
+                    <div className="blog-card-title">Chăm Sóc Cây</div>
+                    <div className="blog-card-desc">Hướng dẫn chăm sóc hiệu quả</div>
+                  </Link>
+                  <Link to="/articles/inspiration" className="dropdown-blog-card">
+                    <div className="blog-card-image">
+                      <img src="https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=400" alt="Cảm hứng ý tưởng" />
+                    </div>
+                    <div className="blog-card-title">Cảm Hứng Trang Trí</div>
+                    <div className="blog-card-desc">Ý tưởng không gian xanh đẹp</div>
+                  </Link>
+                </div>
+              </div>
               {user?.role === 'admin' && (
                 <Link to="/admin/products" className="nav-item admin-link">
                   <span>Quản trị</span>
@@ -145,9 +191,13 @@ export default function Header(){
                 <>
                   <div className="user-menu">
                     <div className="user-info">
-                      <span className="user-avatar">{user.name.charAt(0).toUpperCase()}</span>
+                      <Link to="/profile" className="user-avatar-link">
+                        <span className="user-avatar">{user.name.charAt(0).toUpperCase()}</span>
+                      </Link>
                       <div className="user-details">
-                        <span className="user-name">{user.name}</span>
+                        <Link to="/profile" className="user-name-link">
+                          <span className="user-name">{user.name}</span>
+                        </Link>
                         <span className="user-role">{user.role === 'admin' ? 'Quản trị viên' : 'Khách hàng'}</span>
                       </div>
                     </div>

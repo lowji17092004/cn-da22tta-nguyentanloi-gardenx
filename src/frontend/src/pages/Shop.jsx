@@ -3,6 +3,7 @@ import axios from 'axios'
 import { useCart } from '../contexts/CartContext'
 import { useAuth } from '../contexts/AuthContext'
 import { Link, useSearchParams, useNavigate } from 'react-router-dom'
+import PageBanner from '../components/PageBanner'
 
 const CATEGORIES = [
   { slug: 'hoa-kieng', name: 'Hoa kiểng' },
@@ -114,13 +115,10 @@ export default function Shop(){
   }
 
   return (
-    <div className="container">
-      <div className="page-header">
-        <h1>🌺 Cửa hàng hoa kiểng</h1>
-        <p>Khám phá bộ sưu tập hoa và cây kiểng cao cấp</p>
-      </div>
-
-      <div className="shop-filters">
+    <>
+      <PageBanner page="shop" />
+      <div className="container">
+        <div className="shop-filters">
         <div className="search-box">
           <svg className="search-icon" width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -256,6 +254,7 @@ export default function Shop(){
           )}
         </div>
       )}
-    </div>
+      </div>
+    </>
   )
 }

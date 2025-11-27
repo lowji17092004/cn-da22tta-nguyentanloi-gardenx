@@ -5,7 +5,9 @@ const { requireAuth, requireAdmin } = require('../middleware/auth');
 
 // list
 router.get('/', async (req, res) => {
-  const list = await Article.find().sort({ createdAt: -1 });
+  const { category } = req.query;
+  const filter = category ? { category } : {};
+  const list = await Article.find(filter).sort({ createdAt: -1 });
   res.json(list);
 });
 

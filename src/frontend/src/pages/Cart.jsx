@@ -2,6 +2,7 @@ import React, { useEffect, useRef } from 'react'
 import { useCart } from '../contexts/CartContext'
 import { Link, useNavigate } from 'react-router-dom'
 import axios from 'axios'
+import PageBanner from '../components/PageBanner'
 
 export default function Cart(){
   const { items, remove, updateQuantity, total, selectedItems, selectedTotal, toggleSelect, selectAll, deselectAll, isSelected, refreshStock } = useCart()
@@ -48,13 +49,10 @@ export default function Cart(){
   const allSelected = items.length > 0 && selectedItems.length === items.length
   
   return (
-    <div className="container cart-container">
-      <div className="page-header">
-        <h1>🛒 Giỏ hàng của bạn</h1>
-        <p>Quản lý sản phẩm và tiến hành thanh toán</p>
-      </div>
-      
-      {items.length === 0 ? (
+    <>
+      <PageBanner page="cart" />
+      <div className="container cart-container">
+        {items.length === 0 ? (
         <div className="empty-cart">
           <div className="empty-cart-icon">🛒</div>
           <h2>Giỏ hàng trống</h2>
@@ -223,6 +221,7 @@ export default function Cart(){
           </div>
         </div>
       )}
-    </div>
+      </div>
+    </>
   )
 }

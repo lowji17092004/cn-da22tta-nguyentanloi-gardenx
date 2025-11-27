@@ -51,9 +51,9 @@ export default function AdminUsers() {
 
   const getRoleBadge = (role) => {
     return role === 'admin' ? (
-      <span className="role-badge admin">👑 Admin</span>
+      <span className="role-badge admin">Admin</span>
     ) : (
-      <span className="role-badge user">👤 User</span>
+      <span className="role-badge user">User</span>
     )
   }
 
@@ -61,12 +61,11 @@ export default function AdminUsers() {
     <AdminLayout>
       <div className="admin-page-header">
         <div>
-          <h1 className="admin-page-title">👥 Quản lý Người dùng</h1>
+          <h1 className="admin-page-title">Quản lý Người dùng</h1>
           <p className="admin-page-desc">Thêm, sửa, xóa và quản lý tài khoản người dùng</p>
         </div>
         <Link to="/admin/users/new">
           <button className="btn btn-primary">
-            <span className="btn-icon">✨</span>
             <span>Thêm người dùng</span>
           </button>
         </Link>
@@ -79,12 +78,15 @@ export default function AdminUsers() {
         </div>
       ) : users.length === 0 ? (
         <div className="admin-empty">
-          <div className="admin-empty-icon">👥</div>
+          <div className="admin-empty-icon">
+            <svg width="48" height="48" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+            </svg>
+          </div>
           <h3>Chưa có người dùng nào</h3>
           <p>Hãy tạo người dùng đầu tiên</p>
           <Link to="/admin/users/new">
             <button className="btn btn-primary">
-              <span className="btn-icon">✨</span>
               <span>Thêm người dùng</span>
             </button>
           </Link>
@@ -113,21 +115,33 @@ export default function AdminUsers() {
 
           <div className="admin-stats-row">
             <div className="admin-stat-card">
-              <div className="stat-icon">👥</div>
+              <div className="stat-icon">
+                <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+              </div>
               <div className="stat-content">
                 <div className="stat-label">Tổng người dùng</div>
                 <div className="stat-value">{users.length}</div>
               </div>
             </div>
             <div className="admin-stat-card">
-              <div className="stat-icon">👑</div>
+              <div className="stat-icon">
+                <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                </svg>
+              </div>
               <div className="stat-content">
                 <div className="stat-label">Admin</div>
                 <div className="stat-value">{users.filter(u => u.role === 'admin').length}</div>
               </div>
             </div>
             <div className="admin-stat-card">
-              <div className="stat-icon">👤</div>
+              <div className="stat-icon">
+                <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                </svg>
+              </div>
               <div className="stat-content">
                 <div className="stat-label">Khách hàng</div>
                 <div className="stat-value">{users.filter(u => u.role === 'user').length}</div>
@@ -164,9 +178,9 @@ export default function AdminUsers() {
                     <td className="user-email-cell">{user.email}</td>
                     <td>
                       {user.role === 'admin' ? (
-                        <span className="role-badge admin">👑 Admin</span>
+                        <span className="role-badge admin">Admin</span>
                       ) : (
-                        <span className="role-badge user">👤 User</span>
+                        <span className="role-badge user">User</span>
                       )}
                     </td>
                     <td className="user-date-cell">
@@ -204,7 +218,7 @@ export default function AdminUsers() {
         <div className="modal-overlay" onClick={() => setDeleteModal({ show: false, user: null })}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
-              <h3 className="modal-title">⚠️ Xác nhận xóa</h3>
+              <h3 className="modal-title">Xác nhận xóa</h3>
               <button className="modal-close" onClick={() => setDeleteModal({ show: false, user: null })}>×</button>
             </div>
             <div className="modal-body">

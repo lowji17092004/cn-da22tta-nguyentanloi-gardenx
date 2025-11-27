@@ -44,15 +44,15 @@ export default function Footer(){
             <ul className="footer-links">
               <li><Link to="/articles">Hướng dẫn chăm sóc</Link></li>
               <li><Link to="/articles">Kiến thức</Link></li>
-              <li><a href="#">Chính sách đổi trả</a></li>
-              <li><a href="#">Câu hỏi thường gặp</a></li>
+              <li><a href="#">Cảm hứng</a></li>
+              <li><a href="#">Về chúng tôi</a></li>
             </ul>
           </div>
 
           <div className="footer-col">
             <h4>Liên hệ</h4>
             <ul className="footer-contact">
-              <li>📍 126 Nguyễn Chí Thành, phường Trà Vinh, Vĩnh Long</li>
+              <li>📍 126 Nguyễn Chí Th, phường Trà Vinh, Vĩnh Long</li>
               <li>📞 <a href="tel:+84123456789">0368 920 249</a></li>
               <li>✉️ <a href="mailto:info@hoakieng.vn">info@hoakieng.vn</a></li>
               <li>🕒 8:00 - 20:00 (T2-CN)</li>
