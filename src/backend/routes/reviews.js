@@ -162,7 +162,7 @@ router.get('/product/:productId', async (req, res) => {
       isHidden: false
     })
       .populate('user', 'name')
-      .populate('reply.repliedBy', 'name')
+      .populate('reply.user', 'name')
       .sort(sortOption)
       .skip((page - 1) * limit)
       .limit(parseInt(limit));
@@ -202,7 +202,7 @@ router.get('/my-reviews', requireAuth, async (req, res) => {
   try {
     const reviews = await Review.find({ user: req.user.userId })
       .populate('product', 'name images')
-      .populate('reply.repliedBy', 'name')
+      .populate('reply.user', 'name')
       .sort({ createdAt: -1 });
     
     res.json(reviews);
@@ -312,7 +312,7 @@ router.get('/', requireAuth, requireAdmin, async (req, res) => {
       .populate('user', 'name email')
       .populate('product', 'name images')
       .populate('order', 'createdAt')
-      .populate('reply.repliedBy', 'name')
+      .populate('reply.user', 'name')
       .sort({ createdAt: -1 })
       .skip((page - 1) * limit)
       .limit(parseInt(limit));
@@ -357,7 +357,7 @@ router.post('/:id/reply', requireAuth, requireAdmin, async (req, res) => {
     
     await review.save();
     await review.populate('user', 'name');
-    await review.populate('reply.repliedBy', 'name');
+    await review.populate('reply.user', 'name');
     
     res.json(review);
   } catch (err) {
