@@ -11,7 +11,19 @@ router.get('/me', requireAuth, async (req, res) => {
     if (!user) {
       return res.status(404).json({ message: 'Không tìm thấy người dùng' });
     }
-    res.json(user);
+    
+    // Map phoneNumber to phone for frontend compatibility
+    const userResponse = {
+      id: user._id,
+      name: user.name,
+      email: user.email,
+      phone: user.phoneNumber,
+      address: user.address,
+      avatar: user.avatar,
+      role: user.role
+    };
+    
+    res.json(userResponse);
   } catch (error) {
     console.error('Error getting profile:', error);
     res.status(500).json({ message: 'Lỗi server' });
@@ -21,7 +33,7 @@ router.get('/me', requireAuth, async (req, res) => {
 // Update user profile
 router.put('/me', requireAuth, async (req, res) => {
   try {
-    const { name, email, phone, address } = req.body;
+    const { name, email, phone, address, avatar } = req.body;
     
     const user = await User.findById(req.user.id);
     if (!user) {
@@ -39,8 +51,9 @@ router.put('/me', requireAuth, async (req, res) => {
     // Update fields
     if (name) user.name = name;
     if (email) user.email = email;
-    if (phone !== undefined) user.phone = phone;
+    if (phone !== undefined) user.phoneNumber = phone;
     if (address !== undefined) user.address = address;
+    if (avatar !== undefined) user.avatar = avatar;
 
     await user.save();
 
@@ -50,8 +63,9 @@ router.put('/me', requireAuth, async (req, res) => {
         id: user._id,
         name: user.name,
         email: user.email,
-        phone: user.phone,
+        phone: user.phoneNumber,
         address: user.address,
+        avatar: user.avatar,
         role: user.role
       }
     });

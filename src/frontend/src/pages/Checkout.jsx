@@ -12,7 +12,9 @@ export default function Checkout(){
   const [phone, setPhone] = useState('')
   const [address, setAddress] = useState('')
   const [note, setNote] = useState('')
+  const [paymentMethod, setPaymentMethod] = useState('cod') // 'cod' or 'qr'
   const [loading, setLoading] = useState(false)
+  const [showQR, setShowQR] = useState(false)
   const navigate = useNavigate()
 
   useEffect(() => {
