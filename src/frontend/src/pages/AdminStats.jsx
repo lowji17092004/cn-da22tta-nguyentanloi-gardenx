@@ -143,12 +143,13 @@ export default function AdminStats() {
         const orders = ordersRes.data
         const products = productsRes.data
         
+        // Chỉ tính doanh thu từ đơn hàng đã hoàn thành (delivered)
         const totalRevenue = orders
-          .filter(o => o.status === 'completed')
+          .filter(o => o.status === 'delivered')
           .reduce((sum, o) => sum + (o.total || 0), 0)
 
         const pendingOrders = orders.filter(o => o.status === 'pending').length
-        const completedOrders = orders.filter(o => o.status === 'completed').length
+        const completedOrders = orders.filter(o => o.status === 'delivered').length
         const cancelledOrders = orders.filter(o => o.status === 'cancelled').length
 
         setStats({
@@ -250,9 +251,9 @@ export default function AdminStats() {
                   </svg>
                 </div>
                 <div className="stats-overview-content">
-                  <span className="stats-overview-label">Doanh thu</span>
+                  <span className="stats-overview-label">Doanh thu (Đơn hoàn thành)</span>
                   <span className="stats-overview-value">{stats.totalRevenue.toLocaleString()}đ</span>
-                  <span className="stats-overview-change positive">+12.5%</span>
+                  <span className="stats-overview-subtitle">{stats.completedOrders} đơn đã giao</span>
                 </div>
               </div>
 
@@ -303,6 +304,7 @@ export default function AdminStats() {
               <div className="stats-chart-card">
                 <div className="stats-chart-header">
                   <h3>Doanh thu theo tháng</h3>
+                  <span className="chart-info">Chỉ tính đơn đã hoàn thành</span>
                 </div>
                 <LineChart data={monthlyData} height={180} />
               </div>
@@ -310,6 +312,7 @@ export default function AdminStats() {
               <div className="stats-chart-card">
                 <div className="stats-chart-header">
                   <h3>Trạng thái đơn hàng</h3>
+                  <span className="chart-info">Phân bổ theo trạng thái</span>
                 </div>
                 <div className="donut-section">
                   <DonutChart data={orderStatusData} size={130} />
@@ -321,6 +324,37 @@ export default function AdminStats() {
                         <span className="donut-legend-value">{item.value}</span>
                       </div>
                     ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Revenue Info Card */}
+            <div className="revenue-info-card">
+              <div className="revenue-info-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <circle cx="12" cy="12" r="10"/>
+                  <path d="M12 16v-4M12 8h.01"/>
+                </svg>
+              </div>
+              <div className="revenue-info-content">
+                <h4>📊 Cách tính doanh thu</h4>
+                <p>
+                  Doanh thu chỉ được tính khi đơn hàng chuyển sang trạng thái <strong>"Đã giao thành công"</strong>. 
+                  Khi admin xác nhận hoàn thành đơn hàng, số tiền sẽ được tự động cộng vào tổng doanh thu.
+                </p>
+                <div className="revenue-breakdown">
+                  <div className="breakdown-item">
+                    <span className="breakdown-label">✅ Đơn hoàn thành:</span>
+                    <span className="breakdown-value success">{stats.completedOrders} đơn</span>
+                  </div>
+                  <div className="breakdown-item">
+                    <span className="breakdown-label">⏳ Đang xử lý:</span>
+                    <span className="breakdown-value pending">{stats.pendingOrders} đơn</span>
+                  </div>
+                  <div className="breakdown-item">
+                    <span className="breakdown-label">❌ Đã hủy:</span>
+                    <span className="breakdown-value cancelled">{stats.cancelledOrders} đơn</span>
                   </div>
                 </div>
               </div>
