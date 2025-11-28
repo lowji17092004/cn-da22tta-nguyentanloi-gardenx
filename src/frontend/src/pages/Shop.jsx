@@ -162,78 +162,73 @@ export default function Shop(){
 
       <div className="products-grid">
         {filteredItems.map(it => (
-          <article key={it._id} className="product-card-modern">
-            <Link to={`/product/${it._id}`} className="product-image-wrapper">
-              {it.images && it.images[0] ? (
-                <img src={it.images[0]} alt={it.name} className="product-image" loading="lazy" />
-              ) : (
-                <div className="product-image-placeholder">
-                  <span className="placeholder-icon">🌿</span>
+          <article key={it._id} className="product-card-minimal">
+            {/* Product Image */}
+            <Link to={`/product/${it._id}`} className="product-image-link">
+              <div className="product-image-container">
+                {it.images && it.images[0] ? (
+                  <img src={it.images[0]} alt={it.name} className="product-image" loading="lazy" />
+                ) : (
+                  <div className="product-image-placeholder">
+                    <span className="placeholder-icon">🌿</span>
+                  </div>
+                )}
+                
+                {/* Tags - Top Left */}
+                {(it.isFeatured || it.isBestSeller || it.stock === 0) && (
+                  <div className="product-badges-top">
+                    {it.stock === 0 && (
+                      <span className="product-badge out-of-stock">Hết hàng</span>
+                    )}
+                    {it.isFeatured && it.stock > 0 && (
+                      <span className="product-badge featured">⭐ Nổi bật</span>
+                    )}
+                    {it.isBestSeller && it.stock > 0 && (
+                      <span className="product-badge bestseller">🔥 Bán chạy</span>
+                    )}
+                  </div>
+                )}
+
+                {/* Add to Cart Button - Only on Hover */}
+                <div className="product-hover-action">
+                  <button 
+                    className="btn-add-to-cart-hover" 
+                    onClick={(e) => {
+                      e.preventDefault()
+                      handleAdd(it)
+                    }}
+                    disabled={it.stock === 0}
+                    title={it.stock === 0 ? "Hết hàng" : "Thêm vào giỏ hàng"}
+                  >
+                    <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/>
+                    </svg>
+                    <span>Thêm vào giỏ</span>
+                  </button>
                 </div>
-              )}
-              {(it.isFeatured || it.isBestSeller) && (
-                <div className="product-tags">
-                  {it.isFeatured && (
-                    <span className="product-tag featured">
-                      <span className="product-tag-icon">⭐</span>
-                      Nổi bật
-                    </span>
-                  )}
-                  {it.isBestSeller && (
-                    <span className="product-tag bestseller">
-                      <span className="product-tag-icon">🔥</span>
-                      Bán chạy
-                    </span>
-                  )}
-                </div>
-              )}
-              {it.stock < 5 && it.stock > 0 && (
-                <div className="product-badge badge-warning">Sắp hết</div>
-              )}
-              {it.stock === 0 && (
-                <div className="product-badge badge-danger">Hết hàng</div>
-              )}
+              </div>
             </Link>
             
-            <div className="product-info">
-              <Link to={`/product/${it._id}`} className="product-link">
-                <h3 className="product-name">{it.name}</h3>
-              </Link>
-              
+            {/* Product Info */}
+            <div className="product-info-minimal">
+              {/* Category */}
               {it.category && (
-                <span className="product-category">{getCategoryName(normalizeCategorySlug(it.category))}</span>
+                <span className="product-category-tag">
+                  {getCategoryName(normalizeCategorySlug(it.category))}
+                </span>
               )}
               
-              <div className="product-price-wrapper">
-                <span className="product-price">{it.price?.toLocaleString('vi-VN')}₫</span>
-                {it.stock > 0 && (
-                  <span className="product-stock">Còn {it.stock}</span>
-                )}
-              </div>
+              {/* Product Name */}
+              <Link to={`/product/${it._id}`} className="product-name-link">
+                <h3 className="product-name-minimal">{it.name}</h3>
+              </Link>
               
-              <div className="product-actions">
-                <button 
-                  className="btn-add-cart" 
-                  onClick={() => handleAdd(it)}
-                  disabled={it.stock === 0}
-                  title="Thêm vào giỏ hàng"
-                >
-                  <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/>
-                  </svg>
-                  <span>Thêm</span>
-                </button>
-                <button 
-                  className="btn-buy-now" 
-                  onClick={() => handleBuyNow(it)}
-                  disabled={it.stock === 0}
-                  title="Mua ngay"
-                >
-                  <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
-                  </svg>
-                  <span>Mua ngay</span>
-                </button>
+              {/* Price */}
+              <div className="product-price-minimal">
+                <span className="price-amount">{it.price?.toLocaleString('vi-VN')}₫</span>
+                {it.stock > 0 && it.stock < 10 && (
+                  <span className="stock-indicator">Còn {it.stock}</span>
+                )}
               </div>
             </div>
           </article>

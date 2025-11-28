@@ -106,62 +106,67 @@ export default function HomeNew(){
             <Link to="/shop" className="muted">Xem tất cả</Link>
           </div>
           <div className="products-grid">
-            {featured.map(p=> (
-              <article key={p._id} className="product-card-modern">
-                <Link to={`/product/${p._id}`} className="product-image-wrapper">
-                  {p.images && p.images[0] ? (
-                    <img src={p.images[0]} alt={p.name} className="product-image" loading="lazy" />
-                  ) : (
-                    <div className="product-image-placeholder">
-                      <span className="placeholder-icon">🌿</span>
-                    </div>
-                  )}
-                  {p.stock === 0 && (
-                    <div className="product-badge badge-danger">Hết hàng</div>
-                  )}
-                  {(p.isFeatured || p.isBestSeller) && (
-                    <div className="product-tags">
-                      {p.isFeatured && (
-                        <span className="product-tag featured">
-                          <span className="product-tag-icon">⭐</span>
-                          Nổi bật
-                        </span>
-                      )}
-                      {p.isBestSeller && (
-                        <span className="product-tag bestseller">
-                          <span className="product-tag-icon">🔥</span>
-                          Bán chạy
-                        </span>
-                      )}
-                    </div>
-                  )}
-                </Link>
-                <div className="product-info">
-                  <Link to={`/product/${p._id}`} className="product-link">
-                    <h3 className="product-name">{p.name}</h3>
-                  </Link>
-                  {p.category && (
-                    <span className="product-category">{getCategoryName(normalizeCategorySlug(p.category))}</span>
-                  )}
-                  <div className="product-price-wrapper">
-                    <span className="product-price">{p.price?.toLocaleString('vi-VN')}₫</span>
-                    {p.stock > 0 && (
-                      <span className="product-stock">Còn {p.stock}</span>
+            {featured.map(p => (
+              <article key={p._id} className="product-card-minimal">
+                <Link to={`/product/${p._id}`} className="product-image-link">
+                  <div className="product-image-container">
+                    {p.images && p.images[0] ? (
+                      <img src={p.images[0]} alt={p.name} className="product-image" loading="lazy" />
+                    ) : (
+                      <div className="product-image-placeholder">
+                        <span className="placeholder-icon">🌿</span>
+                      </div>
                     )}
+                    
+                    {(p.isFeatured || p.isBestSeller || p.stock === 0) && (
+                      <div className="product-badges-top">
+                        {p.stock === 0 && (
+                          <span className="product-badge out-of-stock">Hết hàng</span>
+                        )}
+                        {p.isFeatured && p.stock > 0 && (
+                          <span className="product-badge featured">⭐ Nổi bật</span>
+                        )}
+                        {p.isBestSeller && p.stock > 0 && (
+                          <span className="product-badge bestseller">🔥 Bán chạy</span>
+                        )}
+                      </div>
+                    )}
+
+                    <div className="product-hover-action">
+                      <button 
+                        className="btn-add-to-cart-hover" 
+                        onClick={(e) => {
+                          e.preventDefault()
+                          handleAdd(p)
+                        }}
+                        disabled={p.stock === 0}
+                        title={p.stock === 0 ? "Hết hàng" : "Thêm vào giỏ hàng"}
+                      >
+                        <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+                          <path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/>
+                        </svg>
+                        <span>Thêm vào giỏ</span>
+                      </button>
+                    </div>
                   </div>
-                  <div className="product-actions">
-                    <button className="btn-add-cart" onClick={() => handleAdd(p)} disabled={p.stock === 0}>
-                      <svg fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/>
-                      </svg>
-                      <span>Thêm</span>
-                    </button>
-                    <button className="btn-buy-now" onClick={() => handleBuyNow(p)} disabled={p.stock === 0}>
-                      <svg fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
-                      </svg>
-                      <span>Mua ngay</span>
-                    </button>
+                </Link>
+                
+                <div className="product-info-minimal">
+                  {p.category && (
+                    <span className="product-category-tag">
+                      {getCategoryName(normalizeCategorySlug(p.category))}
+                    </span>
+                  )}
+                  
+                  <Link to={`/product/${p._id}`} className="product-name-link">
+                    <h3 className="product-name-minimal">{p.name}</h3>
+                  </Link>
+                  
+                  <div className="product-price-minimal">
+                    <span className="price-amount">{p.price?.toLocaleString('vi-VN')}₫</span>
+                    {p.stock > 0 && p.stock < 10 && (
+                      <span className="stock-indicator">Còn {p.stock}</span>
+                    )}
                   </div>
                 </div>
               </article>
@@ -177,62 +182,67 @@ export default function HomeNew(){
             <Link to="/shop" className="muted">Xem tất cả</Link>
           </div>
           <div className="products-grid">
-            {best.map(p=> (
-              <article key={p._id} className="product-card-modern">
-                <Link to={`/product/${p._id}`} className="product-image-wrapper">
-                  {p.images && p.images[0] ? (
-                    <img src={p.images[0]} alt={p.name} className="product-image" loading="lazy" />
-                  ) : (
-                    <div className="product-image-placeholder">
-                      <span className="placeholder-icon">🌿</span>
-                    </div>
-                  )}
-                  {p.stock === 0 && (
-                    <div className="product-badge badge-danger">Hết hàng</div>
-                  )}
-                  {(p.isFeatured || p.isBestSeller) && (
-                    <div className="product-tags">
-                      {p.isFeatured && (
-                        <span className="product-tag featured">
-                          <span className="product-tag-icon">⭐</span>
-                          Nổi bật
-                        </span>
-                      )}
-                      {p.isBestSeller && (
-                        <span className="product-tag bestseller">
-                          <span className="product-tag-icon">🔥</span>
-                          Bán chạy
-                        </span>
-                      )}
-                    </div>
-                  )}
-                </Link>
-                <div className="product-info">
-                  <Link to={`/product/${p._id}`} className="product-link">
-                    <h3 className="product-name">{p.name}</h3>
-                  </Link>
-                  {p.category && (
-                    <span className="product-category">{getCategoryName(normalizeCategorySlug(p.category))}</span>
-                  )}
-                  <div className="product-price-wrapper">
-                    <span className="product-price">{p.price?.toLocaleString('vi-VN')}₫</span>
-                    {p.stock > 0 && (
-                      <span className="product-stock">Còn {p.stock}</span>
+            {best.map(p => (
+              <article key={p._id} className="product-card-minimal">
+                <Link to={`/product/${p._id}`} className="product-image-link">
+                  <div className="product-image-container">
+                    {p.images && p.images[0] ? (
+                      <img src={p.images[0]} alt={p.name} className="product-image" loading="lazy" />
+                    ) : (
+                      <div className="product-image-placeholder">
+                        <span className="placeholder-icon">🌿</span>
+                      </div>
                     )}
+                    
+                    {(p.isFeatured || p.isBestSeller || p.stock === 0) && (
+                      <div className="product-badges-top">
+                        {p.stock === 0 && (
+                          <span className="product-badge out-of-stock">Hết hàng</span>
+                        )}
+                        {p.isFeatured && p.stock > 0 && (
+                          <span className="product-badge featured">⭐ Nổi bật</span>
+                        )}
+                        {p.isBestSeller && p.stock > 0 && (
+                          <span className="product-badge bestseller">🔥 Bán chạy</span>
+                        )}
+                      </div>
+                    )}
+
+                    <div className="product-hover-action">
+                      <button 
+                        className="btn-add-to-cart-hover" 
+                        onClick={(e) => {
+                          e.preventDefault()
+                          handleAdd(p)
+                        }}
+                        disabled={p.stock === 0}
+                        title={p.stock === 0 ? "Hết hàng" : "Thêm vào giỏ hàng"}
+                      >
+                        <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+                          <path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/>
+                        </svg>
+                        <span>Thêm vào giỏ</span>
+                      </button>
+                    </div>
                   </div>
-                  <div className="product-actions">
-                    <button className="btn-add-cart" onClick={() => handleAdd(p)} disabled={p.stock === 0}>
-                      <svg fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/>
-                      </svg>
-                      <span>Thêm</span>
-                    </button>
-                    <button className="btn-buy-now" onClick={() => handleBuyNow(p)} disabled={p.stock === 0}>
-                      <svg fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
-                      </svg>
-                      <span>Mua ngay</span>
-                    </button>
+                </Link>
+                
+                <div className="product-info-minimal">
+                  {p.category && (
+                    <span className="product-category-tag">
+                      {getCategoryName(normalizeCategorySlug(p.category))}
+                    </span>
+                  )}
+                  
+                  <Link to={`/product/${p._id}`} className="product-name-link">
+                    <h3 className="product-name-minimal">{p.name}</h3>
+                  </Link>
+                  
+                  <div className="product-price-minimal">
+                    <span className="price-amount">{p.price?.toLocaleString('vi-VN')}₫</span>
+                    {p.stock > 0 && p.stock < 10 && (
+                      <span className="stock-indicator">Còn {p.stock}</span>
+                    )}
                   </div>
                 </div>
               </article>
