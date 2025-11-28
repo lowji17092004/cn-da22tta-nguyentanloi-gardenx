@@ -52,7 +52,7 @@ export default function Footer(){
           <div className="footer-col">
             <h4>Liên hệ</h4>
             <ul className="footer-contact">
-              <li>📍 126 Nguyễn Chí Th, phường Trà Vinh, Vĩnh Long</li>
+              <li>📍 126 Nguyễn Thiện Thành, Vĩnh Long</li>
               <li>📞 <a href="tel:+84123456789">0368 920 249</a></li>
               <li>✉️ <a href="mailto:info@hoakieng.vn">info@hoakieng.vn</a></li>
               <li>🕒 8:00 - 20:00 (T2-CN)</li>
