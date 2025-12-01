@@ -4,6 +4,7 @@ import { useCart } from '../contexts/CartContext'
 import { useAuth } from '../contexts/AuthContext'
 import { Link, useSearchParams, useNavigate } from 'react-router-dom'
 import PageBanner from '../components/PageBanner'
+import { flyToCart } from '../utils/cartAnimation'
 
 const CATEGORIES = [
   { slug: 'hoa-kieng', name: 'Hoa kiểng' },
@@ -82,7 +83,7 @@ export default function Shop(){
     setFilteredItems(result)
   }, [searchTerm, selectedCategory, items])
 
-  function handleAdd(it){
+  function handleAdd(it, event){
     if (!user) {
       navigate('/login', { state: { from: '/shop' } })
       return
@@ -91,6 +92,13 @@ export default function Shop(){
     if (it.stock === 0) {
       alert('Sản phẩm hiện đang hết hàng')
       return
+    }
+    
+    // Trigger flying animation
+    const productElement = event?.target?.closest('.product-card-minimal')
+    if (productElement) {
+      const productImage = it.images && it.images[0] ? it.images[0] : '/images/placeholder.png'
+      flyToCart(productElement, productImage, it.name)
     }
     
     add(it, 1)
@@ -195,7 +203,7 @@ export default function Shop(){
                     className="btn-add-to-cart-hover" 
                     onClick={(e) => {
                       e.preventDefault()
-                      handleAdd(it)
+                      handleAdd(it, e)
                     }}
                     disabled={it.stock === 0}
                     title={it.stock === 0 ? "Hết hàng" : "Thêm vào giỏ hàng"}

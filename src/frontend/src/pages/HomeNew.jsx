@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { useCart } from '../contexts/CartContext'
 import { useAuth } from '../contexts/AuthContext'
 import api from '../api'
+import { flyToCart } from '../utils/cartAnimation'
 
 const CATEGORIES = {
   'hoa-kieng': 'Hoa kiểng',
@@ -59,7 +60,7 @@ export default function HomeNew(){
 
   const { add, announce } = useCart()
 
-  function handleAdd(p){
+  function handleAdd(p, event){
     if (!user) {
       navigate('/login', { state: { from: '/' } })
       return
@@ -68,6 +69,13 @@ export default function HomeNew(){
     if (p.stock === 0) {
       alert('Sản phẩm hiện đang hết hàng')
       return
+    }
+    
+    // Trigger flying animation
+    const productElement = event?.target?.closest('.product-card-minimal')
+    if (productElement) {
+      const productImage = p.images && p.images[0] ? p.images[0] : '/images/placeholder.png'
+      flyToCart(productElement, productImage, p.name)
     }
     
     add(p, 1)
@@ -137,7 +145,7 @@ export default function HomeNew(){
                         className="btn-add-to-cart-hover" 
                         onClick={(e) => {
                           e.preventDefault()
-                          handleAdd(p)
+                          handleAdd(p, e)
                         }}
                         disabled={p.stock === 0}
                         title={p.stock === 0 ? "Hết hàng" : "Thêm vào giỏ hàng"}
@@ -213,7 +221,7 @@ export default function HomeNew(){
                         className="btn-add-to-cart-hover" 
                         onClick={(e) => {
                           e.preventDefault()
-                          handleAdd(p)
+                          handleAdd(p, e)
                         }}
                         disabled={p.stock === 0}
                         title={p.stock === 0 ? "Hết hàng" : "Thêm vào giỏ hàng"}
