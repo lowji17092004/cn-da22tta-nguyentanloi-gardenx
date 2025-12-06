@@ -1,0 +1,63 @@
+BÁO CÁO TIẾN ĐỘ TUẦN 2
+
+Thời gian thực hiện: 24/11 – 30/11/2025
+Sinh viên: Nguyễn Tấn Lợi
+Tên đề tài: Xây dựng website quảng bá và kinh doanh hoa kiểng
+
+1. Nội dung công việc đã thực hiện
+
+Trong tuần 2, em đã triển khai các công việc theo kế hoạch đặt ra, bao gồm:
+
+1.1. Xây dựng module thư viện hoa kiểng
+
+Thiết kế giao diện hiển thị danh sách hoa kiểng.
+
+Tạo cấu trúc ReactJS cho trang danh mục sản phẩm.
+
+Kết nối dữ liệu mẫu để mô phỏng danh sách sản phẩm.
+
+1.2. Chức năng tìm kiếm & lọc sản phẩm
+
+Xây dựng thanh tìm kiếm.
+
+Tạo bộ lọc theo danh mục, giá và độ phổ biến.
+
+Thử nghiệm hoạt động lọc trên dữ liệu giả lập.
+
+1.3. Module bài viết & hướng dẫn chăm sóc
+
+Tạo trang hiển thị danh sách bài viết.
+
+Thiết kế trang chi tiết bài viết.
+
+Chuẩn bị dữ liệu mẫu cho giao diện hiển thị.
+
+1.4. Viết báo cáo Chương 2 – Cơ sở lý thuyết
+
+Thu thập nội dung: Client–Server, MVC, MongoDB, ReactJS, NodeJS, Docker, API.
+
+Hoàn thiện bản nháp chương 2.
+
+2. Khó khăn – Hạn chế
+
+Chưa hoàn thiện kết nối API thật vì backend chưa triển khai xong.
+
+Một số bộ lọc sản phẩm hoạt động chưa tối ưu trên dữ liệu lớn (cần tối ưu sau khi có API thật).
+
+3. Kết quả đạt được
+
+Giao diện danh sách sản phẩm và bài viết đã hoạt động ổn định trên ReactJS.
+
+Người dùng có thể xem thư viện hoa kiểng và đọc bài viết cơ bản.
+
+Chương 2 của báo cáo đã hoàn thành gần 90%.
+
+Đã sẵn sàng cho buổi demo tiến độ lần 2 với GVHD 
+
+4. Kế hoạch tuần tiếp theo
+
+Bắt đầu xây dựng module giỏ hàng và thanh toán.
+
+Hoàn thiện phần đánh giá – bình luận bài viết.
+
+Bắt đầu viết báo cáo Chương 3 – Hiện thực hệ thống.
