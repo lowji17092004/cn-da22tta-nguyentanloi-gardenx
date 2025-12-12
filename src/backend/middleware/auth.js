@@ -24,3 +24,12 @@ exports.requireAdmin = (req, res, next) => {
   if (req.user.role !== 'admin') return res.status(403).json({ message: 'Admin only' });
   next();
 };
+
+// Middleware cho phép cả Admin và Collaborator
+exports.requireAdminOrCollaborator = (req, res, next) => {
+  if (!req.user) return res.status(401).json({ message: 'No user' });
+  if (req.user.role !== 'admin' && req.user.role !== 'collaborator') {
+    return res.status(403).json({ message: 'Admin or Collaborator only' });
+  }
+  next();
+};

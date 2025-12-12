@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react'
 import api from '../api'
 import { useNavigate, useParams } from 'react-router-dom'
 import AdminLayout from '../components/AdminLayout'
+import { suggestCategory, getSuggestionLabel, shouldAutoApply } from '../utils/autoCategorize'
+import './ProductForm.css'
 
 export default function ProductForm(){
   const { id } = useParams()
@@ -10,20 +12,65 @@ export default function ProductForm(){
     name:'', 
     description:'', 
     price:0, 
-    category:'', 
-    stock:0, 
+    category:'',
+    subcategory:'', 
+    stock:0,
+    sold: 0, // Số lượng đã bán 
     images: [],
-    isFeatured: false,
-    isBestSeller: false
+    isFeatured: false
   })
   const [uploading, setUploading] = useState(false)
   const [progressMap, setProgressMap] = useState({})
   const [error, setError] = useState('')
+  const [categories, setCategories] = useState([])
+  const [selectedCategory, setSelectedCategory] = useState(null)
+  const [categorySuggestion, setCategorySuggestion] = useState(null)
+  const [showSuggestion, setShowSuggestion] = useState(false)
 
   useEffect(()=>{
     if (!id || id === 'new') return
-    api.get('/products/' + id).then(r=> setData(r.data)).catch(()=>{ setError('Không thể tải sản phẩm') })
-  }, [id])
+    api.get('/products/' + id).then(r=> {
+      setData(r.data)
+      const cat = categories.find(c => c.slug === r.data.category)
+      if (cat) setSelectedCategory(cat)
+    }).catch(()=>{ setError('Không thể tải sản phẩm') })
+  }, [id, categories])
+
+  useEffect(() => {
+    api.get('/categories?type=product').then(r => setCategories(r.data)).catch(()=>{})
+  }, [])
+
+  // Auto-suggest category when product name changes
+  useEffect(() => {
+    if (!data.name || data.name.length < 3) {
+      setCategorySuggestion(null)
+      setShowSuggestion(false)
+      return
+    }
+
+    // Only suggest if category is not manually set
+    if (!data.category || data.category === '') {
+      const suggestion = suggestCategory(data.name, data.description)
+      
+      if (suggestion && suggestion.category) {
+        setCategorySuggestion(suggestion)
+        setShowSuggestion(true)
+        
+        // Auto-apply if confidence is high (for new products only)
+        if ((!id || id === 'new') && shouldAutoApply(suggestion)) {
+          const cat = categories.find(c => c.slug === suggestion.category)
+          if (cat) {
+            setSelectedCategory(cat)
+            setData(prev => ({
+              ...prev, 
+              category: suggestion.category,
+              subcategory: suggestion.subcategory || ''
+            }))
+          }
+        }
+      }
+    }
+  }, [data.name, data.description, data.category, categories, id])
 
   const submit = async e => {
     e.preventDefault()
@@ -63,6 +110,21 @@ export default function ProductForm(){
       await api.delete('/upload/' + fname)
     }catch(e){ /* ignore server errors, still remove locally */ }
     setData(prev => ({...prev, images: prev.images.filter((_,k)=>k!==i)}))
+  }
+
+  const applySuggestion = () => {
+    if (!categorySuggestion) return
+    
+    const cat = categories.find(c => c.slug === categorySuggestion.category)
+    if (cat) {
+      setSelectedCategory(cat)
+      setData(prev => ({
+        ...prev,
+        category: categorySuggestion.category,
+        subcategory: categorySuggestion.subcategory || ''
+      }))
+      setShowSuggestion(false)
+    }
   }
 
   return (
@@ -158,22 +220,73 @@ export default function ProductForm(){
               </div>
             </div>
 
-            <div className="form-group">
-              <label className="form-label">Danh mục <span className="required">*</span></label>
-              <select 
-                className="form-input" 
-                value={data.category} 
-                onChange={e=>setData({...data, category:e.target.value})}
-                required
-              >
-                <option value="">-- Chọn danh mục --</option>
-                <option value="hoa-kieng">Hoa kiểng</option>
-                <option value="cay-canh">Cây cảnh</option>
-                <option value="cay-thuy-canh">Cây thủy cảnh</option>
-                <option value="sen-da">Sen đá</option>
-              </select>
-              <span className="form-hint">Chọn danh mục để phân loại sản phẩm dễ dàng</span>
+            <div className="form-row">
+              <div className="form-group">
+                <label className="form-label">Danh mục lớn <span className="required">*</span></label>
+                
+                {/* Auto-categorization suggestion banner */}
+                {showSuggestion && categorySuggestion && !data.category && (
+                  <div className="category-suggestion-banner">
+                    <div className="suggestion-icon">🤖</div>
+                    <div className="suggestion-content">
+                      <div className="suggestion-title">Gợi ý danh mục tự động</div>
+                      <div className="suggestion-text">
+                        {getSuggestionLabel(categorySuggestion, categories)}
+                      </div>
+                    </div>
+                    <div className="suggestion-actions">
+                      <button 
+                        type="button" 
+                        className="btn-apply-suggestion"
+                        onClick={applySuggestion}
+                      >
+                        ✓ Áp dụng
+                      </button>
+                      <button 
+                        type="button" 
+                        className="btn-dismiss-suggestion"
+                        onClick={() => setShowSuggestion(false)}
+                      >
+                        ×
+                      </button>
+                    </div>
+                  </div>
+                )}
+                
+                <select 
+                  className="form-input" 
+                  value={data.category} 
+                  onChange={e=>{
+                    const cat = categories.find(c => c.slug === e.target.value)
+                    setSelectedCategory(cat)
+                    setData({...data, category:e.target.value, subcategory:''})
+                    setShowSuggestion(false) // Hide suggestion when manually selected
+                  }}
+                  required
+                >
+                  <option value="">-- Chọn danh mục --</option>
+                  {categories.map(cat => (
+                    <option key={cat._id} value={cat.slug}>{cat.name}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="form-group">
+                <label className="form-label">Danh mục con</label>
+                <select 
+                  className="form-input" 
+                  value={data.subcategory || ''} 
+                  onChange={e=>setData({...data, subcategory:e.target.value})}
+                  disabled={!selectedCategory || !selectedCategory.subcategories || selectedCategory.subcategories.length === 0}
+                >
+                  <option value="">-- Chọn danh mục con (tùy chọn) --</option>
+                  {selectedCategory?.subcategories?.map(sub => (
+                    <option key={sub._id || sub.slug} value={sub.slug}>{sub.name}</option>
+                  ))}
+                </select>
+              </div>
             </div>
+            <span className="form-hint">Chọn danh mục để phân loại sản phẩm dễ dàng</span>
 
             <div className="form-group">
               <label className="form-label">Gắn thẻ hiển thị</label>
@@ -193,24 +306,8 @@ export default function ProductForm(){
                     </span>
                   </span>
                 </label>
-
-                <label className="checkbox-label">
-                  <input 
-                    type="checkbox"
-                    checked={data.isBestSeller || false}
-                    onChange={e => setData({...data, isBestSeller: e.target.checked})}
-                    className="checkbox-input"
-                  />
-                  <span className="checkbox-text">
-                    <span className="tag-icon">🔥</span>
-                    <span>
-                      <strong>Sản phẩm bán chạy</strong>
-                      <small>Hiển thị trong mục "Sản phẩm bán chạy" ở trang chủ</small>
-                    </span>
-                  </span>
-                </label>
               </div>
-              <span className="form-hint">Chọn một hoặc cả hai thẻ để làm nổi bật sản phẩm</span>
+              <span className="form-hint">Đánh dấu để làm nổi bật sản phẩm trên trang chủ</span>
             </div>
           </div>
 

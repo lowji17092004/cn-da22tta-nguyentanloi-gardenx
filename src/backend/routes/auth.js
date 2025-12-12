@@ -116,7 +116,9 @@ router.post('/login', async (req, res) => {
         phone: user.phoneNumber,
         address: user.address,
         avatar: user.avatar,
-        role: user.role 
+        role: user.role,
+        createdAt: user.createdAt,
+        isLocked: user.isLocked
       } 
     });
   } catch (err) {

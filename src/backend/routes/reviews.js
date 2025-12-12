@@ -6,7 +6,7 @@ const fs = require('fs');
 const Review = require('../models/Review');
 const Order = require('../models/Order');
 const Product = require('../models/Product');
-const { requireAuth, requireAdmin } = require('../middleware/auth');
+const { requireAuth, requireAdmin, requireAdminOrCollaborator } = require('../middleware/auth');
 
 // Configure multer for review media upload
 const reviewStorage = multer.diskStorage({
@@ -162,7 +162,7 @@ router.get('/product/:productId', async (req, res) => {
       isHidden: false
     })
       .populate('user', 'name')
-      .populate('reply.user', 'name')
+      .populate('reply.repliedBy', 'name')
       .sort(sortOption)
       .skip((page - 1) * limit)
       .limit(parseInt(limit));
@@ -202,7 +202,7 @@ router.get('/my-reviews', requireAuth, async (req, res) => {
   try {
     const reviews = await Review.find({ user: req.user.userId })
       .populate('product', 'name images')
-      .populate('reply.user', 'name')
+      .populate('reply.repliedBy', 'name')
       .sort({ createdAt: -1 });
     
     res.json(reviews);
@@ -295,10 +295,10 @@ router.delete('/:id', requireAuth, async (req, res) => {
   }
 });
 
-// ========== ADMIN ROUTES ==========
+// ========== ADMIN/COLLABORATOR ROUTES ==========
 
-// Get all reviews (admin)
-router.get('/', requireAuth, requireAdmin, async (req, res) => {
+// Get all reviews (admin/collaborator)
+router.get('/', requireAuth, requireAdminOrCollaborator, async (req, res) => {
   try {
     const { page = 1, limit = 20, status, rating } = req.query;
     
@@ -312,7 +312,7 @@ router.get('/', requireAuth, requireAdmin, async (req, res) => {
       .populate('user', 'name email')
       .populate('product', 'name images')
       .populate('order', 'createdAt')
-      .populate('reply.user', 'name')
+      .populate('reply.repliedBy', 'name')
       .sort({ createdAt: -1 })
       .skip((page - 1) * limit)
       .limit(parseInt(limit));
@@ -339,8 +339,8 @@ router.get('/', requireAuth, requireAdmin, async (req, res) => {
   }
 });
 
-// Admin reply to review
-router.post('/:id/reply', requireAuth, requireAdmin, async (req, res) => {
+// Admin/Collaborator reply to review
+router.post('/:id/reply', requireAuth, requireAdminOrCollaborator, async (req, res) => {
   try {
     const { content } = req.body;
     
@@ -357,7 +357,8 @@ router.post('/:id/reply', requireAuth, requireAdmin, async (req, res) => {
     
     await review.save();
     await review.populate('user', 'name');
-    await review.populate('reply.user', 'name');
+    await review.populate('product', 'name image');
+    await review.populate('reply.repliedBy', 'name');
     
     res.json(review);
   } catch (err) {

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
 import api from '../api'
 import AdminLayout from '../components/AdminLayout'
+import './AdminUsers.css'
 
 export default function UserForm() {
   const { id } = useParams()
@@ -14,6 +15,7 @@ export default function UserForm() {
     password: '',
     role: 'user'
   })
+  const [userData, setUserData] = useState(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
@@ -22,10 +24,8 @@ export default function UserForm() {
       const loadUser = async () => {
         try {
           const res = await api.get(`/users/${id}`)
+          setUserData(res.data)
           setFormData({
-            name: res.data.name,
-            email: res.data.email,
-            password: '',
             role: res.data.role
           })
         } catch (e) {
@@ -50,11 +50,8 @@ export default function UserForm() {
       if (isNew) {
         await api.post('/users', formData)
       } else {
-        const updateData = { ...formData }
-        if (!updateData.password) {
-          delete updateData.password
-        }
-        await api.put(`/users/${id}`, updateData)
+        // Only send role for edit
+        await api.put(`/users/${id}`, { role: formData.role })
       }
       navigate('/admin/users')
     } catch (e) {
@@ -68,10 +65,10 @@ export default function UserForm() {
       <div className="admin-page-header">
         <div>
           <h1 className="admin-page-title">
-            {isNew ? '✨ Tạo người dùng mới' : '✏️ Chỉnh sửa người dùng'}
+            {isNew ? '✨ Tạo người dùng mới' : '🔑 Thay đổi quyền người dùng'}
           </h1>
           <p className="admin-page-desc">
-            {isNew ? 'Thêm người dùng mới vào hệ thống' : 'Cập nhật thông tin người dùng'}
+            {isNew ? 'Thêm người dùng mới vào hệ thống' : 'Chỉ có thể thay đổi vai trò (role) của người dùng'}
           </p>
         </div>
         <Link to="/admin/users">
@@ -87,49 +84,72 @@ export default function UserForm() {
             </div>
           )}
 
-          <div className="form-group">
-            <label htmlFor="name">Tên người dùng *</label>
-            <input
-              type="text"
-              id="name"
-              name="name"
-              value={formData.name}
-              onChange={handleChange}
-              required
-              placeholder="Nhập tên người dùng"
-            />
-          </div>
+          {!isNew && userData && (
+            <div className="user-info-display">
+              <h3>Thông tin người dùng</h3>
+              <div className="info-row">
+                <span className="info-label">Tên:</span>
+                <span className="info-value">{userData.name}</span>
+              </div>
+              <div className="info-row">
+                <span className="info-label">Email:</span>
+                <span className="info-value">{userData.email}</span>
+              </div>
+              {userData.phoneNumber && (
+                <div className="info-row">
+                  <span className="info-label">Số điện thoại:</span>
+                  <span className="info-value">{userData.phoneNumber}</span>
+                </div>
+              )}
+              <p className="info-note">
+                ℹ️ Người dùng có thể tự cập nhật thông tin cá nhân của họ. Admin chỉ có thể thay đổi quyền.
+              </p>
+            </div>
+          )}
 
-          <div className="form-group">
-            <label htmlFor="email">Email *</label>
-            <input
-              type="email"
-              id="email"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-              required
-              placeholder="example@email.com"
-            />
-          </div>
+          {isNew && (
+            <>
+              <div className="form-group">
+                <label htmlFor="name">Tên người dùng *</label>
+                <input
+                  type="text"
+                  id="name"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleChange}
+                  required
+                  placeholder="Nhập tên người dùng"
+                />
+              </div>
 
-          <div className="form-group">
-            <label htmlFor="password">
-              Mật khẩu {!isNew && '(Để trống nếu không đổi)'}
-            </label>
-            <input
-              type="password"
-              id="password"
-              name="password"
-              value={formData.password}
-              onChange={handleChange}
-              required={isNew}
-              placeholder={isNew ? 'Nhập mật khẩu' : 'Nhập mật khẩu mới (nếu muốn đổi)'}
-            />
-            {isNew && (
-              <small className="form-hint">Tối thiểu 6 ký tự</small>
-            )}
-          </div>
+              <div className="form-group">
+                <label htmlFor="email">Email *</label>
+                <input
+                  type="email"
+                  id="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  required
+                  placeholder="example@email.com"
+                />
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="password">Mật khẩu *</label>
+                <input
+                  type="password"
+                  id="password"
+                  name="password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  required
+                  placeholder="Nhập mật khẩu"
+                />
+                <small className="form-hint">Tối thiểu 6 ký tự</small>
+              </div>
+            </>
+          )}
 
           <div className="form-group">
             <label htmlFor="role">Vai trò *</label>
@@ -141,10 +161,13 @@ export default function UserForm() {
               required
             >
               <option value="user">👤 User (Người dùng)</option>
+              <option value="collaborator">🤝 Cộng tác viên</option>
               <option value="admin">👑 Admin (Quản trị viên)</option>
             </select>
             <small className="form-hint">
-              Admin có quyền truy cập toàn bộ hệ thống
+              • User: Khách hàng thông thường<br/>
+              • Cộng tác viên: Duyệt đơn, phản hồi đánh giá, trả lời tin nhắn<br/>
+              • Admin: Toàn quyền quản trị
             </small>
           </div>
 

@@ -1,0 +1,414 @@
+/* Collaborator Dashboard Styles */
+.collab-dashboard {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #faf8f3 0%, #f5f1ea 100%);
+}
+
+/* Loading */
+.collab-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  gap: 16px;
+  color: #64748b;
+}
+
+.collab-loading .loading-spinner {
+  width: 48px;
+  height: 48px;
+  border: 4px solid #f1f5f9;
+  border-top-color: #d4a574;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Header */
+.collab-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 32px;
+  background: white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.collab-header-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.collab-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 20px;
+  font-weight: 700;
+  color: #d4a574;
+}
+
+.collab-logo svg {
+  color: #d4a574;
+}
+
+.collab-badge {
+  padding: 6px 14px;
+  background: linear-gradient(135deg, #d4a574, #c9965f);
+  color: white;
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: 20px;
+  letter-spacing: 0.5px;
+}
+
+.collab-header-right {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.collab-user-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.collab-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #d4a574;
+}
+
+.collab-avatar-placeholder {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #d4a574, #c9965f);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 16px;
+}
+
+.collab-username {
+  font-weight: 500;
+  color: #374151;
+}
+
+.collab-logout-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  background: #f3f4f6;
+  border: none;
+  border-radius: 10px;
+  color: #6b7280;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.collab-logout-btn:hover {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+/* Main Content */
+.collab-main {
+  padding: 40px 32px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.collab-welcome {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.collab-welcome h1 {
+  font-size: 32px;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0 0 8px;
+}
+
+.collab-welcome p {
+  font-size: 16px;
+  color: #6b7280;
+  margin: 0;
+}
+
+/* Stats */
+.collab-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  margin-bottom: 40px;
+}
+
+.collab-stat-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 24px;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  transition: all 0.3s ease;
+}
+
+.collab-stat-item:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+}
+
+.stat-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.stat-icon.orders {
+  background: rgba(14, 165, 233, 0.1);
+  color: #0ea5e9;
+}
+
+.stat-icon.reviews {
+  background: rgba(245, 158, 11, 0.1);
+  color: #f59e0b;
+}
+
+.stat-icon.messages {
+  background: rgba(16, 185, 129, 0.1);
+  color: #10b981;
+}
+
+.stat-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.stat-number {
+  font-size: 28px;
+  font-weight: 700;
+  color: #1f2937;
+  line-height: 1;
+}
+
+.stat-label {
+  font-size: 14px;
+  color: #6b7280;
+  margin-top: 4px;
+}
+
+/* Menu Cards */
+.collab-menu {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  margin-bottom: 40px;
+}
+
+.collab-menu-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 32px 24px;
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  text-decoration: none;
+  position: relative;
+  transition: all 0.3s ease;
+  overflow: hidden;
+}
+
+.collab-menu-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #d4a574, #c9965f);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.collab-menu-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12);
+}
+
+.collab-menu-card:hover::before {
+  opacity: 1;
+}
+
+.menu-card-icon {
+  width: 72px;
+  height: 72px;
+  border-radius: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+  transition: transform 0.3s ease;
+}
+
+.collab-menu-card:hover .menu-card-icon {
+  transform: scale(1.1);
+}
+
+.menu-card-content {
+  text-align: center;
+}
+
+.menu-card-content h3 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0 0 8px;
+}
+
+.menu-card-content p {
+  font-size: 14px;
+  color: #6b7280;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.menu-card-badge {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  min-width: 24px;
+  height: 24px;
+  padding: 0 8px;
+  border-radius: 12px;
+  color: white;
+  font-size: 12px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+.menu-card-arrow {
+  position: absolute;
+  bottom: 16px;
+  right: 16px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #f3f4f6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #9ca3af;
+  opacity: 0;
+  transform: translateX(-10px);
+  transition: all 0.3s ease;
+}
+
+.collab-menu-card:hover .menu-card-arrow {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+/* Tips */
+.collab-tips {
+  background: white;
+  border-radius: 16px;
+  padding: 24px 32px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.collab-tips h3 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0 0 16px;
+}
+
+.collab-tips ul {
+  margin: 0;
+  padding-left: 20px;
+}
+
+.collab-tips li {
+  color: #6b7280;
+  font-size: 14px;
+  line-height: 1.8;
+  position: relative;
+}
+
+.collab-tips li::marker {
+  color: #d4a574;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .collab-stats,
+  .collab-menu {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .collab-header {
+    flex-direction: column;
+    gap: 16px;
+    padding: 16px;
+  }
+
+  .collab-header-left,
+  .collab-header-right {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .collab-main {
+    padding: 24px 16px;
+  }
+
+  .collab-welcome h1 {
+    font-size: 24px;
+  }
+
+  .collab-stats,
+  .collab-menu {
+    grid-template-columns: 1fr;
+  }
+
+  .collab-stat-item {
+    padding: 20px;
+  }
+
+  .collab-menu-card {
+    padding: 24px 20px;
+  }
+}

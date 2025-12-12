@@ -1,0 +1,362 @@
+/* Simple Auth Page Styles - Clean & Compact */
+
+.auth-simple-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #faf8f3 0%, #f0ebe3 100%);
+  padding: 24px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Background Decoration */
+.auth-simple-bg {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.bg-circle {
+  position: absolute;
+  border-radius: 50%;
+  opacity: 0.5;
+}
+
+.bg-circle-1 {
+  width: 400px;
+  height: 400px;
+  background: linear-gradient(135deg, rgba(212, 165, 116, 0.15) 0%, transparent 70%);
+  top: -100px;
+  right: -100px;
+}
+
+.bg-circle-2 {
+  width: 300px;
+  height: 300px;
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, transparent 70%);
+  bottom: -50px;
+  left: -50px;
+}
+
+.bg-circle-3 {
+  width: 200px;
+  height: 200px;
+  background: linear-gradient(135deg, rgba(212, 165, 116, 0.1) 0%, transparent 70%);
+  top: 50%;
+  left: 20%;
+}
+
+/* Container */
+.auth-simple-container {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: 420px;
+}
+
+/* Logo */
+.auth-simple-logo {
+  margin-bottom: 24px;
+}
+
+.auth-simple-logo img {
+  height: 50px;
+  width: auto;
+}
+
+/* Card */
+.auth-simple-card {
+  width: 100%;
+  background: white;
+  border-radius: 20px;
+  padding: 36px 32px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08), 0 2px 10px rgba(0, 0, 0, 0.04);
+}
+
+/* Header */
+.auth-simple-header {
+  text-align: center;
+  margin-bottom: 28px;
+}
+
+.auth-simple-header h1 {
+  font-size: 24px;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0 0 8px 0;
+}
+
+.auth-simple-header p {
+  font-size: 14px;
+  color: #6b7280;
+  margin: 0;
+}
+
+/* Error */
+.auth-simple-error {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 10px;
+  margin-bottom: 20px;
+  font-size: 14px;
+  color: #dc2626;
+}
+
+.auth-simple-error svg {
+  flex-shrink: 0;
+}
+
+/* Form */
+.auth-simple-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Field */
+.auth-simple-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.auth-simple-field label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #374151;
+}
+
+/* Input Wrapper */
+.auth-simple-input-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.auth-simple-input-wrap svg {
+  position: absolute;
+  left: 14px;
+  color: #9ca3af;
+  pointer-events: none;
+}
+
+.auth-simple-input-wrap input {
+  width: 100%;
+  height: 48px;
+  padding: 0 14px 0 44px;
+  font-size: 15px;
+  color: #1f2937;
+  background: #f9fafb;
+  border: 2px solid #e5e7eb;
+  border-radius: 12px;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.auth-simple-input-wrap input:hover {
+  border-color: #d1d5db;
+}
+
+.auth-simple-input-wrap input:focus {
+  border-color: #d4a574;
+  background: white;
+  box-shadow: 0 0 0 3px rgba(212, 165, 116, 0.1);
+}
+
+.auth-simple-input-wrap input::placeholder {
+  color: #9ca3af;
+}
+
+/* Password Toggle */
+.auth-simple-toggle {
+  position: absolute;
+  right: 4px;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: #9ca3af;
+  transition: color 0.2s;
+}
+
+.auth-simple-toggle:hover {
+  color: #6b7280;
+}
+
+/* Password Strength */
+.auth-simple-strength {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 4px;
+}
+
+.strength-bars {
+  display: flex;
+  gap: 4px;
+  flex: 1;
+}
+
+.strength-bar {
+  height: 4px;
+  flex: 1;
+  border-radius: 2px;
+  background: #e5e7eb;
+  transition: background-color 0.2s;
+}
+
+.strength-text {
+  font-size: 12px;
+  font-weight: 600;
+  min-width: 70px;
+  text-align: right;
+}
+
+/* Options */
+.auth-simple-options {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: -8px;
+}
+
+.auth-simple-forgot {
+  font-size: 13px;
+  color: #d4a574;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+
+.auth-simple-forgot:hover {
+  color: #c08e5a;
+  text-decoration: underline;
+}
+
+/* Submit Button */
+.auth-simple-submit {
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #d4a574 0%, #c08e5a 100%);
+  color: white;
+  font-size: 15px;
+  font-weight: 600;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(212, 165, 116, 0.3);
+}
+
+.auth-simple-submit:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(212, 165, 116, 0.4);
+}
+
+.auth-simple-submit:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.auth-simple-submit:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* Spinner */
+.auth-simple-spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Footer */
+.auth-simple-footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid #f3f4f6;
+  font-size: 14px;
+}
+
+.auth-simple-footer span {
+  color: #6b7280;
+}
+
+.auth-simple-footer a {
+  color: #d4a574;
+  text-decoration: none;
+  font-weight: 600;
+  transition: color 0.2s;
+}
+
+.auth-simple-footer a:hover {
+  color: #c08e5a;
+  text-decoration: underline;
+}
+
+/* Back Link */
+.auth-simple-back {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 24px;
+  font-size: 14px;
+  color: #6b7280;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.auth-simple-back:hover {
+  color: #374151;
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  .auth-simple-page {
+    padding: 16px;
+  }
+
+  .auth-simple-card {
+    padding: 28px 24px;
+    border-radius: 16px;
+  }
+
+  .auth-simple-header h1 {
+    font-size: 22px;
+  }
+
+  .auth-simple-input-wrap input {
+    height: 44px;
+    font-size: 14px;
+  }
+
+  .auth-simple-submit {
+    height: 44px;
+    font-size: 14px;
+  }
+}

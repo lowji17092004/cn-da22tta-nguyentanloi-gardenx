@@ -157,6 +157,33 @@ const Orders = () => {
     }
   };
 
+  const cancelOrder = async (orderId) => {
+    if (!window.confirm('Bạn có chắc muốn hủy đơn hàng này?')) return;
+    
+    try {
+      const response = await fetch(`http://localhost:5000/api/orders/${orderId}/status`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify({ status: 'cancelled' })
+      });
+
+      if (response.ok) {
+        alert('Đơn hàng đã được hủy thành công!');
+        fetchOrders();
+        setSelectedOrder(null);
+      } else {
+        const error = await response.json();
+        alert(error.message || 'Có lỗi xảy ra khi hủy đơn hàng');
+      }
+    } catch (error) {
+      console.error('Lỗi khi hủy đơn hàng:', error);
+      alert('Có lỗi xảy ra khi hủy đơn hàng');
+    }
+  };
+
   const getProductImage = (item) => {
     // Ưu tiên lấy từ item.image (đã lưu sẵn trong Order)
     if (item.image) return `http://localhost:5000${item.image}`;
@@ -650,6 +677,24 @@ const Orders = () => {
                         </div>
                       </div>
                     </div>
+
+                    {/* Cancel Order Button - Only show for pending/confirmed */}
+                    {(selectedOrder.status === 'pending' || selectedOrder.status === 'confirmed') && (
+                      <div className="cancel-order-section">
+                        <button 
+                          className="btn-cancel-order"
+                          onClick={() => cancelOrder(selectedOrder._id)}
+                        >
+                          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                            <circle cx="12" cy="12" r="10"/>
+                            <line x1="15" y1="9" x2="9" y2="15"/>
+                            <line x1="9" y1="9" x2="15" y2="15"/>
+                          </svg>
+                          Hủy đơn hàng
+                        </button>
+                        <p className="cancel-note">Bạn chỉ có thể hủy đơn hàng khi đơn chưa được giao cho đơn vị vận chuyển</p>
+                      </div>
+                    )}
                   </div>
                 )}
 

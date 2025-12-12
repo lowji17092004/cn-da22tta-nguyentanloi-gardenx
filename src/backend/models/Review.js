@@ -34,9 +34,9 @@ const reviewSchema = new mongoose.Schema({
     type: String
   }],
   reply: {
-    text: String,
-    date: Date,
-    user: {
+    content: String,
+    repliedAt: Date,
+    repliedBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User'
     }

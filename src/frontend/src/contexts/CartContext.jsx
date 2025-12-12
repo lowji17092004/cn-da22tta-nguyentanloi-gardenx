@@ -83,7 +83,8 @@ export function CartProvider({ children }){
         price: product.price, 
         quantity: Math.min(qty, maxStock),
         stock: maxStock,
-        image: product.images?.[0] || product.imageUrl || null
+        imageUrl: product.images?.[0] || product.imageUrl || null,
+        category: product.category || ''
       }]
       save(next)
     }
@@ -108,21 +109,29 @@ export function CartProvider({ children }){
   const clear = () => { save([]); saveSelected([]) }
 
   const refreshStock = useCallback((products) => {
-    // Cập nhật stock từ danh sách sản phẩm mới
+    // Cập nhật stock và imageUrl từ danh sách sản phẩm mới
     setItems(prevItems => {
       const next = prevItems.map(item => {
         const product = products.find(p => p._id === item.product)
         if (product) {
           const newStock = product.stock || 999
           const newQty = Math.min(item.quantity, newStock)
-          return {...item, stock: newStock, quantity: newQty}
+          return {
+            ...item, 
+            stock: newStock, 
+            quantity: newQty,
+            imageUrl: product.images?.[0] || product.imageUrl || item.imageUrl,
+            name: product.name || item.name,
+            price: product.price || item.price
+          }
         }
         return item
       })
-      localStorage.setItem('cart', JSON.stringify(next))
+      const key = user ? `cart_${user.id}` : 'cart_guest'
+      localStorage.setItem(key, JSON.stringify(next))
       return next
     })
-  }, [])
+  }, [user])
 
   const toggleSelect = (productId) => {
     if (selectedItems.includes(productId)) {

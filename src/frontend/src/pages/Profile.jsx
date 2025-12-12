@@ -90,7 +90,7 @@ const Profile = () => {
             'Authorization': `Bearer ${token}`
           }
         });
-        avatarUrl = uploadRes.data.url;
+        avatarUrl = uploadRes.data.path;
       }
 
       // Update profile
@@ -191,6 +191,7 @@ const Profile = () => {
       <div className="profile-wrapper">
         {/* Profile Header */}
         <div className="profile-header">
+          <div className="profile-header-overlay"></div>
           <div className="profile-avatar">
             {isEditing ? (
               <div className="avatar-upload">
@@ -202,8 +203,10 @@ const Profile = () => {
                   style={{ display: 'none' }}
                 />
                 <label htmlFor="avatar-input" className="avatar-circle clickable">
-                  {avatarPreview || user.avatar ? (
-                    <img src={avatarPreview || user.avatar} alt="Avatar" />
+                  {avatarPreview ? (
+                    <img src={avatarPreview} alt="Avatar" />
+                  ) : user.avatar ? (
+                    <img src={user.avatar.startsWith('http') ? user.avatar : `http://localhost:5000${user.avatar}`} alt="Avatar" />
                   ) : (
                     <span>{user.name?.charAt(0).toUpperCase() || 'U'}</span>
                   )}
@@ -219,7 +222,7 @@ const Profile = () => {
             ) : (
               <div className="avatar-circle">
                 {user.avatar ? (
-                  <img src={user.avatar} alt="Avatar" />
+                  <img src={user.avatar.startsWith('http') ? user.avatar : `http://localhost:5000${user.avatar}`} alt="Avatar" />
                 ) : (
                   <span>{user.name?.charAt(0).toUpperCase() || 'U'}</span>
                 )}
@@ -227,11 +230,71 @@ const Profile = () => {
             )}
           </div>
           <div className="profile-info">
-            <h1>{user.name || 'Người dùng'}</h1>
-            <p className="profile-email">{user.email}</p>
-            <span className={`profile-role ${user.role}`}>
-              {user.role === 'admin' ? 'Quản trị viên' : 'Khách hàng'}
-            </span>
+            <div className="profile-name-wrapper">
+              <h1>{user.name || 'Người dùng'}</h1>
+              <span className={`profile-badge ${user.role}`}>
+                {user.role === 'admin' ? '👑 Quản trị viên' : user.role === 'collaborator' ? '🤝 Cộng tác viên' : '🌸 Khách hàng'}
+              </span>
+            </div>
+            <p className="profile-email">✉️ {user.email}</p>
+            <p className="profile-joined">📅 Tham gia {new Date(user.createdAt).toLocaleDateString('vi-VN', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
+          </div>
+        </div>
+
+        {/* Account Stats */}
+        <div className="account-stats">
+          <div className="stat-item">
+            <div className="stat-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                <line x1="16" y1="2" x2="16" y2="6"/>
+                <line x1="8" y1="2" x2="8" y2="6"/>
+                <line x1="3" y1="10" x2="21" y2="10"/>
+              </svg>
+            </div>
+            <div className="stat-details">
+              <span className="stat-label">Thành viên từ</span>
+              <span className="stat-value">
+                {new Date(user.createdAt).toLocaleDateString('vi-VN', { 
+                  year: 'numeric', 
+                  month: 'long', 
+                  day: 'numeric' 
+                })}
+              </span>
+            </div>
+          </div>
+          <div className="stat-item">
+            <div className="stat-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <circle cx="12" cy="12" r="10"/>
+                <polyline points="12 6 12 12 16 14"/>
+              </svg>
+            </div>
+            <div className="stat-details">
+              <span className="stat-label">Thời gian thành viên</span>
+              <span className="stat-value">
+                {(() => {
+                  const days = Math.floor((new Date() - new Date(user.createdAt)) / (1000 * 60 * 60 * 24));
+                  if (days < 30) return `${days} ngày`;
+                  if (days < 365) return `${Math.floor(days / 30)} tháng`;
+                  return `${Math.floor(days / 365)} năm`;
+                })()}
+              </span>
+            </div>
+          </div>
+          <div className="stat-item">
+            <div className="stat-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                <circle cx="12" cy="7" r="4"/>
+              </svg>
+            </div>
+            <div className="stat-details">
+              <span className="stat-label">Trạng thái tài khoản</span>
+              <span className={`stat-value status ${user.isLocked ? 'locked' : 'active'}`}>
+                {user.isLocked ? 'Đã khóa' : 'Hoạt động'}
+              </span>
+            </div>
           </div>
         </div>
 
@@ -372,23 +435,27 @@ const Profile = () => {
                 </form>
               ) : (
                 <>
-                  <div className="info-grid">
-                    <div className="info-item">
-                      <label>Họ và tên</label>
-                      <div className="info-value">{user.name || 'Chưa cập nhật'}</div>
-                    </div>
-                    <div className="info-item">
-                      <label>Email</label>
-                      <div className="info-value">{user.email}</div>
-                    </div>
-                    <div className="info-item">
-                      <label>Số điện thoại</label>
-                      <div className="info-value">{user.phone || 'Chưa cập nhật'}</div>
-                    </div>
-                    <div className="info-item">
-                      <label>Địa chỉ</label>
-                      <div className="info-value">{user.address || 'Chưa cập nhật'}</div>
-                    </div>
+                  <div className="info-table-wrapper">
+                    <table className="info-table">
+                      <tbody>
+                        <tr>
+                          <td className="info-label">Họ và tên</td>
+                          <td className="info-value">{user.name || 'Chưa cập nhật'}</td>
+                        </tr>
+                        <tr>
+                          <td className="info-label">Email</td>
+                          <td className="info-value">{user.email}</td>
+                        </tr>
+                        <tr>
+                          <td className="info-label">Số điện thoại</td>
+                          <td className="info-value">{user.phone || 'Chưa cập nhật'}</td>
+                        </tr>
+                        <tr>
+                          <td className="info-label">Địa chỉ</td>
+                          <td className="info-value">{user.address || 'Chưa cập nhật'}</td>
+                        </tr>
+                      </tbody>
+                    </table>
                   </div>
                   <div className="profile-actions">
                     <button className="btn-primary" onClick={() => setIsEditing(true)}>

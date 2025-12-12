@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const Order = require('../models/Order');
 const Product = require('../models/Product');
-const { requireAuth, requireAdmin } = require('../middleware/auth');
+const { requireAuth, requireAdmin, requireAdminOrCollaborator } = require('../middleware/auth');
 
 // Status flow definitions
 const STATUS_FLOW = {
@@ -79,8 +79,8 @@ router.post('/', requireAuth, async (req, res) => {
   }
 });
 
-// admin list
-router.get('/', requireAuth, requireAdmin, async (req, res) => {
+// admin/collaborator list - Cho phép cả admin và cộng tác viên xem danh sách đơn hàng
+router.get('/', requireAuth, requireAdminOrCollaborator, async (req, res) => {
   const list = await Order.find()
     .sort({ createdAt: -1 })
     .populate('user', 'name email')
@@ -123,8 +123,8 @@ router.get('/:id', requireAuth, async (req, res) => {
   }
 });
 
-// admin update status with history tracking
-router.put('/:id/status', requireAuth, requireAdmin, async (req, res) => {
+// admin/collaborator update status with history tracking
+router.put('/:id/status', requireAuth, requireAdminOrCollaborator, async (req, res) => {
   try {
     const { status, note } = req.body;
     const order = await Order.findById(req.params.id);
@@ -154,9 +154,16 @@ router.put('/:id/status', requireAuth, requireAdmin, async (req, res) => {
       updatedAt: new Date()
     });
     
-    // Set delivered date if completed
+    // Set delivered date if completed and update sold count
     if (status === 'delivered') {
       order.deliveredAt = new Date();
+      
+      // Tăng số lượng đã bán cho mỗi sản phẩm trong đơn hàng
+      for (const item of order.items) {
+        await Product.findByIdAndUpdate(item.product, {
+          $inc: { sold: item.quantity }
+        });
+      }
     }
     
     // Set cancel reason if cancelled

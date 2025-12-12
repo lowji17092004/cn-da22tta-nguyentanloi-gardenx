@@ -55,20 +55,15 @@ router.post('/', requireAuth, requireAdmin, async (req, res) => {
   }
 });
 
-// Update user (Admin only)
+// Update user (Admin only) - Only allow role change
 router.put('/:id', requireAuth, requireAdmin, async (req, res) => {
   try {
-    const { name, email, role, password } = req.body;
-    const updateData = { name, email, role };
-    
-    if (password) {
-      const salt = await bcrypt.genSalt(10);
-      updateData.password = await bcrypt.hash(password, salt);
-    }
+    const { role } = req.body;
+    if (!role) return res.status(400).json({ message: 'Role is required' });
     
     const user = await User.findByIdAndUpdate(
       req.params.id, 
-      updateData, 
+      { role }, 
       { new: true }
     ).select('-password');
     
@@ -79,15 +74,52 @@ router.put('/:id', requireAuth, requireAdmin, async (req, res) => {
   }
 });
 
-// Delete user (Admin only)
-router.delete('/:id', requireAuth, requireAdmin, async (req, res) => {
+// Get user order count (Admin only)
+router.get('/:id/order-count', requireAuth, requireAdmin, async (req, res) => {
   try {
-    const user = await User.findByIdAndDelete(req.params.id);
-    if (!user) return res.status(404).json({ message: 'User not found' });
-    res.json({ message: 'User deleted' });
+    const Order = require('../models/Order');
+    const count = await Order.countDocuments({ userId: req.params.id });
+    res.json({ count });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
 });
+
+// Lock user account (Admin only)
+router.put('/:id/lock', requireAuth, requireAdmin, async (req, res) => {
+  try {
+    const user = await User.findByIdAndUpdate(
+      req.params.id,
+      { isLocked: true },
+      { new: true }
+    ).select('-password');
+    
+    if (!user) return res.status(404).json({ message: 'User not found' });
+    res.json(user);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// Unlock user account (Admin only)
+router.put('/:id/unlock', requireAuth, requireAdmin, async (req, res) => {
+  try {
+    const user = await User.findByIdAndUpdate(
+      req.params.id,
+      { isLocked: false },
+      { new: true }
+    ).select('-password');
+    
+    if (!user) return res.status(404).json({ message: 'User not found' });
+    res.json(user);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// Delete user - REMOVED (Admin can only lock/unlock)
+// router.delete('/:id', requireAuth, requireAdmin, async (req, res) => {
+//   Users cannot be deleted, only locked
+// });
 
 module.exports = router;

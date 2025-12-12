@@ -1,12 +1,59 @@
 const express = require('express');
 const router = express.Router();
 const Product = require('../models/Product');
+const Order = require('../models/Order');
 const { requireAuth, requireAdmin } = require('../middleware/auth');
 
 // Public list
 router.get('/', async (req, res) => {
-  const items = await Product.find().sort({ createdAt: -1 });
-  res.json(items);
+  try {
+    const { category, bestseller, featured } = req.query;
+    let query = {};
+    
+    // Filter by category
+    if (category) {
+      query.category = new RegExp(category, 'i');
+    }
+    
+    // Filter bestsellers (sold >= 10 with paid orders only)
+    if (bestseller === 'true') {
+      // Aggregate paid orders to find products with >= 10 paid sales
+      const paidSalesAggregation = await Order.aggregate([
+        {
+          $match: {
+            paymentStatus: 'paid'
+          }
+        },
+        {
+          $unwind: '$items'
+        },
+        {
+          $group: {
+            _id: '$items.product',
+            paidQuantity: { $sum: '$items.quantity' }
+          }
+        },
+        {
+          $match: {
+            paidQuantity: { $gte: 10 }
+          }
+        }
+      ]);
+      
+      const bestsellersIds = paidSalesAggregation.map(item => item._id);
+      query._id = { $in: bestsellersIds };
+    }
+    
+    // Filter featured
+    if (featured === 'true') {
+      query.isFeatured = true;
+    }
+    
+    const items = await Product.find(query).sort({ createdAt: -1 });
+    res.json(items);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
 });
 
 // Get one

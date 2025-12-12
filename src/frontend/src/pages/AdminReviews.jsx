@@ -296,6 +296,9 @@ export default function AdminReviews() {
                         setReplyContent('')
                       }}
                     >
+                      <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                      </svg>
                       Hủy
                     </button>
                     <button 
@@ -303,6 +306,9 @@ export default function AdminReviews() {
                       onClick={() => handleReply(review._id)}
                       disabled={submittingReply}
                     >
+                      <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                      </svg>
                       {submittingReply ? 'Đang gửi...' : 'Gửi phản hồi'}
                     </button>
                   </div>

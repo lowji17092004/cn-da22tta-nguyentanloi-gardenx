@@ -20,7 +20,9 @@ router.get('/me', requireAuth, async (req, res) => {
       phone: user.phoneNumber,
       address: user.address,
       avatar: user.avatar,
-      role: user.role
+      role: user.role,
+      createdAt: user.createdAt,
+      isLocked: user.isLocked
     };
     
     res.json(userResponse);
@@ -66,7 +68,9 @@ router.put('/me', requireAuth, async (req, res) => {
         phone: user.phoneNumber,
         address: user.address,
         avatar: user.avatar,
-        role: user.role
+        role: user.role,
+        createdAt: user.createdAt,
+        isLocked: user.isLocked
       }
     });
   } catch (error) {

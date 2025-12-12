@@ -46,11 +46,14 @@ export default function Home(){
   ]
 
   useEffect(() => {
-    // Fetch featured products
+    // Fetch bestsellers (sold >= 10)
+    axios.get('/api/products?bestseller=true').then(r => {
+      setFeaturedProducts(r.data.slice(0, 8))
+    }).catch(() => {})
+    
+    // Fetch new products
     axios.get('/api/products').then(r => {
-      const products = r.data
-      setFeaturedProducts(products.filter(p => p.isFeatured || p.isBestSeller).slice(0, 8))
-      setNewProducts(products.slice(0, 8))
+      setNewProducts(r.data.slice(0, 8))
     }).catch(() => {})
   }, [])
 
@@ -80,8 +83,8 @@ export default function Home(){
         <section className="home-section">
           <div className="container">
             <div className="section-header">
-              <h2 className="section-title">Sản phẩm nổi bật</h2>
-              <p className="section-subtitle">Những sản phẩm được yêu thích nhất</p>
+              <h2 className="section-title">Sản phẩm bán chạy</h2>
+              <p className="section-subtitle">Những sản phẩm được yêu thích và đã bán trên 10 sản phẩm</p>
               <Link to="/shop" className="section-view-all">
                 Xem tất cả
                 <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -103,7 +106,7 @@ export default function Home(){
                         </div>
                       )}
                       
-                      {(product.isFeatured || product.isBestSeller || product.stock === 0) && (
+                      {(product.isFeatured || (product.sold || 0) >= 10 || product.stock === 0) && (
                         <div className="product-badges-top">
                           {product.stock === 0 && (
                             <span className="product-badge out-of-stock">Hết hàng</span>
@@ -111,7 +114,7 @@ export default function Home(){
                           {product.isFeatured && product.stock > 0 && (
                             <span className="product-badge featured">⭐ Nổi bật</span>
                           )}
-                          {product.isBestSeller && product.stock > 0 && (
+                          {(product.sold || 0) >= 10 && product.stock > 0 && (
                             <span className="product-badge bestseller">🔥 Bán chạy</span>
                           )}
                         </div>
@@ -189,7 +192,7 @@ export default function Home(){
                         </div>
                       )}
                       
-                      {(product.isFeatured || product.isBestSeller || product.stock === 0) && (
+                      {(product.isFeatured || (product.sold || 0) >= 10 || product.stock === 0) && (
                         <div className="product-badges-top">
                           {product.stock === 0 && (
                             <span className="product-badge out-of-stock">Hết hàng</span>
@@ -197,7 +200,7 @@ export default function Home(){
                           {product.isFeatured && product.stock > 0 && (
                             <span className="product-badge featured">⭐ Nổi bật</span>
                           )}
-                          {product.isBestSeller && product.stock > 0 && (
+                          {(product.sold || 0) >= 10 && product.stock > 0 && (
                             <span className="product-badge bestseller">🔥 Bán chạy</span>
                           )}
                         </div>
@@ -249,3 +252,5 @@ export default function Home(){
     </div>
   )
 }
+
+

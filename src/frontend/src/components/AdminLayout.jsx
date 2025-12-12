@@ -10,7 +10,10 @@ export default function AdminLayout({ children }) {
   const [showUserMenu, setShowUserMenu] = useState(false)
   const menuRef = useRef(null)
 
-  const menuItems = [
+  const isCollaborator = user?.role === 'collaborator'
+
+  // Menu items cho Admin
+  const adminMenuItems = [
     { 
       path: '/admin/products', 
       label: 'Sản phẩm', 
@@ -57,6 +60,15 @@ export default function AdminLayout({ children }) {
       )
     },
     { 
+      path: '/admin/messages', 
+      label: 'Tin nhắn', 
+      icon: (
+        <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/>
+        </svg>
+      )
+    },
+    { 
       path: '/admin/users', 
       label: 'Người dùng', 
       icon: (
@@ -75,6 +87,48 @@ export default function AdminLayout({ children }) {
       )
     },
   ]
+
+  // Menu items cho Collaborator (chỉ có đơn hàng, đánh giá, tin nhắn)
+  const collaboratorMenuItems = [
+    { 
+      path: '/collaborator', 
+      label: 'Dashboard', 
+      icon: (
+        <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+        </svg>
+      )
+    },
+    { 
+      path: '/admin/orders', 
+      label: 'Đơn hàng', 
+      icon: (
+        <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/>
+        </svg>
+      )
+    },
+    { 
+      path: '/admin/reviews', 
+      label: 'Đánh giá', 
+      icon: (
+        <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+          <polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/>
+        </svg>
+      )
+    },
+    { 
+      path: '/admin/messages', 
+      label: 'Tin nhắn', 
+      icon: (
+        <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/>
+        </svg>
+      )
+    },
+  ]
+
+  const menuItems = isCollaborator ? collaboratorMenuItems : adminMenuItems
 
   // Close menu when clicking outside
   useEffect(() => {
@@ -105,7 +159,7 @@ export default function AdminLayout({ children }) {
           <Link to="/" className="admin-logo">
             <div className="admin-logo-content">
               <span className="admin-logo-text">Hoa Kiểng</span>
-              {!collapsed && <span className="admin-logo-badge">Admin Panel</span>}
+              {!collapsed && <span className="admin-logo-badge">{isCollaborator ? 'Cộng tác viên' : 'Admin Panel'}</span>}
             </div>
           </Link>
           <button 
@@ -137,7 +191,7 @@ export default function AdminLayout({ children }) {
                   <svg width="12" height="12" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24" style={{marginRight: '4px'}}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
                   </svg>
-                  Quản trị viên
+                  {isCollaborator ? 'Cộng tác viên' : 'Quản trị viên'}
                 </div>
               </div>
               <svg 
@@ -158,7 +212,7 @@ export default function AdminLayout({ children }) {
                 <div className="admin-dropdown-header">
                   <div className="admin-dropdown-name">{user?.name}</div>
                   <div className="admin-dropdown-email">{user?.email}</div>
-                  <div className="admin-dropdown-badge">Admin</div>
+                  <div className="admin-dropdown-badge">{isCollaborator ? 'Collaborator' : 'Admin'}</div>
                 </div>
                 <div className="admin-dropdown-divider"></div>
                 <Link 

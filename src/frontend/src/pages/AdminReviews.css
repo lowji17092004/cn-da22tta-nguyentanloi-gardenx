@@ -1,4 +1,9 @@
 /* Admin Reviews Page Styles */
+.admin-reviews-page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #faf8f3 0%, #f5f1ea 100%);
+}
+
 .admin-reviews-list {
   display: flex;
   flex-direction: column;
@@ -7,14 +12,16 @@
 
 .admin-review-card {
   background: #fff;
-  border: 1px solid #e5e7eb;
+  border: 1px solid #f3e5d8;
   border-radius: 12px;
   padding: 1.25rem;
-  transition: box-shadow 0.2s ease;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(212, 165, 116, 0.06);
 }
 
 .admin-review-card:hover {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 4px 16px rgba(212, 165, 116, 0.12);
+  transform: translateY(-2px);
 }
 
 /* Review Header */
@@ -49,7 +56,7 @@
 
 .review-product-name {
   font-weight: 500;
-  color: #1a1a1a;
+  color: #334155;
   font-size: 0.95rem;
 }
 
@@ -103,8 +110,8 @@
 
 /* Admin Reply */
 .review-admin-reply {
-  background: #f9fafb;
-  border-left: 3px solid #1a1a1a;
+  background: #fef8f0;
+  border-left: 3px solid #d4a574;
   border-radius: 0 8px 8px 0;
   padding: 0.75rem 1rem;
   margin-top: 0.75rem;
@@ -115,13 +122,13 @@
   align-items: center;
   gap: 0.5rem;
   font-size: 0.8rem;
-  color: #6b7280;
+  color: #64748b;
   margin-bottom: 0.5rem;
 }
 
 .reply-header span:first-of-type {
   font-weight: 500;
-  color: #1a1a1a;
+  color: #334155;
 }
 
 .reply-time {
@@ -157,7 +164,8 @@
 
 .reply-textarea:focus {
   outline: none;
-  border-color: #1a1a1a;
+  border-color: #d4a574;
+  box-shadow: 0 0 0 3px rgba(212, 165, 116, 0.1);
 }
 
 .reply-actions {
@@ -190,10 +198,12 @@
 }
 
 .btn-reply:hover {
-  background: #f9fafb;
-  border-color: #1a1a1a;
+  background: #fef8f0;
+  border-color: #d4a574;
+  color: #d4a574;
 }
 
+/* ===== FIX lỗi dư ===== */
 .btn-delete {
   display: inline-flex;
   align-items: center;
@@ -213,7 +223,7 @@
   border-color: #dc2626;
 }
 
-/* Order Progress for Admin Orders */
+/* Order Progress */
 .order-progress-bar {
   padding: 1rem 1.25rem;
   background: #fafafa;
@@ -230,7 +240,7 @@
 
 .progress-fill {
   height: 100%;
-  background: #1a1a1a;
+  background: linear-gradient(135deg, #d4a574 0%, #c9965f 100%);
   border-radius: 2px;
   transition: width 0.3s ease;
 }
@@ -263,14 +273,14 @@
 }
 
 .progress-step.completed .step-circle {
-  background: #1a1a1a;
-  border-color: #1a1a1a;
+  background: linear-gradient(135deg, #d4a574 0%, #c9965f 100%);
+  border-color: #d4a574;
   color: #fff;
 }
 
 .progress-step.current .step-circle {
-  border-color: #1a1a1a;
-  color: #1a1a1a;
+  border-color: #d4a574;
+  color: #d4a574;
 }
 
 .step-text {
@@ -281,297 +291,8 @@
 
 .progress-step.completed .step-text,
 .progress-step.current .step-text {
-  color: #1a1a1a;
+  color: #334155;
   font-weight: 500;
-}
-
-.order-progress-cancelled {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  padding: 0.75rem;
-  background: #fef2f2;
-  color: #dc2626;
-  font-weight: 500;
-  font-size: 0.9rem;
-}
-
-/* Admin Order Card Updates */
-.admin-order-card.expanded {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-}
-
-.admin-order-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1rem 1.25rem;
-  cursor: pointer;
-  transition: background 0.2s ease;
-}
-
-.admin-order-header:hover {
-  background: #fafafa;
-}
-
-.order-header-left {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-}
-
-.order-header-right {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-}
-
-.order-total-preview {
-  font-weight: 600;
-  color: #1a1a1a;
-}
-
-.expand-icon {
-  color: #9ca3af;
-}
-
-/* Order Details */
-.admin-order-details {
-  padding: 1.25rem;
-  border-top: 1px solid #f0f0f0;
-  display: flex;
-  flex-direction: column;
-  gap: 1.25rem;
-}
-
-.order-details-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1.5rem;
-}
-
-.order-customer-info h4,
-.order-items-section h4,
-.order-status-history h4,
-.order-actions-section h4 {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: #1a1a1a;
-  margin: 0 0 0.75rem 0;
-}
-
-.customer-info-content p {
-  margin: 0.35rem 0;
-  font-size: 0.85rem;
-  color: #4b5563;
-}
-
-.customer-info-content strong {
-  color: #374151;
-}
-
-/* Order Products List */
-.order-products-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.order-product-item {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 0.5rem;
-  background: #f9fafb;
-  border-radius: 8px;
-}
-
-.product-thumb {
-  width: 40px;
-  height: 40px;
-  border-radius: 6px;
-  object-fit: cover;
-  border: 1px solid #e5e7eb;
-}
-
-.product-info {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 0.1rem;
-}
-
-.product-name {
-  font-size: 0.85rem;
-  font-weight: 500;
-  color: #1a1a1a;
-}
-
-.product-qty {
-  font-size: 0.75rem;
-  color: #6b7280;
-}
-
-.product-price {
-  font-size: 0.85rem;
-  font-weight: 500;
-  color: #1a1a1a;
-}
-
-.order-total-row {
-  display: flex;
-  justify-content: space-between;
-  padding-top: 0.75rem;
-  margin-top: 0.5rem;
-  border-top: 1px solid #e5e7eb;
-  font-size: 0.95rem;
-}
-
-.order-total-row strong {
-  color: #1a1a1a;
-}
-
-/* Status History */
-.order-status-history {
-  padding-top: 0.5rem;
-}
-
-.history-list {
-  position: relative;
-  padding-left: 1.25rem;
-}
-
-.history-list::before {
-  content: '';
-  position: absolute;
-  left: 4px;
-  top: 0;
-  bottom: 0;
-  width: 2px;
-  background: #e5e7eb;
-}
-
-.history-item {
-  position: relative;
-  padding-bottom: 0.75rem;
-}
-
-.history-item:last-child {
-  padding-bottom: 0;
-}
-
-.history-dot {
-  position: absolute;
-  left: -1.25rem;
-  top: 2px;
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: #1a1a1a;
-  border: 2px solid #fff;
-}
-
-.history-content {
-  display: flex;
-  flex-direction: column;
-  gap: 0.1rem;
-}
-
-.history-status {
-  font-weight: 500;
-  font-size: 0.85rem;
-  color: #1a1a1a;
-}
-
-.history-time {
-  font-size: 0.7rem;
-  color: #9ca3af;
-}
-
-.history-note {
-  font-size: 0.8rem;
-  color: #6b7280;
-  font-style: italic;
-  margin-top: 0.2rem;
-}
-
-/* Status Update Actions */
-.order-actions-section {
-  padding-top: 0.75rem;
-  border-top: 1px solid #f0f0f0;
-}
-
-.status-update-form {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-}
-
-.status-note-input {
-  padding: 0.6rem 0.75rem;
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
-  font-size: 0.85rem;
-  font-family: inherit;
-}
-
-.status-note-input:focus {
-  outline: none;
-  border-color: #1a1a1a;
-}
-
-.status-action-buttons {
-  display: flex;
-  gap: 0.5rem;
-  flex-wrap: wrap;
-}
-
-.btn-next-status {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.35rem;
-}
-
-.btn-loading {
-  font-style: italic;
-}
-
-/* Status Badges Update */
-.status-pending {
-  background: #fef3c7;
-  color: #d97706;
-}
-
-.status-confirmed {
-  background: #dbeafe;
-  color: #2563eb;
-}
-
-.status-preparing {
-  background: #ede9fe;
-  color: #7c3aed;
-}
-
-.status-shipping {
-  background: #cffafe;
-  color: #0891b2;
-}
-
-.status-delivered {
-  background: #d1fae5;
-  color: #059669;
-}
-
-.status-cancelled {
-  background: #fee2e2;
-  color: #dc2626;
 }
 
 /* Responsive */
@@ -584,19 +305,5 @@
     flex-direction: column;
     gap: 0.75rem;
     align-items: flex-start;
-  }
-
-  .progress-steps {
-    gap: 0.25rem;
-  }
-
-  .step-text {
-    font-size: 0.55rem;
-  }
-
-  .step-circle {
-    width: 22px;
-    height: 22px;
-    font-size: 0.6rem;
   }
 }

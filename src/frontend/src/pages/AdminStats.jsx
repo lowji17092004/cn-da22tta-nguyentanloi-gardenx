@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import api from '../api'
 import AdminLayout from '../components/AdminLayout'
+import './AdminStats.css'
 
 // Simple Line Chart Component
 function LineChart({ data, height = 180 }) {
@@ -41,30 +42,102 @@ function LineChart({ data, height = 180 }) {
   )
 }
 
-// Bar Chart Component
-function BarChart({ data, height = 180 }) {
+// Bar Chart Component with Enhanced Design
+function BarChart({ data, height = 200 }) {
   if (!data || data.length === 0) return null
   const maxValue = Math.max(...data.map(d => d.value), 1)
   
+  const creamGradients = [
+    'linear-gradient(135deg, #d4a574 0%, #c9965f 100%)',
+    'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
+    'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+    'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
+    'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)',
+    'linear-gradient(135deg, #ec4899 0%, #db2777 100%)',
+    'linear-gradient(135deg, #14b8a6 0%, #0d9488 100%)',
+    'linear-gradient(135deg, #f97316 0%, #ea580c 100%)'
+  ]
+  
   return (
-    <div className="bar-chart-wrapper" style={{ height }}>
-      <div className="bar-chart-bars">
-        {data.map((item, index) => (
-          <div key={index} className="bar-chart-item">
-            <div className="bar-chart-bar-container">
-              <div 
-                className="bar-chart-bar" 
-                style={{ 
-                  height: `${(item.value / maxValue) * 100}%`,
-                  background: item.color || '#d4a574'
-                }}
-              >
-                <span className="bar-chart-value">{item.value}</span>
+    <div style={{ width: '100%', overflowX: 'auto', padding: '20px 0' }}>
+      <div style={{ 
+        minWidth: `${data.length * 100}px`,
+        display: 'flex',
+        alignItems: 'flex-end',
+        justifyContent: 'space-around',
+        height: height,
+        gap: '20px',
+        padding: '0 20px'
+      }}>
+        {data.map((item, index) => {
+          const fullName = item.fullLabel || item.label
+          return (
+            <div 
+              key={index} 
+              style={{
+                flex: '0 0 auto',
+                width: '80px',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                cursor: 'pointer',
+                transition: 'transform 0.3s ease'
+              }}
+              title={`${fullName}: ${item.value} sản phẩm`}
+              onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-8px)'}
+              onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
+            >
+              <div style={{ 
+                width: '100%', 
+                height: '100%', 
+                display: 'flex', 
+                alignItems: 'flex-end',
+                minHeight: '100px'
+              }}>
+                <div 
+                  style={{ 
+                    width: '100%',
+                    height: `${(item.value / maxValue) * 100}%`,
+                    background: item.color || creamGradients[index % creamGradients.length],
+                    borderRadius: '12px 12px 0 0',
+                    boxShadow: '0 4px 16px rgba(212, 165, 116, 0.3)',
+                    transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+                    position: 'relative',
+                    overflow: 'hidden',
+                    display: 'flex',
+                    alignItems: 'flex-start',
+                    justifyContent: 'center',
+                    paddingTop: '12px',
+                    minHeight: '50px',
+                    transformOrigin: 'bottom',
+                    animation: 'barGrowth 0.6s ease-out'
+                  }}
+                >
+                  <div className="bar-shimmer"></div>
+                  <span style={{
+                    color: 'white',
+                    fontWeight: '700',
+                    fontSize: '15px',
+                    textShadow: '0 2px 4px rgba(0,0,0,0.3)',
+                    position: 'relative',
+                    zIndex: 1
+                  }}>{item.value}</span>
+                </div>
               </div>
+              <span style={{
+                color: '#475569',
+                fontSize: '12px',
+                fontWeight: '600',
+                marginTop: '12px',
+                display: 'block',
+                textAlign: 'center',
+                lineHeight: '1.4',
+                wordBreak: 'break-word',
+                maxWidth: '80px'
+              }}>{item.label}</span>
             </div>
-            <span className="bar-chart-label">{item.label}</span>
-          </div>
-        ))}
+          )
+        })}
       </div>
     </div>
   )
@@ -128,6 +201,85 @@ export default function AdminStats() {
   const [recentOrders, setRecentOrders] = useState([])
   const [monthlyData, setMonthlyData] = useState([])
   const [categoryData, setCategoryData] = useState([])
+  const [timePeriod, setTimePeriod] = useState('month') // day, week, month, year
+  const [revenueChartData, setRevenueChartData] = useState([])
+  const [allOrders, setAllOrders] = useState([])
+  const [topProducts, setTopProducts] = useState([])
+  const [recentArticles, setRecentArticles] = useState([])
+
+  // Calculate revenue by time period
+  const calculateRevenueByPeriod = (orders, period) => {
+    const deliveredOrders = orders.filter(o => o.status === 'delivered')
+    const now = new Date()
+    let data = []
+
+    if (period === 'day') {
+      for (let i = 6; i >= 0; i--) {
+        const date = new Date(now)
+        date.setDate(date.getDate() - i)
+        const dateStr = date.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit' })
+        
+        const dayRevenue = deliveredOrders
+          .filter(o => {
+            const orderDate = new Date(o.createdAt)
+            return orderDate.toDateString() === date.toDateString()
+          })
+          .reduce((sum, o) => sum + (o.total || 0), 0)
+        
+        data.push({ label: dateStr, value: dayRevenue })
+      }
+    } else if (period === 'week') {
+      for (let i = 7; i >= 0; i--) {
+        const weekStart = new Date(now)
+        weekStart.setDate(weekStart.getDate() - (i * 7) - weekStart.getDay())
+        const weekEnd = new Date(weekStart)
+        weekEnd.setDate(weekEnd.getDate() + 6)
+        
+        const weekLabel = `T${8 - i}`
+        
+        const weekRevenue = deliveredOrders
+          .filter(o => {
+            const orderDate = new Date(o.createdAt)
+            return orderDate >= weekStart && orderDate <= weekEnd
+          })
+          .reduce((sum, o) => sum + (o.total || 0), 0)
+        
+        data.push({ label: weekLabel, value: weekRevenue })
+      }
+    } else if (period === 'month') {
+      const monthNames = ['T1', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'T8', 'T9', 'T10', 'T11', 'T12']
+      for (let i = 5; i >= 0; i--) {
+        const date = new Date(now)
+        date.setMonth(date.getMonth() - i)
+        const monthIndex = date.getMonth()
+        const year = date.getFullYear()
+        
+        const monthRevenue = deliveredOrders
+          .filter(o => {
+            const orderDate = new Date(o.createdAt)
+            return orderDate.getMonth() === monthIndex && orderDate.getFullYear() === year
+          })
+          .reduce((sum, o) => sum + (o.total || 0), 0)
+        
+        data.push({ label: monthNames[monthIndex], value: monthRevenue })
+      }
+    } else if (period === 'year') {
+      for (let i = 4; i >= 0; i--) {
+        const year = now.getFullYear() - i
+        
+        const yearRevenue = deliveredOrders
+          .filter(o => {
+            const orderDate = new Date(o.createdAt)
+            return orderDate.getFullYear() === year
+          })
+          .reduce((sum, o) => sum + (o.total || 0), 0)
+        
+        data.push({ label: year.toString(), value: yearRevenue })
+      }
+    }
+
+    setRevenueChartData(data)
+  }
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -163,6 +315,9 @@ export default function AdminStats() {
           cancelledOrders
         })
 
+        // Store all orders for time-based filtering
+        setAllOrders(orders)
+
         // Generate monthly revenue data (last 6 months)
         const months = ['T1', 'T2', 'T3', 'T4', 'T5', 'T6']
         const monthlyRevenue = months.map((label) => ({
@@ -171,23 +326,96 @@ export default function AdminStats() {
         }))
         setMonthlyData(monthlyRevenue)
 
-        // Category data for products
+        // Calculate initial revenue chart data - will be done after allOrders is set
+        const deliveredOrders = orders.filter(o => o.status === 'delivered')
+        const now = new Date()
+        const monthNames = ['T1', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'T8', 'T9', 'T10', 'T11', 'T12']
+        let initialData = []
+        for (let i = 5; i >= 0; i--) {
+          const date = new Date(now)
+          date.setMonth(date.getMonth() - i)
+          const monthIndex = date.getMonth()
+          const year = date.getFullYear()
+          
+          const monthRevenue = deliveredOrders
+            .filter(o => {
+              const orderDate = new Date(o.createdAt)
+              return orderDate.getMonth() === monthIndex && orderDate.getFullYear() === year
+            })
+            .reduce((sum, o) => sum + (o.total || 0), 0)
+          
+          initialData.push({ label: monthNames[monthIndex], value: monthRevenue })
+        }
+        setRevenueChartData(initialData)
+
+        // Category data for products - Get full category names from API
+        let categoryMap = {}
+        try {
+          const categoriesRes = await api.get('/api/categories')
+          const allCategories = categoriesRes.data || []
+          
+          // Create category map: id -> name
+          const buildCategoryMap = (cats, parentName = '') => {
+            cats.forEach(cat => {
+              const fullName = parentName ? `${parentName} / ${cat.name}` : cat.name
+              categoryMap[cat._id] = fullName
+              if (cat.subcategories && cat.subcategories.length > 0) {
+                buildCategoryMap(cat.subcategories, fullName)
+              }
+            })
+          }
+          buildCategoryMap(allCategories)
+        } catch (error) {
+          console.error('Error loading categories:', error)
+        }
+        
+        // Count products by category
         const categories = {}
         products.forEach(p => {
-          const cat = p.category || 'Khác'
-          categories[cat] = (categories[cat] || 0) + 1
+          const catId = p.category
+          const catName = categoryMap[catId] || 'Khác'
+          categories[catName] = (categories[catName] || 0) + 1
         })
-        const colors = ['#d4a574', '#22c55e', '#3b82f6', '#f59e0b', '#ec4899', '#8b5cf6']
-        const catData = Object.entries(categories).slice(0, 6).map(([name, count], i) => ({
-          label: name.length > 8 ? name.substring(0, 8) + '...' : name,
-          value: count,
-          color: colors[i % colors.length]
-        }))
+        
+        const colors = [
+          'linear-gradient(135deg, #d4a574 0%, #c9965f 100%)',
+          'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
+          'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+          'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
+          'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)',
+          'linear-gradient(135deg, #ec4899 0%, #db2777 100%)',
+          'linear-gradient(135deg, #14b8a6 0%, #0d9488 100%)',
+          'linear-gradient(135deg, #f97316 0%, #ea580c 100%)'
+        ]
+        
+        const catData = Object.entries(categories)
+          .sort((a, b) => b[1] - a[1]) // Sort by count descending
+          .slice(0, 8) // Get top 8 categories
+          .map(([name, count], i) => ({
+            label: name.length > 15 ? name.substring(0, 15) + '...' : name,
+            fullLabel: name,
+            value: count,
+            color: colors[i % colors.length]
+          }))
         setCategoryData(catData)
 
         // Get 5 most recent orders
         const sorted = orders.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
         setRecentOrders(sorted.slice(0, 5))
+
+        // Get top selling products (based on featured/bestseller or just first 5)
+        const topProds = products
+          .filter(p => p.isBestseller || p.isFeatured)
+          .slice(0, 5)
+        if (topProds.length < 5) {
+          const remaining = products.filter(p => !topProds.includes(p)).slice(0, 5 - topProds.length)
+          topProds.push(...remaining)
+        }
+        setTopProducts(topProds.slice(0, 5))
+
+        // Get recent articles
+        const sortedArticles = articlesRes.data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+        setRecentArticles(sortedArticles.slice(0, 3))
       } catch (e) {
         console.error(e)
       }
@@ -196,6 +424,22 @@ export default function AdminStats() {
 
     fetchStats()
   }, [])
+
+  // Handle time period change
+  const handleTimePeriodChange = (period) => {
+    setTimePeriod(period)
+    calculateRevenueByPeriod(allOrders, period)
+  }
+
+  const getTimePeriodLabel = () => {
+    switch (timePeriod) {
+      case 'day': return '7 ngày qua'
+      case 'week': return '8 tuần qua'
+      case 'month': return '6 tháng qua'
+      case 'year': return '5 năm qua'
+      default: return ''
+    }
+  }
 
   const formatDate = (date) => {
     return new Date(date).toLocaleDateString('vi-VN', {
@@ -242,71 +486,212 @@ export default function AdminStats() {
           </div>
         ) : (
           <>
-            {/* Stats Cards */}
+            {/* Stats Cards - Row 1: Main Stats */}
             <div className="stats-overview-cards">
               <div className="stats-overview-card revenue">
-                <div className="stats-overview-icon">
-                  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/>
-                  </svg>
+                <div className="stats-card-top">
+                  <div className="stats-overview-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/>
+                    </svg>
+                  </div>
+                  <a href="/admin/orders" className="stats-card-link">Chi tiết →</a>
                 </div>
                 <div className="stats-overview-content">
-                  <span className="stats-overview-label">Doanh thu (Đơn hoàn thành)</span>
+                  <span className="stats-overview-label">Tổng doanh thu</span>
                   <span className="stats-overview-value">{stats.totalRevenue.toLocaleString()}đ</span>
-                  <span className="stats-overview-subtitle">{stats.completedOrders} đơn đã giao</span>
+                </div>
+                <div className="stats-card-footer">
+                  <div className="stats-mini-info">
+                    <span className="mini-dot success"></span>
+                    <span>{stats.completedOrders} đơn hoàn thành</span>
+                  </div>
                 </div>
               </div>
 
               <div className="stats-overview-card orders">
-                <div className="stats-overview-icon">
-                  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4zM3 6h18M16 10a4 4 0 01-8 0"/>
-                  </svg>
+                <div className="stats-card-top">
+                  <div className="stats-overview-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4zM3 6h18M16 10a4 4 0 01-8 0"/>
+                    </svg>
+                  </div>
+                  <a href="/admin/orders" className="stats-card-link">Chi tiết →</a>
                 </div>
                 <div className="stats-overview-content">
-                  <span className="stats-overview-label">Đơn hàng</span>
+                  <span className="stats-overview-label">Tổng đơn hàng</span>
                   <span className="stats-overview-value">{stats.totalOrders}</span>
-                  <span className="stats-overview-change positive">+8.2%</span>
+                </div>
+                <div className="stats-card-footer">
+                  <div className="stats-mini-bar">
+                    <div className="mini-bar-segment pending" style={{width: `${stats.totalOrders > 0 ? (stats.pendingOrders / stats.totalOrders * 100) : 0}%`}}></div>
+                    <div className="mini-bar-segment success" style={{width: `${stats.totalOrders > 0 ? (stats.completedOrders / stats.totalOrders * 100) : 0}%`}}></div>
+                    <div className="mini-bar-segment danger" style={{width: `${stats.totalOrders > 0 ? (stats.cancelledOrders / stats.totalOrders * 100) : 0}%`}}></div>
+                  </div>
+                  <div className="stats-mini-legend">
+                    <span><span className="mini-dot pending"></span>{stats.pendingOrders} chờ</span>
+                    <span><span className="mini-dot success"></span>{stats.completedOrders} xong</span>
+                    <span><span className="mini-dot danger"></span>{stats.cancelledOrders} hủy</span>
+                  </div>
                 </div>
               </div>
 
               <div className="stats-overview-card products">
-                <div className="stats-overview-icon">
-                  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/>
-                  </svg>
+                <div className="stats-card-top">
+                  <div className="stats-overview-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/>
+                    </svg>
+                  </div>
+                  <a href="/admin/products" className="stats-card-link">Chi tiết →</a>
                 </div>
                 <div className="stats-overview-content">
                   <span className="stats-overview-label">Sản phẩm</span>
                   <span className="stats-overview-value">{stats.totalProducts}</span>
-                  <span className="stats-overview-info">Đang bán</span>
+                </div>
+                <div className="stats-card-footer">
+                  <div className="stats-mini-info">
+                    <span className="mini-dot info"></span>
+                    <span>Đang kinh doanh</span>
+                  </div>
                 </div>
               </div>
 
               <div className="stats-overview-card users">
-                <div className="stats-overview-icon">
-                  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/>
-                    <circle cx="9" cy="7" r="4"/>
-                    <path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/>
-                  </svg>
+                <div className="stats-card-top">
+                  <div className="stats-overview-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/>
+                      <circle cx="9" cy="7" r="4"/>
+                      <path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/>
+                    </svg>
+                  </div>
+                  <a href="/admin/users" className="stats-card-link">Chi tiết →</a>
                 </div>
                 <div className="stats-overview-content">
                   <span className="stats-overview-label">Khách hàng</span>
                   <span className="stats-overview-value">{stats.totalUsers}</span>
-                  <span className="stats-overview-info">Đã đăng ký</span>
+                </div>
+                <div className="stats-card-footer">
+                  <div className="stats-mini-info">
+                    <span className="mini-dot info"></span>
+                    <span>Tài khoản đã đăng ký</span>
+                  </div>
                 </div>
               </div>
+            </div>
+
+            {/* Quick Actions */}
+            <div className="stats-quick-actions">
+              <a href="/admin/orders" className="quick-action-btn">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/>
+                  <line x1="3" y1="6" x2="21" y2="6"/>
+                </svg>
+                Quản lý đơn hàng
+                {stats.pendingOrders > 0 && <span className="action-badge">{stats.pendingOrders}</span>}
+              </a>
+              <a href="/admin/products" className="quick-action-btn">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/>
+                </svg>
+                Quản lý sản phẩm
+              </a>
+              <a href="/admin/users" className="quick-action-btn">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/>
+                  <circle cx="9" cy="7" r="4"/>
+                </svg>
+                Quản lý khách hàng
+              </a>
+              <a href="/admin/articles" className="quick-action-btn">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+                  <path d="M14 2v6h6"/>
+                </svg>
+                Quản lý bài viết
+                <span className="action-count">{stats.totalArticles}</span>
+              </a>
+              <a href="/admin/categories" className="quick-action-btn">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/>
+                </svg>
+                Quản lý danh mục
+              </a>
+              <a href="/admin/reviews" className="quick-action-btn">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                </svg>
+                Quản lý đánh giá
+              </a>
             </div>
 
             {/* Charts Row */}
             <div className="stats-charts-row">
               <div className="stats-chart-card">
                 <div className="stats-chart-header">
-                  <h3>Doanh thu theo tháng</h3>
-                  <span className="chart-info">Chỉ tính đơn đã hoàn thành</span>
+                  <div className="chart-title-section">
+                    <h3>Doanh thu theo thời gian</h3>
+                    <span className="chart-info">{getTimePeriodLabel()} - Chỉ tính đơn đã hoàn thành</span>
+                  </div>
+                  <div className="time-period-selector">
+                    <button 
+                      className={`period-btn ${timePeriod === 'day' ? 'active' : ''}`}
+                      onClick={() => handleTimePeriodChange('day')}
+                    >
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                        <line x1="16" y1="2" x2="16" y2="6"/>
+                        <line x1="8" y1="2" x2="8" y2="6"/>
+                        <line x1="3" y1="10" x2="21" y2="10"/>
+                      </svg>
+                      Ngày
+                    </button>
+                    <button 
+                      className={`period-btn ${timePeriod === 'week' ? 'active' : ''}`}
+                      onClick={() => handleTimePeriodChange('week')}
+                    >
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                        <line x1="3" y1="10" x2="21" y2="10"/>
+                        <line x1="9" y1="4" x2="9" y2="22"/>
+                      </svg>
+                      Tuần
+                    </button>
+                    <button 
+                      className={`period-btn ${timePeriod === 'month' ? 'active' : ''}`}
+                      onClick={() => handleTimePeriodChange('month')}
+                    >
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                        <line x1="16" y1="2" x2="16" y2="6"/>
+                        <line x1="8" y1="2" x2="8" y2="6"/>
+                        <line x1="3" y1="10" x2="21" y2="10"/>
+                        <path d="M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01"/>
+                      </svg>
+                      Tháng
+                    </button>
+                    <button 
+                      className={`period-btn ${timePeriod === 'year' ? 'active' : ''}`}
+                      onClick={() => handleTimePeriodChange('year')}
+                    >
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <circle cx="12" cy="12" r="10"/>
+                        <polyline points="12 6 12 12 16 14"/>
+                      </svg>
+                      Năm
+                    </button>
+                  </div>
                 </div>
-                <LineChart data={monthlyData} height={180} />
+                <LineChart data={revenueChartData.length > 0 ? revenueChartData : monthlyData} height={200} />
+                <div className="chart-summary">
+                  <div className="chart-summary-item">
+                    <span className="summary-label">Tổng doanh thu kỳ này:</span>
+                    <span className="summary-value">
+                      {(revenueChartData.reduce((sum, d) => sum + d.value, 0) || 0).toLocaleString()}đ
+                    </span>
+                  </div>
+                </div>
               </div>
 
               <div className="stats-chart-card">
@@ -329,80 +714,89 @@ export default function AdminStats() {
               </div>
             </div>
 
-            {/* Revenue Info Card */}
-            <div className="revenue-info-card">
-              <div className="revenue-info-icon">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <circle cx="12" cy="12" r="10"/>
-                  <path d="M12 16v-4M12 8h.01"/>
-                </svg>
-              </div>
-              <div className="revenue-info-content">
-                <h4>📊 Cách tính doanh thu</h4>
-                <p>
-                  Doanh thu chỉ được tính khi đơn hàng chuyển sang trạng thái <strong>"Đã giao thành công"</strong>. 
-                  Khi admin xác nhận hoàn thành đơn hàng, số tiền sẽ được tự động cộng vào tổng doanh thu.
-                </p>
-                <div className="revenue-breakdown">
-                  <div className="breakdown-item">
-                    <span className="breakdown-label">✅ Đơn hoàn thành:</span>
-                    <span className="breakdown-value success">{stats.completedOrders} đơn</span>
-                  </div>
-                  <div className="breakdown-item">
-                    <span className="breakdown-label">⏳ Đang xử lý:</span>
-                    <span className="breakdown-value pending">{stats.pendingOrders} đơn</span>
-                  </div>
-                  <div className="breakdown-item">
-                    <span className="breakdown-label">❌ Đã hủy:</span>
-                    <span className="breakdown-value cancelled">{stats.cancelledOrders} đơn</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
             {/* Second Charts Row */}
             <div className="stats-charts-row">
               <div className="stats-chart-card wide">
                 <div className="stats-chart-header">
-                  <h3>Sản phẩm theo danh mục</h3>
+                  <h3>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/>
+                    </svg>
+                    Sản phẩm theo danh mục
+                  </h3>
+                  <a href="/admin/categories" className="stats-view-all">Quản lý danh mục →</a>
                 </div>
-                <BarChart data={categoryData} height={180} />
+                {categoryData && categoryData.length > 0 ? (
+                  <BarChart data={categoryData} height={200} />
+                ) : (
+                  <div style={{ padding: '40px', textAlign: 'center', color: '#94a3b8' }}>
+                    <p>Chưa có dữ liệu danh mục</p>
+                  </div>
+                )}
               </div>
 
               <div className="stats-chart-card">
                 <div className="stats-chart-header">
-                  <h3>Tình trạng nhanh</h3>
+                  <h3>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+                    </svg>
+                    Hoạt động hôm nay
+                  </h3>
                 </div>
-                <div className="quick-status-grid">
-                  <div className="quick-status-item pending">
-                    <span className="quick-status-icon">
-                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <div className="today-activity-grid">
+                  <div className="today-activity-item">
+                    <div className="activity-icon pending">
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                         <circle cx="12" cy="12" r="10"/>
                         <path d="M12 6v6l4 2"/>
                       </svg>
-                    </span>
-                    <span className="quick-status-value">{stats.pendingOrders}</span>
-                    <span className="quick-status-label">Chờ xử lý</span>
+                    </div>
+                    <div className="activity-info">
+                      <span className="activity-value">{stats.pendingOrders}</span>
+                      <span className="activity-label">Đơn chờ xử lý</span>
+                    </div>
+                    <a href="/admin/orders?status=pending" className="activity-action">Xem →</a>
                   </div>
-                  <div className="quick-status-item completed">
-                    <span className="quick-status-icon">
-                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <div className="today-activity-item">
+                    <div className="activity-icon success">
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                         <path d="M22 11.08V12a10 10 0 11-5.93-9.14"/>
                         <path d="M22 4L12 14.01l-3-3"/>
                       </svg>
-                    </span>
-                    <span className="quick-status-value">{stats.completedOrders}</span>
-                    <span className="quick-status-label">Hoàn thành</span>
+                    </div>
+                    <div className="activity-info">
+                      <span className="activity-value">{stats.completedOrders}</span>
+                      <span className="activity-label">Đơn hoàn thành</span>
+                    </div>
+                    <a href="/admin/orders?status=delivered" className="activity-action">Xem →</a>
                   </div>
-                  <div className="quick-status-item articles">
-                    <span className="quick-status-icon">
-                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
-                        <path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/>
+                  <div className="today-activity-item">
+                    <div className="activity-icon danger">
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <circle cx="12" cy="12" r="10"/>
+                        <line x1="15" y1="9" x2="9" y2="15"/>
+                        <line x1="9" y1="9" x2="15" y2="15"/>
                       </svg>
-                    </span>
-                    <span className="quick-status-value">{stats.totalArticles}</span>
-                    <span className="quick-status-label">Bài viết</span>
+                    </div>
+                    <div className="activity-info">
+                      <span className="activity-value">{stats.cancelledOrders}</span>
+                      <span className="activity-label">Đơn đã hủy</span>
+                    </div>
+                    <a href="/admin/orders?status=cancelled" className="activity-action">Xem →</a>
+                  </div>
+                  <div className="today-activity-item">
+                    <div className="activity-icon info">
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+                        <path d="M14 2v6h6"/>
+                      </svg>
+                    </div>
+                    <div className="activity-info">
+                      <span className="activity-value">{stats.totalArticles}</span>
+                      <span className="activity-label">Bài viết</span>
+                    </div>
+                    <a href="/admin/articles" className="activity-action">Xem →</a>
                   </div>
                 </div>
               </div>
@@ -412,37 +806,56 @@ export default function AdminStats() {
             {recentOrders.length > 0 && (
               <div className="stats-recent-section">
                 <div className="stats-section-header">
-                  <h3>Đơn hàng gần đây</h3>
-                  <a href="/admin/orders" className="stats-view-all">Xem tất cả →</a>
+                  <h3>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/>
+                      <line x1="3" y1="6" x2="21" y2="6"/>
+                    </svg>
+                    Đơn hàng mới nhất
+                  </h3>
+                  <a href="/admin/orders" className="stats-view-all">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/>
+                      <polyline points="15 3 21 3 21 9"/>
+                      <line x1="10" y1="14" x2="21" y2="3"/>
+                    </svg>
+                    Quản lý đơn hàng
+                  </a>
                 </div>
-                <div className="stats-table-wrapper">
-                  <table className="stats-data-table">
-                    <thead>
-                      <tr>
-                        <th>Mã đơn</th>
-                        <th>Khách hàng</th>
-                        <th>Ngày</th>
-                        <th>Tổng tiền</th>
-                        <th>Trạng thái</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {recentOrders.map(order => {
-                        const badge = getStatusBadge(order.status)
-                        return (
-                          <tr key={order._id}>
-                            <td className="order-id-cell">#{order._id.slice(-6).toUpperCase()}</td>
-                            <td>{order.customerName || 'Khách hàng'}</td>
-                            <td>{formatDate(order.createdAt)}</td>
-                            <td className="order-total-cell">{(order.total || 0).toLocaleString()}đ</td>
-                            <td>
-                              <span className={`status-badge-new ${badge.class}`}>{badge.label}</span>
-                            </td>
-                          </tr>
-                        )
-                      })}
-                    </tbody>
-                  </table>
+                <div className="stats-orders-grid">
+                  {recentOrders.map(order => {
+                    const badge = getStatusBadge(order.status)
+                    return (
+                      <div key={order._id} className="stats-order-card">
+                        <div className="order-card-header">
+                          <span className="order-card-id">#{order._id.slice(-6).toUpperCase()}</span>
+                          <span className={`order-card-status ${badge.class}`}>{badge.label}</span>
+                        </div>
+                        <div className="order-card-body">
+                          <div className="order-card-customer">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                              <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/>
+                              <circle cx="12" cy="7" r="4"/>
+                            </svg>
+                            {order.customerName || 'Khách hàng'}
+                          </div>
+                          <div className="order-card-date">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                              <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                              <line x1="16" y1="2" x2="16" y2="6"/>
+                              <line x1="8" y1="2" x2="8" y2="6"/>
+                              <line x1="3" y1="10" x2="21" y2="10"/>
+                            </svg>
+                            {formatDate(order.createdAt)}
+                          </div>
+                        </div>
+                        <div className="order-card-footer">
+                          <span className="order-card-total">{(order.total || 0).toLocaleString()}đ</span>
+                          <a href={`/admin/orders`} className="order-card-view">Xem chi tiết</a>
+                        </div>
+                      </div>
+                    )
+                  })}
                 </div>
               </div>
             )}
