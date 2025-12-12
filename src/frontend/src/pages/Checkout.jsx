@@ -6,7 +6,7 @@ import { useNavigate, Link } from 'react-router-dom'
 import './Checkout.css'
 
 export default function Checkout(){
-  const { items, clear } = useCart()
+  const { items, clear, remove } = useCart()
   const { user } = useAuth()
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
@@ -17,6 +17,8 @@ export default function Checkout(){
   const [loading, setLoading] = useState(false)
   const [showQR, setShowQR] = useState(false)
   const [orderCreated, setOrderCreated] = useState(null)
+  const [checkoutItems, setCheckoutItems] = useState([])
+  const [isInitialized, setIsInitialized] = useState(false)
   const navigate = useNavigate()
 
   const BANK_INFO = {
@@ -25,6 +27,25 @@ export default function Checkout(){
     accountName: 'NGUYEN TAN LOI',
     template: 'compact'
   }
+
+  // Get selected items from sessionStorage
+  useEffect(() => {
+    const selectedIds = sessionStorage.getItem('checkoutItems')
+    if (selectedIds) {
+      try {
+        const ids = JSON.parse(selectedIds)
+        const selectedItems = items.filter(item => ids.includes(item.product))
+        setCheckoutItems(selectedItems)
+      } catch (e) {
+        // If error, use all items
+        setCheckoutItems(items)
+      }
+    } else {
+      // If no selection, use all items
+      setCheckoutItems(items)
+    }
+    setIsInitialized(true)
+  }, [items])
 
   useEffect(() => {
     if (user) {
@@ -36,13 +57,19 @@ export default function Checkout(){
   }, [user])
 
   useEffect(() => {
-    if (items.length === 0 && !showQR) {
+    // Only redirect after initialization is complete
+    if (!isInitialized || showQR) return
+    
+    if (items.length === 0) {
+      navigate('/cart')
+    } else if (checkoutItems.length === 0) {
+      // Only redirect if no items selected after proper initialization
       navigate('/cart')
     }
-  }, [items, showQR])
+  }, [checkoutItems, showQR, items, isInitialized])
 
-  // Tính tổng tiền từ tất cả items trong giỏ
-  const subtotal = items.reduce((sum, item) => sum + (item.price * item.quantity), 0)
+  // Tính tổng tiền từ các items đã chọn
+  const subtotal = checkoutItems.reduce((sum, item) => sum + (item.price * item.quantity), 0)
   const shippingFee = subtotal >= 500000 ? 0 : 30000
   const finalTotal = subtotal + shippingFee
 
@@ -55,7 +82,7 @@ export default function Checkout(){
   const handleSubmit = async e => {
     e.preventDefault()
     
-    if (items.length === 0) {
+    if (checkoutItems.length === 0) {
       return alert('Vui lòng chọn sản phẩm')
     }
 
@@ -66,7 +93,7 @@ export default function Checkout(){
         customerEmail: email, 
         phone: phone,
         address: address,
-        items: items, 
+        items: checkoutItems, 
         total: finalTotal, 
         notes: note,
         paymentMethod: paymentMethod,
@@ -78,7 +105,9 @@ export default function Checkout(){
       if (paymentMethod === 'qr') {
         setShowQR(true)
       } else {
-        clear()
+        // Remove only checkout items from cart
+        checkoutItems.forEach(item => remove(item.product))
+        sessionStorage.removeItem('checkoutItems')
         navigate('/orders')
         alert('Đặt hàng thành công! Mã: #' + res.data._id.slice(-8))
       }
@@ -89,7 +118,9 @@ export default function Checkout(){
   }
 
   const confirmPayment = () => {
-    clear()
+    // Remove only checkout items from cart
+    checkoutItems.forEach(item => remove(item.product))
+    sessionStorage.removeItem('checkoutItems')
     navigate('/orders')
     alert('Đơn hàng đã được tạo! Mã đơn: #' + orderCreated._id.slice(-8) + '\nVui lòng chờ admin xác nhận thanh toán của bạn.')
   }
@@ -269,10 +300,10 @@ export default function Checkout(){
 
         {/* Right - Order Summary */}
         <div className="order-summary">
-          <h2>Đơn hàng của bạn</h2>
+          <h2>Đơn hàng của bạn ({checkoutItems.length} sản phẩm)</h2>
           
           <div className="order-items">
-            {items.map(item => (
+            {checkoutItems.map(item => (
               <div key={item.product} className="order-item">
                 <div className="item-image">
                   {item.imageUrl ? (
