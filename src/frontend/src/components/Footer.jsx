@@ -17,8 +17,10 @@ export default function Footer(){
             <div className="footer-badge">
             </div>
             <div className="footer-company-info">
-              <p><strong>Florana - Hoa & Cây Cảnh</strong></p>
+              <p><strong>Đồ án chuyên ngành "Xây dựng website quảng bá và kinh doanh hoa kiểng"</strong></p>
               <p>Đại học Trà Vinh</p>
+              <p>Nguyên Tấn Lợi, DA22TTA, 110122014</p>
+              
             </div>
           </div>
 
