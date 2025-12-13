@@ -245,16 +245,15 @@ export default function AdminMessages() {
                   onChange={(e) => setNewMessage(e.target.value)}
                   disabled={sending}
                 />
-                <button type="submit" disabled={sending || !newMessage.trim()} title="Gửi tin nhắn">
+                <button type="submit" disabled={sending || !newMessage.trim()} title="Gửi tin nhắn" className="am-send-btn">
                   {sending ? (
                     <svg className="am-spinner" width="22" height="22" viewBox="0 0 24 24">
                       <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" opacity="0.25" />
                       <path fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" opacity="0.75" />
                     </svg>
                   ) : (
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M22 2L11 13" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                      <path d="M22 2L15 22L11 13L2 9L22 2Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M2.01 21L23 12L2.01 3L2 10L17 12L2 14L2.01 21Z"/>
                     </svg>
                   )}
                 </button>

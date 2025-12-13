@@ -409,6 +409,38 @@
   color: #475569;
 }
 
+/* Today Live Badge */
+.today-live-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #10b981;
+  background: #ecfdf5;
+  padding: 6px 12px;
+  border-radius: 20px;
+}
+
+.live-dot {
+  width: 8px;
+  height: 8px;
+  background: #10b981;
+  border-radius: 50%;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.5;
+    transform: scale(1.2);
+  }
+}
+
 /* Responsive */
 @media (max-width: 1200px) {
   .stats-charts-row {

@@ -78,6 +78,8 @@ export default function AdminProducts(){
         case 'price-desc': return (Number(b.price) || 0) - (Number(a.price) || 0)
         case 'stock-asc': return (Number(a.stock) || 0) - (Number(b.stock) || 0)
         case 'stock-desc': return (Number(b.stock) || 0) - (Number(a.stock) || 0)
+        case 'newest': return new Date(b.createdAt || 0) - new Date(a.createdAt || 0)
+        case 'oldest': return new Date(a.createdAt || 0) - new Date(b.createdAt || 0)
         default: return 0
       }
     })
@@ -309,6 +311,8 @@ export default function AdminProducts(){
                     <label>Sắp xếp:</label>
                     <select value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
                       <option value="name">Tên A-Z</option>
+                      <option value="newest">Mới nhất</option>
+                      <option value="oldest">Cũ nhất</option>
                       <option value="price-asc">Giá: Thấp → Cao</option>
                       <option value="price-desc">Giá: Cao → Thấp</option>
                       <option value="stock-asc">Tồn kho: Thấp → Cao</option>

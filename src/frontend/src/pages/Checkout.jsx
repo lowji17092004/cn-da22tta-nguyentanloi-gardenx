@@ -5,6 +5,44 @@ import api from '../api'
 import { useNavigate, Link } from 'react-router-dom'
 import './Checkout.css'
 
+// Success Modal Component
+function SuccessModal({ isOpen, orderCode, onClose }) {
+  if (!isOpen) return null
+  
+  return (
+    <div className="success-modal-overlay" onClick={onClose}>
+      <div className="success-modal" onClick={e => e.stopPropagation()}>
+        <div className="success-modal-icon">
+          <svg width="80" height="80" viewBox="0 0 24 24" fill="none">
+            <circle cx="12" cy="12" r="11" stroke="#10b981" strokeWidth="2"/>
+            <path d="M7 12.5l3 3 7-7" stroke="#10b981" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+        </div>
+        <h2>Đặt hàng thành công!</h2>
+        <p className="success-order-code">Mã đơn hàng: <strong>#{orderCode}</strong></p>
+        <p className="success-message">
+          Cảm ơn bạn đã đặt hàng tại Florana! <br/>
+          Chúng tôi sẽ liên hệ xác nhận đơn hàng trong thời gian sớm nhất.
+        </p>
+        <div className="success-actions">
+          <Link to="/orders" className="success-btn primary">
+            <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+            </svg>
+            Xem đơn hàng
+          </Link>
+          <Link to="/" className="success-btn secondary">
+            <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+            </svg>
+            Về trang chủ
+          </Link>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 export default function Checkout(){
   const { items, clear, remove } = useCart()
   const { user } = useAuth()
@@ -19,6 +57,8 @@ export default function Checkout(){
   const [orderCreated, setOrderCreated] = useState(null)
   const [checkoutItems, setCheckoutItems] = useState([])
   const [isInitialized, setIsInitialized] = useState(false)
+  const [showSuccessModal, setShowSuccessModal] = useState(false)
+  const [successOrderCode, setSuccessOrderCode] = useState('')
   const navigate = useNavigate()
 
   const BANK_INFO = {
@@ -58,15 +98,16 @@ export default function Checkout(){
 
   useEffect(() => {
     // Only redirect after initialization is complete
-    if (!isInitialized || showQR) return
+    // Don't redirect if success modal is showing or QR page is showing
+    if (!isInitialized || showQR || showSuccessModal) return
     
-    if (items.length === 0) {
+    if (items.length === 0 && !orderCreated) {
       navigate('/cart')
-    } else if (checkoutItems.length === 0) {
+    } else if (checkoutItems.length === 0 && !orderCreated) {
       // Only redirect if no items selected after proper initialization
       navigate('/cart')
     }
-  }, [checkoutItems, showQR, items, isInitialized])
+  }, [checkoutItems, showQR, items, isInitialized, showSuccessModal, orderCreated])
 
   // Tính tổng tiền từ các items đã chọn
   const subtotal = checkoutItems.reduce((sum, item) => sum + (item.price * item.quantity), 0)
@@ -108,8 +149,8 @@ export default function Checkout(){
         // Remove only checkout items from cart
         checkoutItems.forEach(item => remove(item.product))
         sessionStorage.removeItem('checkoutItems')
-        navigate('/orders')
-        alert('Đặt hàng thành công! Mã: #' + res.data._id.slice(-8))
+        setSuccessOrderCode(res.data._id.slice(-8).toUpperCase())
+        setShowSuccessModal(true)
       }
     } catch(e) { 
       alert('Đặt hàng thất bại: ' + (e.response?.data?.message || e.message)) 
@@ -121,8 +162,8 @@ export default function Checkout(){
     // Remove only checkout items from cart
     checkoutItems.forEach(item => remove(item.product))
     sessionStorage.removeItem('checkoutItems')
-    navigate('/orders')
-    alert('Đơn hàng đã được tạo! Mã đơn: #' + orderCreated._id.slice(-8) + '\nVui lòng chờ admin xác nhận thanh toán của bạn.')
+    setSuccessOrderCode(orderCreated._id.slice(-8).toUpperCase())
+    setShowSuccessModal(true)
   }
 
   // QR Payment Page
@@ -188,6 +229,13 @@ export default function Checkout(){
             </div>
           </div>
         </div>
+
+        {/* Success Modal for QR payment */}
+        <SuccessModal 
+          isOpen={showSuccessModal} 
+          orderCode={successOrderCode}
+          onClose={() => navigate('/orders')}
+        />
       </div>
     )
   }
@@ -345,6 +393,13 @@ export default function Checkout(){
           </button>
         </div>
       </form>
+
+      {/* Success Modal */}
+      <SuccessModal 
+        isOpen={showSuccessModal} 
+        orderCode={successOrderCode}
+        onClose={() => navigate('/orders')}
+      />
     </div>
   )
 }

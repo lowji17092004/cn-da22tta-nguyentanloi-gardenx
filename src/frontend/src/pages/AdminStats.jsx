@@ -206,6 +206,12 @@ export default function AdminStats() {
   const [allOrders, setAllOrders] = useState([])
   const [topProducts, setTopProducts] = useState([])
   const [recentArticles, setRecentArticles] = useState([])
+  const [todayStats, setTodayStats] = useState({
+    pendingOrders: 0,
+    completedOrders: 0,
+    cancelledOrders: 0,
+    articles: 0
+  })
 
   // Calculate revenue by time period
   const calculateRevenueByPeriod = (orders, period) => {
@@ -348,32 +354,25 @@ export default function AdminStats() {
         }
         setRevenueChartData(initialData)
 
-        // Category data for products - Get full category names from API
-        let categoryMap = {}
+        // Category data for products - Get MAIN categories only from API
+        let mainCategories = []
         try {
-          const categoriesRes = await api.get('/api/categories')
-          const allCategories = categoriesRes.data || []
-          
-          // Create category map: id -> name
-          const buildCategoryMap = (cats, parentName = '') => {
-            cats.forEach(cat => {
-              const fullName = parentName ? `${parentName} / ${cat.name}` : cat.name
-              categoryMap[cat._id] = fullName
-              if (cat.subcategories && cat.subcategories.length > 0) {
-                buildCategoryMap(cat.subcategories, fullName)
-              }
-            })
-          }
-          buildCategoryMap(allCategories)
+          const categoriesRes = await api.get('/categories?type=product')
+          mainCategories = categoriesRes.data || []
         } catch (error) {
           console.error('Error loading categories:', error)
         }
         
-        // Count products by category
+        // Count products by MAIN category only (not subcategories)
         const categories = {}
         products.forEach(p => {
-          const catId = p.category
-          const catName = categoryMap[catId] || 'Khác'
+          // Find the main category that matches this product's category
+          const mainCat = mainCategories.find(cat => 
+            cat.slug === p.category || 
+            cat._id === p.category ||
+            cat.subcategories?.some(sub => sub.slug === p.category || sub._id === p.category)
+          )
+          const catName = mainCat?.name || 'Khác'
           categories[catName] = (categories[catName] || 0) + 1
         })
         
@@ -416,6 +415,23 @@ export default function AdminStats() {
         // Get recent articles
         const sortedArticles = articlesRes.data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
         setRecentArticles(sortedArticles.slice(0, 3))
+
+        // Calculate today's stats
+        const today = new Date()
+        today.setHours(0, 0, 0, 0)
+        
+        const todayOrders = orders.filter(o => new Date(o.createdAt) >= today)
+        const todayPending = todayOrders.filter(o => o.status === 'pending').length
+        const todayCompleted = todayOrders.filter(o => o.status === 'delivered').length
+        const todayCancelled = todayOrders.filter(o => o.status === 'cancelled').length
+        const todayArticles = articlesRes.data.filter(a => new Date(a.createdAt) >= today).length
+        
+        setTodayStats({
+          pendingOrders: todayPending,
+          completedOrders: todayCompleted,
+          cancelledOrders: todayCancelled,
+          articles: todayArticles
+        })
       } catch (e) {
         console.error(e)
       }
@@ -423,6 +439,11 @@ export default function AdminStats() {
     }
 
     fetchStats()
+    
+    // Real-time polling for today's stats every 30 seconds
+    const pollInterval = setInterval(fetchStats, 30000)
+    
+    return () => clearInterval(pollInterval)
   }, [])
 
   // Handle time period change
@@ -743,6 +764,10 @@ export default function AdminStats() {
                     </svg>
                     Hoạt động hôm nay
                   </h3>
+                  <span className="today-live-badge">
+                    <span className="live-dot"></span>
+                    Cập nhật tự động
+                  </span>
                 </div>
                 <div className="today-activity-grid">
                   <div className="today-activity-item">
@@ -753,7 +778,7 @@ export default function AdminStats() {
                       </svg>
                     </div>
                     <div className="activity-info">
-                      <span className="activity-value">{stats.pendingOrders}</span>
+                      <span className="activity-value">{todayStats.pendingOrders}</span>
                       <span className="activity-label">Đơn chờ xử lý</span>
                     </div>
                     <a href="/admin/orders?status=pending" className="activity-action">Xem →</a>
@@ -766,7 +791,7 @@ export default function AdminStats() {
                       </svg>
                     </div>
                     <div className="activity-info">
-                      <span className="activity-value">{stats.completedOrders}</span>
+                      <span className="activity-value">{todayStats.completedOrders}</span>
                       <span className="activity-label">Đơn hoàn thành</span>
                     </div>
                     <a href="/admin/orders?status=delivered" className="activity-action">Xem →</a>
@@ -780,7 +805,7 @@ export default function AdminStats() {
                       </svg>
                     </div>
                     <div className="activity-info">
-                      <span className="activity-value">{stats.cancelledOrders}</span>
+                      <span className="activity-value">{todayStats.cancelledOrders}</span>
                       <span className="activity-label">Đơn đã hủy</span>
                     </div>
                     <a href="/admin/orders?status=cancelled" className="activity-action">Xem →</a>
@@ -793,7 +818,7 @@ export default function AdminStats() {
                       </svg>
                     </div>
                     <div className="activity-info">
-                      <span className="activity-value">{stats.totalArticles}</span>
+                      <span className="activity-value">{todayStats.articles}</span>
                       <span className="activity-label">Bài viết</span>
                     </div>
                     <a href="/admin/articles" className="activity-action">Xem →</a>

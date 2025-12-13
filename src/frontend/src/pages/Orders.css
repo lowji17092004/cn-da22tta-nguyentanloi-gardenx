@@ -682,6 +682,14 @@
   cursor: pointer;
   position: relative;
   transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.detail-tab svg {
+  flex-shrink: 0;
 }
 
 .detail-tab:hover {
@@ -701,6 +709,28 @@
   height: 3px;
   background: #10b981;
   border-radius: 3px 3px 0 0;
+}
+
+/* No Products Message */
+.no-products-message {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  color: #94a3b8;
+  text-align: center;
+}
+
+.no-products-message svg {
+  color: #cbd5e1;
+  margin-bottom: 12px;
+}
+
+.no-products-message p {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 500;
 }
 
 /* Panel Body */

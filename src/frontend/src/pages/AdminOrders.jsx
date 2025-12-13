@@ -14,6 +14,13 @@ export default function AdminOrders() {
   const [sortBy, setSortBy] = useState('date-desc')
   const [expandedRow, setExpandedRow] = useState(null)
   const [updatingStatus, setUpdatingStatus] = useState(null)
+  const [updatingPayment, setUpdatingPayment] = useState(null)
+
+  const paymentStatusLabels = {
+    pending: 'Chưa thanh toán',
+    paid: 'Đã thanh toán',
+    failed: 'Thất bại'
+  }
 
   const statusLabels = {
     pending: 'Chờ xác nhận',
@@ -48,6 +55,17 @@ export default function AdminOrders() {
       alert('Cập nhật lỗi')
     }
     setUpdatingStatus(null)
+  }
+
+  const updatePaymentStatus = async (id, paymentStatus) => {
+    setUpdatingPayment(id)
+    try {
+      await api.put('/orders/' + id + '/payment', { paymentStatus })
+      load()
+    } catch (e) {
+      alert('Cập nhật thanh toán lỗi')
+    }
+    setUpdatingPayment(null)
   }
 
   const deleteOrder = async (id) => {
@@ -273,7 +291,7 @@ export default function AdminOrders() {
                       <td>
                         <div className="customer-info">
                           <div className="customer-avatar">
-                            {order.user?.avatar ? (
+                            {(order.user?.avatar) ? (
                               <img 
                                 src={order.user.avatar.startsWith('http') ? order.user.avatar : `http://localhost:5000${order.user.avatar}`} 
                                 alt="" 
@@ -286,7 +304,14 @@ export default function AdminOrders() {
                           </div>
                           <div className="customer-details">
                             <div className="customer-name">{order.customerName || order.user?.name || 'Khách hàng'}</div>
-                            <div className="customer-phone">{order.phone || 'N/A'}</div>
+                            <div className="customer-contact">
+                              <span className="customer-phone">
+                                <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                                </svg>
+                                {order.phone || 'N/A'}
+                              </span>
+                            </div>
                           </div>
                         </div>
                       </td>
@@ -309,23 +334,16 @@ export default function AdminOrders() {
                         <div className="order-total">{formatPrice(order.total)}</div>
                       </td>
                       <td>
-                        <span className={`payment-badge ${order.isPaid ? 'paid' : 'unpaid'}`}>
-                          {order.isPaid ? (
-                            <>
-                              <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
-                              </svg>
-                              Đã thanh toán
-                            </>
-                          ) : (
-                            <>
-                              <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                              </svg>
-                              Chưa thanh toán
-                            </>
-                          )}
-                        </span>
+                        <select
+                          className={`payment-select payment-${order.paymentStatus || 'pending'}`}
+                          value={order.paymentStatus || 'pending'}
+                          onChange={(e) => updatePaymentStatus(order._id, e.target.value)}
+                          disabled={updatingPayment === order._id}
+                        >
+                          {Object.entries(paymentStatusLabels).map(([key, label]) => (
+                            <option key={key} value={key}>{label}</option>
+                          ))}
+                        </select>
                       </td>
                       <td>
                         <select

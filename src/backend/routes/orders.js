@@ -83,7 +83,7 @@ router.post('/', requireAuth, async (req, res) => {
 router.get('/', requireAuth, requireAdminOrCollaborator, async (req, res) => {
   const list = await Order.find()
     .sort({ createdAt: -1 })
-    .populate('user', 'name email')
+    .populate('user', 'name email avatar')
     .populate('items.product', 'name images price')
     .populate('statusHistory.updatedBy', 'name');
   res.json(list);
@@ -205,6 +205,32 @@ router.get('/:id/next-statuses', requireAuth, requireAdmin, async (req, res) => 
     }));
     
     res.json({ currentStatus: order.status, nextStatuses: statusOptions });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// Admin update payment status
+router.put('/:id/payment', requireAuth, requireAdminOrCollaborator, async (req, res) => {
+  try {
+    const { paymentStatus } = req.body;
+    const order = await Order.findById(req.params.id);
+    
+    if (!order) {
+      return res.status(404).json({ message: 'Không tìm thấy đơn hàng' });
+    }
+    
+    if (!['pending', 'paid', 'failed'].includes(paymentStatus)) {
+      return res.status(400).json({ message: 'Trạng thái thanh toán không hợp lệ' });
+    }
+    
+    order.paymentStatus = paymentStatus;
+    await order.save();
+    
+    await order.populate('items.product');
+    await order.populate('user', 'name email avatar');
+    
+    res.json(order);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
