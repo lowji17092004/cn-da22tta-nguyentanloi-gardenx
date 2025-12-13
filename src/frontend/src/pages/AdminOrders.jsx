@@ -22,6 +22,11 @@ export default function AdminOrders() {
     failed: 'Thất bại'
   }
 
+  const paymentMethodLabels = {
+    cod: 'COD',
+    qr: 'QR'
+  }
+
   const statusLabels = {
     pending: 'Chờ xác nhận',
     confirmed: 'Đã xác nhận',
@@ -275,7 +280,8 @@ export default function AdminOrders() {
                   <th>Khách hàng</th>
                   <th>Sản phẩm</th>
                   <th>Tổng tiền</th>
-                  <th>Thanh toán</th>
+                  <th>PT Thanh toán</th>
+                  <th>TT Thanh toán</th>
                   <th>Trạng thái</th>
                   <th>Thời gian</th>
                   <th>Thao tác</th>
@@ -332,6 +338,31 @@ export default function AdminOrders() {
                       </td>
                       <td>
                         <div className="order-total">{formatPrice(order.total)}</div>
+                      </td>
+                      <td>
+                        <span className={`payment-method-badge ${order.paymentMethod || 'cod'}`}>
+                          {order.paymentMethod === 'qr' ? (
+                            <>
+                              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                <rect x="3" y="3" width="7" height="7"/>
+                                <rect x="14" y="3" width="7" height="7"/>
+                                <rect x="3" y="14" width="7" height="7"/>
+                                <rect x="14" y="14" width="3" height="3"/>
+                                <rect x="18" y="14" width="3" height="3"/>
+                                <rect x="14" y="18" width="3" height="3"/>
+                                <rect x="18" y="18" width="3" height="3"/>
+                              </svg>
+                            </>
+                          ) : (
+                            <>
+                              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                <rect x="1" y="4" width="22" height="16" rx="2" ry="2"/>
+                                <line x1="1" y1="10" x2="23" y2="10"/>
+                              </svg>
+                            </>
+                          )}
+                          {paymentMethodLabels[order.paymentMethod] || paymentMethodLabels['cod']}
+                        </span>
                       </td>
                       <td>
                         <select
