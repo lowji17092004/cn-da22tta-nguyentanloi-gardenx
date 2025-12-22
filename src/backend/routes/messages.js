@@ -6,18 +6,23 @@ const { requireAuth, requireAdmin, requireAdminOrCollaborator } = require('../mi
 // User sends message
 router.post('/', requireAuth, async (req, res) => {
   try {
-    const { content } = req.body;
+    const { content, type } = req.body;
     
     if (!content || !content.trim()) {
       return res.status(400).json({ message: 'Nội dung tin nhắn không được để trống' });
     }
 
-    const message = new Message({
-      user: req.user.id,
+    // Handle system messages (payment notifications, etc.)
+    const messageData = {
+      user: req.user.userId || req.user.id,
       userName: req.user.name || 'User',
       userEmail: req.user.email || 'no-email@example.com',
-      content: content.trim()
-    });
+      content: content.trim(),
+      isFromAdmin: type === 'system' || type === 'payment_confirm',
+      status: type === 'system' || type === 'payment_confirm' ? 'replied' : 'pending'
+    };
+
+    const message = new Message(messageData);
 
     await message.save();
     res.status(201).json(message);

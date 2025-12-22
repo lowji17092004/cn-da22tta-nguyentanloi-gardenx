@@ -1,0 +1,47 @@
+/* ==========================================
+   FORMS
+   ========================================== */
+
+input,
+textarea,
+select {
+  width: 100%;
+  padding: 12px 14px;
+  margin-top: 6px;
+  box-sizing: border-box;
+  border: 2px solid var(--border);
+  border-radius: 8px;
+  background: var(--card);
+  font-size: 15px;
+  transition: border-color 200ms;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+label {
+  display: block;
+  margin-bottom: 4px;
+  font-weight: 500;
+  color: var(--text);
+}
+
+.form-group {
+  margin-bottom: 16px;
+}
+
+.form-error {
+  color: #dc2626;
+  font-size: 13px;
+  margin-top: 4px;
+}
+
+.form-success {
+  color: #059669;
+  font-size: 13px;
+  margin-top: 4px;
+}

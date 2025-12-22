@@ -11,15 +11,15 @@ export default function Footer(){
         <div className="footer-grid">
           <div className="footer-col footer-col-about">
             <div className="footer-brand">
-              <h3>Florana</h3>
+              <h3>The Sun Garden</h3>
+              
             </div>
             <p className="footer-desc">Florana mang đến không gian xanh tươi mát, kết nối bạn với thiên nhiên qua những sản phẩm hoa và cây cảnh chất lượng cao, tạo nên vẻ đẹp và sự tĩnh lặng cho ngôi nhà của bạn.</p>
             <div className="footer-badge">
             </div>
             <div className="footer-company-info">
-              <p><strong>Đồ án chuyên ngành "Xây dựng website quảng bá và kinh doanh hoa kiểng"</strong></p>
-              <p>Đại học Trà Vinh</p>
-              <p>Nguyên Tấn Lợi, DA22TTA, 110122014</p>
+              <p><strong> Đồ án chuyên ngành "Xây dựng website quảng bá và kinh doanh hoa kiểng"</strong></p>
+              <p> Nguyễn Tấn Lợi, DA22TTA, 110122014</p>
               
             </div>
           </div>

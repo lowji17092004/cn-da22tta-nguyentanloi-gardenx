@@ -233,7 +233,7 @@ const Profile = () => {
             <div className="profile-name-wrapper">
               <h1>{user.name || 'Người dùng'}</h1>
               <span className={`profile-badge ${user.role}`}>
-                {user.role === 'admin' ? '👑 Quản trị viên' : user.role === 'collaborator' ? '🤝 Cộng tác viên' : '🌸 Khách hàng'}
+                {user.role === 'admin' ? '👑 Quản trị viên' : user.role === 'collaborator' ? '💼 Nhân viên' : '🌸 Khách hàng'}
               </span>
             </div>
             <p className="profile-email">✉️ {user.email}</p>

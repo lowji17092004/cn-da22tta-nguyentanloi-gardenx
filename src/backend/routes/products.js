@@ -4,15 +4,50 @@ const Product = require('../models/Product');
 const Order = require('../models/Order');
 const { requireAuth, requireAdmin } = require('../middleware/auth');
 
-// Public list
+// Public list - excludes hidden products
 router.get('/', async (req, res) => {
   try {
-    const { category, bestseller, featured } = req.query;
-    let query = {};
+    const { category, bestseller, featured, includeHidden } = req.query;
+    let query = { isHidden: { $ne: true } }; // By default, exclude hidden products
+    
+    // Admin can include hidden products
+    if (includeHidden === 'true') {
+      query = {};
+    }
     
     // Filter by category
     if (category) {
-      query.category = new RegExp(category, 'i');
+      // Category can be ID, slug, or name
+      // First try to find the category to get both slug and name
+      const Category = require('../models/Category');
+      let categoryFilter = null;
+      
+      const mongoose = require('mongoose');
+      if (mongoose.Types.ObjectId.isValid(category)) {
+        // If it's a valid ObjectId, find the category
+        const cat = await Category.findById(category);
+        if (cat) {
+          // Match by slug or name (case-insensitive)
+          categoryFilter = {
+            $or: [
+              { category: new RegExp(`^${cat.slug}$`, 'i') },
+              { category: new RegExp(`^${cat.name}$`, 'i') }
+            ]
+          };
+        }
+      } else {
+        // If it's a string (slug or name), search directly
+        categoryFilter = {
+          $or: [
+            { category: new RegExp(`^${category}$`, 'i') },
+            { category: category }
+          ]
+        };
+      }
+      
+      if (categoryFilter) {
+        query = { ...query, ...categoryFilter };
+      }
     }
     
     // Filter bestsellers (sold >= 10 with paid orders only)
@@ -52,6 +87,7 @@ router.get('/', async (req, res) => {
     const items = await Product.find(query).sort({ createdAt: -1 });
     res.json(items);
   } catch (error) {
+    console.error('Error fetching products:', error);
     res.status(500).json({ message: error.message });
   }
 });
@@ -97,6 +133,25 @@ router.delete('/:id', requireAuth, requireAdmin, async (req, res) => {
   }catch(err){ console.error('remove images error', err) }
   await Product.findByIdAndDelete(req.params.id);
   res.json({ message: 'Deleted' });
+});
+
+// Admin toggle product visibility
+router.patch('/:id/toggle-visibility', requireAuth, requireAdmin, async (req, res) => {
+  try {
+    const product = await Product.findById(req.params.id);
+    if (!product) return res.status(404).json({ message: 'Product not found' });
+    
+    product.isHidden = !product.isHidden;
+    await product.save();
+    
+    res.json({ 
+      message: product.isHidden ? 'Đã ẩn sản phẩm' : 'Đã hiển thị sản phẩm',
+      isHidden: product.isHidden 
+    });
+  } catch(err) {
+    console.error('Toggle visibility error', err);
+    res.status(500).json({ message: 'Failed to toggle visibility' });
+  }
 });
 
 // Admin delete all products

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import api from '../api'
 import PageBanner from '../components/PageBanner'
+import CouponDisplay from '../components/CouponDisplay'
 
 export default function BlogFlorana(){
   const [articles, setArticles] = useState([])
@@ -13,7 +14,7 @@ export default function BlogFlorana(){
 
   async function loadArticles(){
     try {
-      const res = await api.get('/articles?category=about')
+      const res = await api.get('/articles')
       setArticles(res.data)
     } catch(err) {
       console.error('Lỗi tải bài viết:', err)

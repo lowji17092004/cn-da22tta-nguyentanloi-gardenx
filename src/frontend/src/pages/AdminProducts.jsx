@@ -3,6 +3,7 @@ import api from '../api'
 import { Link } from 'react-router-dom'
 import AdminLayout from '../components/AdminLayout'
 import { normalizeCategorySlug, matchesSearchTerm } from '../utils/searchUtils'
+import { getCategoryDisplayName } from '../utils/categoryUtils'
 import './AdminProducts.css'
 
 export default function AdminProducts(){
@@ -13,6 +14,7 @@ export default function AdminProducts(){
   const [debouncedSearch, setDebouncedSearch] = useState('')
   const [filterCategory, setFilterCategory] = useState('')
   const [filterStock, setFilterStock] = useState('')
+  const [filterVisibility, setFilterVisibility] = useState('all') // all, visible, hidden
   const [sortBy, setSortBy] = useState('name')
   const [viewMode, setViewMode] = useState('table')
   const [deleteModal, setDeleteModal] = useState({ show: false, item: null })
@@ -21,12 +23,12 @@ export default function AdminProducts(){
   const [page, setPage] = useState(1)
   const perPage = 12
 
-  // load products
+  // load products (including hidden for admin)
   const load = useCallback(async ()=>{
     setLoading(true)
     try{
       const [productsRes, categoriesRes] = await Promise.all([
-        api.get('/products'),
+        api.get('/products?includeHidden=true'),
         api.get('/categories?type=product')
       ])
       setItems(Array.isArray(productsRes.data) ? productsRes.data : [])
@@ -68,7 +70,12 @@ export default function AdminProducts(){
         (filterStock === 'ok' && stock >= 10)
       )
 
-      return matchSearch && matchCategory && matchStock
+      // Visibility filter
+      const matchVisibility = filterVisibility === 'all' || 
+        (filterVisibility === 'visible' && !item.isHidden) ||
+        (filterVisibility === 'hidden' && item.isHidden)
+
+      return matchSearch && matchCategory && matchStock && matchVisibility
     })
 
     result.sort((a,b) => {
@@ -85,7 +92,7 @@ export default function AdminProducts(){
     })
 
     return result
-  }, [items, debouncedSearch, filterCategory, filterStock, sortBy])
+  }, [items, debouncedSearch, filterCategory, filterStock, filterVisibility, sortBy])
 
   // pagination helpers
   const totalPages = Math.max(1, Math.ceil(filteredItems.length / perPage))
@@ -100,10 +107,34 @@ export default function AdminProducts(){
   // counts
   const categoryCounts = useMemo(() => {
     const counts = {}
-    items.forEach(item => {
-      const slug = normalizeCategorySlug(item.category)
-      if (slug) counts[slug] = (counts[slug] || 0) + 1
+
+    // Build map of known slugs -> parent category slug (from categories state)
+    const parentMap = {}
+    categories.forEach(cat => {
+      const catSlug = cat.slug
+      parentMap[normalizeCategorySlug(catSlug)] = catSlug
+      cat.subcategories?.forEach(sub => {
+        parentMap[normalizeCategorySlug(sub.slug)] = catSlug
+        parentMap[normalizeCategorySlug(sub.name || '')] = catSlug
+      })
+      // also map display name (no-diacritics)
+      parentMap[normalizeCategorySlug(cat.name || '')] = catSlug
     })
+
+    items.forEach(item => {
+      // Try to determine the main category slug for this item
+      const itemCat = normalizeCategorySlug(item.category || '')
+      const itemSub = normalizeCategorySlug(item.subcategory || '')
+
+      let mainSlug = null
+      if (parentMap[itemCat]) mainSlug = parentMap[itemCat]
+      else if (parentMap[itemSub]) mainSlug = parentMap[itemSub]
+      else if (itemCat) mainSlug = itemCat
+      else if (itemSub) mainSlug = itemSub
+
+      if (mainSlug) counts[mainSlug] = (counts[mainSlug] || 0) + 1
+    })
+
     return counts
   }, [items])
 
@@ -112,17 +143,19 @@ export default function AdminProducts(){
     const ok = items.filter(it => Number(it.stock || 0) >= 10).length
     const low = items.filter(it => Number(it.stock || 0) > 0 && Number(it.stock) < 10).length
     const out = items.filter(it => Number(it.stock || 0) === 0).length
-    return { all, ok, low, out }
+    const visible = items.filter(it => !it.isHidden).length
+    const hidden = items.filter(it => it.isHidden).length
+    return { all, ok, low, out, visible, hidden }
   }, [items])
 
   // Get category and subcategory display names
   const getCategoryDisplay = useCallback((item) => {
     const cat = categories.find(c => c.slug === normalizeCategorySlug(item.category))
-    const catName = cat?.name || item.category || '-'
+    const catName = cat?.name || getCategoryDisplayName(item.category) || '-'
     
     if (item.subcategory) {
       const sub = cat?.subcategories?.find(s => s.slug === item.subcategory)
-      const subName = sub?.name || item.subcategory
+      const subName = sub?.name || getCategoryDisplayName(item.subcategory)
       return { category: catName, subcategory: subName }
     }
     
@@ -140,6 +173,18 @@ export default function AdminProducts(){
       alert('Xóa thất bại')
     }
   }, [deleteModal])
+
+  const toggleVisibility = useCallback(async (item) => {
+    try {
+      const res = await api.patch(`/products/${item._id}/toggle-visibility`)
+      setItems(prev => prev.map(p => 
+        p._id === item._id ? { ...p, isHidden: res.data.isHidden } : p
+      ))
+    } catch(e) {
+      console.error('Toggle visibility failed', e)
+      alert('Không thể thay đổi trạng thái hiển thị')
+    }
+  }, [])
 
   const remove = useCallback((item) => {
     setDeleteModal({ show: true, item })
@@ -308,6 +353,15 @@ export default function AdminProducts(){
                   </div>
 
                   <div className="ap-filter-group">
+                    <label>Hiển thị:</label>
+                    <select value={filterVisibility} onChange={(e) => { setFilterVisibility(e.target.value); setPage(1) }}>
+                      <option value="all">Tất cả ({stockCounts.all})</option>
+                      <option value="visible">Đang hiện ({stockCounts.visible})</option>
+                      <option value="hidden">Đã ẩn ({stockCounts.hidden})</option>
+                    </select>
+                  </div>
+
+                  <div className="ap-filter-group">
                     <label>Sắp xếp:</label>
                     <select value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
                       <option value="name">Tên A-Z</option>
@@ -357,7 +411,9 @@ export default function AdminProducts(){
                             </td>
                             <td>
                               <div className="ap-product-info">
-                                <div className="ap-product-name">{it.name}</div>
+                                <Link to={`/product/${it._id}`} className="ap-product-name" style={{textDecoration: 'none', color: 'inherit', cursor: 'pointer'}}>
+                                  <div className="ap-product-name">{it.name}</div>
+                                </Link>
                                 <div className="ap-product-desc">{it.description?.substring(0, 50)}{it.description?.length > 50 ? '...' : ''}</div>
                               </div>
                             </td>
@@ -384,7 +440,9 @@ export default function AdminProducts(){
                               </span>
                             </td>
                             <td>
-                              {Number(it.stock) === 0 ? (
+                              {it.isHidden ? (
+                                <span className="ap-status-badge muted">Đã ẩn</span>
+                              ) : Number(it.stock) === 0 ? (
                                 <span className="ap-status-badge danger">Hết hàng</span>
                               ) : Number(it.stock) < 10 ? (
                                 <span className="ap-status-badge warning">Sắp hết</span>
@@ -396,18 +454,30 @@ export default function AdminProducts(){
                               <div className="ap-table-actions">
                                 <Link to={`/admin/products/${it._id}`}>
                                   <button className="ap-action-btn edit" title="Chỉnh sửa">
-                                    <svg width="18" height="18" fill="none" stroke="#ffffff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24" style={{display:'block'}}>
-                                      <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-                                      <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                                    <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                                     </svg>
                                   </button>
                                 </Link>
+                                <button 
+                                  onClick={() => toggleVisibility(it)} 
+                                  className={`ap-action-btn ${it.isHidden ? 'show' : 'hide'}`} 
+                                  title={it.isHidden ? 'Hiện sản phẩm' : 'Ẩn sản phẩm'}
+                                >
+                                  {it.isHidden ? (
+                                    <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                      <path strokeLinecap="round" strokeLinejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                    </svg>
+                                  ) : (
+                                    <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
+                                    </svg>
+                                  )}
+                                </button>
                                 <button onClick={()=>remove(it)} className="ap-action-btn delete" title="Xóa">
-                                  <svg width="18" height="18" fill="none" stroke="#ffffff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24" style={{display:'block'}}>
-                                    <polyline points="3 6 5 6 21 6"></polyline>
-                                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                                    <line x1="10" y1="11" x2="10" y2="17"></line>
-                                    <line x1="14" y1="11" x2="14" y2="17"></line>
+                                  <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                   </svg>
                                 </button>
                               </div>

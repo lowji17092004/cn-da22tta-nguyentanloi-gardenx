@@ -9,19 +9,23 @@ import './ProductDetail.css'
 export default function ProductDetail() {
   const { id } = useParams()
   const navigate = useNavigate()
-  const { add, announce } = useCart()
+  const { add, announce, setBuyNow } = useCart()
   const { user } = useAuth()
   const [product, setProduct] = useState(null)
   const [loading, setLoading] = useState(true)
   const [selectedImage, setSelectedImage] = useState(0)
   const [quantity, setQuantity] = useState(1)
   const [relatedProducts, setRelatedProducts] = useState([])
+  const [relatedIndex, setRelatedIndex] = useState(0)
   const [reviews, setReviews] = useState([])
   const [reviewStats, setReviewStats] = useState(null)
   const [reviewsLoading, setReviewsLoading] = useState(true)
   const [activeTab, setActiveTab] = useState('description') // description, reviews, care
   const [expandedReviews, setExpandedReviews] = useState(new Set())
   const [showImageModal, setShowImageModal] = useState(false)
+  const [likedReviews, setLikedReviews] = useState(new Set())
+
+  const RELATED_PER_PAGE = 4
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -33,8 +37,9 @@ export default function ProductDetail() {
         const allProducts = await axios.get('/api/products')
         const related = allProducts.data
           .filter(p => p._id !== id && p.category === res.data.category)
-          .slice(0, 4)
+          .slice(0, 12)
         setRelatedProducts(related)
+        setRelatedIndex(0)
       } catch (error) {
         console.error('Error fetching product:', error)
       } finally {
@@ -82,6 +87,28 @@ export default function ProductDetail() {
     announce(`Đã thêm ${quantity} ${product.name} vào giỏ hàng`)
   }
 
+  const handleBuyNow = () => {
+    if (!user) {
+      navigate('/login', { state: { from: `/product/${id}` } })
+      return
+    }
+    if (!product) return
+    
+    if (product.stock === 0) {
+      alert('Sản phẩm hiện đang hết hàng')
+      return
+    }
+    
+    if (quantity > product.stock) {
+      alert(`Chỉ còn ${product.stock} sản phẩm trong kho`)
+      return
+    }
+    
+    // Set buy now item and navigate to checkout
+    setBuyNow(product, quantity)
+    navigate('/checkout')
+  }
+
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString('vi-VN', {
       day: '2-digit',
@@ -100,6 +127,42 @@ export default function ProductDetail() {
       }
       return newSet
     })
+  }
+
+  const handleLikeReview = async (reviewId) => {
+    if (!user) {
+      navigate('/login', { state: { from: `/product/${id}` } })
+      return
+    }
+
+    try {
+      await axios.post(`/api/reviews/${reviewId}/like`)
+      
+      // Toggle local state
+      setLikedReviews(prev => {
+        const newSet = new Set(prev)
+        if (newSet.has(reviewId)) {
+          newSet.delete(reviewId)
+        } else {
+          newSet.add(reviewId)
+        }
+        return newSet
+      })
+
+      // Update review count locally
+      setReviews(prevReviews => prevReviews.map(review => {
+        if (review._id === reviewId) {
+          const isLiked = likedReviews.has(reviewId)
+          return {
+            ...review,
+            likes: (review.likes || 0) + (isLiked ? -1 : 1)
+          }
+        }
+        return review
+      }))
+    } catch (error) {
+      console.error('Error liking review:', error)
+    }
   }
 
   const renderStars = (rating) => {
@@ -133,11 +196,19 @@ export default function ProductDetail() {
     )
   }
 
-  const images = product.images || (product.imageUrl ? [product.imageUrl] : [])
+  const normalizeImage = (url) => {
+    if (!url) return null
+    return url.startsWith('http') ? url : `http://localhost:5000${url}`
+  }
+
+  const images = (product.images && product.images.length > 0
+    ? product.images
+    : (product.imageUrl ? [product.imageUrl] : [])
+  ).map(normalizeImage).filter(Boolean)
   const categorySlug = getCategorySlug(product.category)
 
   return (
-    <>
+    <div className="pd-page-wrapper">
       {/* Breadcrumb & Title Section */}
       <div className="pd-hero">
         <div className="container">
@@ -319,6 +390,16 @@ export default function ProductDetail() {
                       {product.stock > 0 ? `Còn ${product.stock}` : 'Hết hàng'}
                     </span>
                   </div>
+
+                  <div className="pd-meta-item">
+                    <span className="pd-meta-label">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <path d="M12 20v-6M6 12l6-8 6 8"/>
+                      </svg>
+                      Đã bán
+                    </span>
+                    <span className="pd-meta-value">{product.sold || 0} sản phẩm</span>
+                  </div>
                 </div>
 
                 {/* Quantity Selector */}
@@ -374,6 +455,17 @@ export default function ProductDetail() {
                       <path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/>
                     </svg>
                     <span>{product.stock === 0 ? 'Hết hàng' : 'Thêm vào giỏ hàng'}</span>
+                  </button>
+                  
+                  <button
+                    className="pd-btn-buy-now"
+                    onClick={handleBuyNow}
+                    disabled={product.stock === 0}
+                  >
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M19 14V6c0-1.1-.9-2-2-2H3c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zm-9-1c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm13-6v11c0 1.1-.9 2-2 2H4v-2h17V7h2z"/>
+                    </svg>
+                    <span>Mua ngay</span>
                   </button>
                 </div>
 
@@ -514,6 +606,19 @@ export default function ProductDetail() {
                             </div>
                           </div>
                           <p className="pd-review-comment">{review.comment}</p>
+                          
+                          {/* Like button */}
+                          <div className="pd-review-actions">
+                            <button
+                              className={`pd-review-like-btn ${likedReviews.has(review._id) ? 'liked' : ''}`}
+                              onClick={() => handleLikeReview(review._id)}
+                            >
+                              <svg width="16" height="16" viewBox="0 0 24 24" fill={likedReviews.has(review._id) ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2">
+                                <path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path>
+                              </svg>
+                              <span>Hữu ích ({review.likes || 0})</span>
+                            </button>
+                          </div>
                         </div>
                       ))}
                     </div>
@@ -531,9 +636,31 @@ export default function ProductDetail() {
           {/* Related Products */}
           {relatedProducts.length > 0 && (
             <div className="pd-related-section">
-              <h2 className="pd-related-title">Sản phẩm tương tự</h2>
+              <div className="pd-related-header">
+                <h2 className="pd-related-title">Sản phẩm tương tự</h2>
+                {relatedProducts.length > RELATED_PER_PAGE && (
+                  <div className="pd-related-nav">
+                    <button
+                      className="pd-related-nav-btn"
+                      onClick={() => setRelatedIndex(Math.max(0, relatedIndex - RELATED_PER_PAGE))}
+                      disabled={relatedIndex === 0}
+                      aria-label="Xem sản phẩm trước"
+                    >
+                      ‹
+                    </button>
+                    <button
+                      className="pd-related-nav-btn"
+                      onClick={() => setRelatedIndex(Math.min(relatedProducts.length - RELATED_PER_PAGE, relatedIndex + RELATED_PER_PAGE))}
+                      disabled={relatedIndex >= relatedProducts.length - RELATED_PER_PAGE}
+                      aria-label="Xem sản phẩm tiếp"
+                    >
+                      ›
+                    </button>
+                  </div>
+                )}
+              </div>
               <div className="pd-related-grid">
-                {relatedProducts.map(item => (
+                {relatedProducts.slice(relatedIndex, relatedIndex + RELATED_PER_PAGE).map(item => (
                   <Link key={item._id} to={`/product/${item._id}`} className="pd-related-card">
                     <div className="pd-related-image">
                       {item.imageUrl || item.images?.[0] ? (
@@ -568,6 +695,6 @@ export default function ProductDetail() {
           </div>
         </div>
       )}
-    </>
+    </div>
   )
 }

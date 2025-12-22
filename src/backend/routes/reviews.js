@@ -402,4 +402,23 @@ router.put('/:id/approve', requireAuth, requireAdmin, async (req, res) => {
   }
 });
 
+// Like/Unlike a review
+router.post('/:id/like', requireAuth, async (req, res) => {
+  try {
+    const review = await Review.findById(req.params.id);
+    if (!review) {
+      return res.status(404).json({ message: 'Không tìm thấy đánh giá' });
+    }
+    
+    // Toggle like
+    const likes = review.likes || 0;
+    review.likes = likes > 0 ? likes - 1 : 1;
+    await review.save();
+    
+    res.json({ likes: review.likes });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
 module.exports = router;

@@ -40,9 +40,10 @@ export default function Home(){
   const navigate = useNavigate()
 
   const hero = [
-    { image: '/images/hero1.jpg' },
-    { image: '/images/hero2.jpg' },
-    { image: '/images/hero3.jpg' }
+    { image: '/images/hoakieng.jpg', title: 'Hoa Kiểng Đẹp', subtitle: 'Bộ sưu tập hoa kiểng cao cấp' },
+    { image: '/images/caycanh.jpg', title: 'Cây Cảnh Xanh Mát', subtitle: 'Tạo không gian sống trong lành' },
+    { image: '/images/caythuycanh.jpg', title: 'Cây Thủy Canh', subtitle: 'Độc đáo và dễ chăm sóc' },
+    { image: '/images/senda.jpg', title: 'Sen Đá Xinh Xắn', subtitle: 'Nhỏ gọn và dễ thương' }
   ]
 
   useEffect(() => {
@@ -70,6 +71,20 @@ export default function Home(){
     
     add(product, 1)
     announce && announce(`${product.name} đã được thêm vào giỏ`)
+  }
+
+  function handleBuyNow(product, event) {
+    event?.preventDefault()
+    if (!user) {
+      navigate('/login', { state: { from: '/' } })
+      return
+    }
+    if (product.stock === 0) {
+      alert('Sản phẩm hiện đang hết hàng')
+      return
+    }
+    add(product, 1)
+    navigate('/checkout')
   }
 
   return (

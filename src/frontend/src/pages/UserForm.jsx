@@ -161,12 +161,12 @@ export default function UserForm() {
               required
             >
               <option value="user">👤 User (Người dùng)</option>
-              <option value="collaborator">🤝 Cộng tác viên</option>
+              <option value="collaborator">💼 Nhân viên</option>
               <option value="admin">👑 Admin (Quản trị viên)</option>
             </select>
             <small className="form-hint">
               • User: Khách hàng thông thường<br/>
-              • Cộng tác viên: Duyệt đơn, phản hồi đánh giá, trả lời tin nhắn<br/>
+              • Nhân viên: Duyệt đơn, phản hồi đánh giá, trả lời tin nhắn<br/>
               • Admin: Toàn quyền quản trị
             </small>
           </div>

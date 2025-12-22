@@ -24,6 +24,8 @@ export function CartProvider({ children }){
     } catch(e){ return [] }
   })
 
+  const [buyNowItem, setBuyNowItem] = useState(null)
+
   // Load cart khi user thay đổi
   useEffect(() => {
     if (user) {
@@ -151,6 +153,23 @@ export function CartProvider({ children }){
 
   const isSelected = (productId) => selectedItems.includes(productId)
 
+  const setBuyNow = (product, qty = 1) => {
+    if (!product) {
+      setBuyNowItem(null)
+      return
+    }
+    setBuyNowItem({
+      product: product._id,
+      name: product.name,
+      price: product.price,
+      salePrice: product.salePrice,
+      quantity: qty,
+      stock: product.stock || 999,
+      imageUrl: product.images?.[0] || product.imageUrl || null,
+      category: product.category || ''
+    })
+  }
+
   const total = items.reduce((s,i)=> s + (i.price||0) * (i.quantity||0), 0)
   const selectedTotal = items
     .filter(i => selectedItems.includes(i.product))
@@ -170,6 +189,8 @@ export function CartProvider({ children }){
     selectAll,
     deselectAll,
     isSelected,
+    buyNowItem,
+    setBuyNow,
     announcement, 
     announce 
   }}>{children}</CartContext.Provider>

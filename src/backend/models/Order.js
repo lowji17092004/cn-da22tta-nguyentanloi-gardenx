@@ -31,8 +31,8 @@ const orderSchema = new mongoose.Schema({
   notes: String,
   paymentMethod: { 
     type: String, 
-    enum: ['cod', 'qr'], 
-    default: 'cod' 
+    enum: ['cod', 'qr', 'zalopay'], 
+    default: 'zalopay' 
   },
   paymentStatus: { 
     type: String, 
@@ -47,7 +47,14 @@ const orderSchema = new mongoose.Schema({
   statusHistory: [statusHistorySchema],
   estimatedDelivery: Date,
   deliveredAt: Date,
-  cancelReason: String
+  cancelReason: String,
+  coupon: {
+    code: String,
+    discount: Number, // Phần trăm giảm giá
+    discountAmount: Number // Số tiền thực tế giảm
+  },
+  subtotal: Number, // Tổng tiền trước khi giảm giá
+  discount: Number // Tổng số tiền giảm giá
 }, { timestamps: true });
 
 // Auto add initial status to history

@@ -15,10 +15,12 @@ const CATEGORIES = getMainCategories()
 // Local storage key for search history
 const SEARCH_HISTORY_KEY = 'florana_search_history'
 const MAX_SEARCH_HISTORY = 10
+const ITEMS_PER_PAGE = 12
 
 export default function Shop(){
   const [items, setItems] = useState([])
   const [filteredItems, setFilteredItems] = useState([])
+  const [currentPage, setCurrentPage] = useState(1)
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedCategory, setSelectedCategory] = useState('')
   const [selectedSubcategory, setSelectedSubcategory] = useState('')
@@ -110,12 +112,22 @@ export default function Shop(){
   useEffect(() => {
     let result = items
 
-    // Filter by search term with Vietnamese support
+    // Enhanced search - search across name, description, category, and price
     if (searchTerm && !searchParams.get('search')) {
-      result = result.filter(item => 
-        matchesSearchTerm(item.name, searchTerm) ||
-        matchesSearchTerm(item.description, searchTerm)
-      )
+      const term = searchTerm.toLowerCase().trim()
+      result = result.filter(item => {
+        const name = (item.name || '').toLowerCase()
+        const description = (item.description || '').toLowerCase()
+        const category = (item.category || '').toLowerCase()
+        const price = (item.price || 0).toString()
+        
+        return matchesSearchTerm(item.name, searchTerm) ||
+               matchesSearchTerm(item.description, searchTerm) ||
+               name.includes(term) ||
+               description.includes(term) ||
+               category.includes(term) ||
+               price.includes(term)
+      })
     }
 
     // Filter by category - exact match
@@ -174,7 +186,89 @@ export default function Shop(){
     })
 
     setFilteredItems(result)
+    setCurrentPage(1)
   }, [searchTerm, selectedCategory, selectedSubcategory, priceRange, sortBy, stockFilter, items, searchParams])
+
+  const totalPages = Math.max(1, Math.ceil(filteredItems.length / ITEMS_PER_PAGE))
+  const paginatedItems = filteredItems.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE)
+
+  const handlePageChange = (page) => {
+    if (page >= 1 && page <= totalPages) {
+      setCurrentPage(page)
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+    }
+  }
+
+  const renderPagination = () => {
+    if (totalPages <= 1 || filteredItems.length === 0) return null
+
+    const pages = []
+    const maxVisible = 5
+    let startPage = Math.max(1, currentPage - Math.floor(maxVisible / 2))
+    let endPage = Math.min(totalPages, startPage + maxVisible - 1)
+
+    if (endPage - startPage < maxVisible - 1) {
+      startPage = Math.max(1, endPage - maxVisible + 1)
+    }
+
+    pages.push(
+      <button
+        key="prev"
+        className="pagination-btn"
+        onClick={() => handlePageChange(currentPage - 1)}
+        disabled={currentPage === 1}
+      >
+        ←
+      </button>
+    )
+
+    if (startPage > 1) {
+      pages.push(
+        <button key={1} className="pagination-btn" onClick={() => handlePageChange(1)}>
+          1
+        </button>
+      )
+      if (startPage > 2) {
+        pages.push(<span key="dots1" className="pagination-dots">...</span>)
+      }
+    }
+
+    for (let i = startPage; i <= endPage; i++) {
+      pages.push(
+        <button
+          key={i}
+          className={`pagination-btn ${currentPage === i ? 'active' : ''}`}
+          onClick={() => handlePageChange(i)}
+        >
+          {i}
+        </button>
+      )
+    }
+
+    if (endPage < totalPages) {
+      if (endPage < totalPages - 1) {
+        pages.push(<span key="dots2" className="pagination-dots">...</span>)
+      }
+      pages.push(
+        <button key={totalPages} className="pagination-btn" onClick={() => handlePageChange(totalPages)}>
+          {totalPages}
+        </button>
+      )
+    }
+
+    pages.push(
+      <button
+        key="next"
+        className="pagination-btn"
+        onClick={() => handlePageChange(currentPage + 1)}
+        disabled={currentPage === totalPages}
+      >
+        →
+      </button>
+    )
+
+    return <div className="pagination-container">{pages}</div>
+  }
 
   function handleAdd(it, event){
     if (!user) {
@@ -200,7 +294,8 @@ export default function Shop(){
     if (el) el.textContent = `${it.name} đã được thêm vào giỏ`
   }
 
-  function handleBuyNow(it){
+  function handleBuyNow(it, event){
+    event?.preventDefault()
     if (!user) {
       navigate('/login', { state: { from: '/shop' } })
       return
@@ -212,7 +307,7 @@ export default function Shop(){
     }
     
     add(it, 1)
-    navigate('/cart')
+    navigate('/checkout')
   }
 
   // Handle search submit
@@ -412,12 +507,12 @@ export default function Shop(){
 
           {/* Results Count */}
           <div className="results-count">
-            Hiển thị <strong>{filteredItems.length}</strong> / {items.length} sản phẩm
+            Hiển thị <strong>{paginatedItems.length}</strong> / {items.length} sản phẩm
           </div>
         </div>
 
       <div className="products-grid">
-        {filteredItems.map(it => (
+        {paginatedItems.map(it => (
           <article key={it._id} className="product-card-minimal">
             {/* Product Image */}
             <Link to={`/product/${it._id}`} className="product-image-link-modern">
@@ -495,6 +590,8 @@ export default function Shop(){
           </article>
         ))}
       </div>
+
+      {renderPagination()}
 
       {filteredItems.length === 0 && (
         <div className="empty-state-modern">

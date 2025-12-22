@@ -25,6 +25,8 @@ export default function CategoryPage() {
   const [stockFilter, setStockFilter] = useState('all')
   const [searchHistory, setSearchHistory] = useState([])
   const [showSearchHistory, setShowSearchHistory] = useState(false)
+  const [currentPage, setCurrentPage] = useState(1)
+  const productsPerPage = 12
   const { add, announce } = useCart()
   const { user } = useAuth()
   const navigate = useNavigate()
@@ -108,45 +110,28 @@ export default function CategoryPage() {
           setSubcategory(null)
         }
         
-        // Load ALL products first, then filter client-side
-        const prodRes = await axios.get('/api/products')
-        
-        // Filter products by category - support both slug and Vietnamese name
-        const filtered = prodRes.data.filter(p => {
-          const pCat = (p.category || '').toLowerCase().trim()
-          const currentSlug = categorySlug.toLowerCase()
-          const categoryName = getCategoryNameFromSlug(categorySlug).toLowerCase()
-          
-          // Direct match with slug (most products store slug)
-          if (pCat === currentSlug) return true
-          
-          // Direct match with slug containing dashes converted to spaces
-          if (pCat === currentSlug.replace(/-/g, ' ')) return true
-          
-          // Match with Vietnamese category name
-          if (pCat === categoryName) return true
-          
-          // Normalize both for comparison (remove diacritics and spaces)
-          const normalize = (str) => str
-            .toLowerCase()
-            .replace(/[\s-]+/g, '')
-            .replace(/[àáạảãâầấậẩẫăằắặẳẵ]/g, 'a')
-            .replace(/[èéẹẻẽêềếệểễ]/g, 'e')
-            .replace(/[ìíịỉĩ]/g, 'i')
-            .replace(/[òóọỏõôồốộổỗơờớợởỡ]/g, 'o')
-            .replace(/[ùúụủũưừứựửữ]/g, 'u')
-            .replace(/[ỳýỵỷỹ]/g, 'y')
-            .replace(/đ/g, 'd')
-          
-          const normalizedPCat = normalize(pCat)
-          const normalizedSlug = normalize(currentSlug)
-          const normalizedName = normalize(categoryName)
-          
-          return normalizedPCat === normalizedSlug || 
-                 normalizedPCat === normalizedName ||
-                 normalizedPCat.includes(normalizedSlug) ||
-                 normalizedSlug.includes(normalizedPCat)
-        })
+        // Load products by category ID
+        let filtered = []
+        if (currentCat && currentCat._id) {
+          try {
+            // Use category ID for API call - backend will handle matching
+            const prodRes = await api.get(`/products?category=${currentCat._id}`)
+            filtered = prodRes.data
+            
+            // If subcategory, filter further by subcategory name/slug
+            if (subSlug && subcategory) {
+              filtered = filtered.filter(p => {
+                const pSub = (p.subcategory || '').toLowerCase().trim()
+                const subName = (subcategory.name || '').toLowerCase().trim()
+                const subSlugNorm = subSlug.toLowerCase().trim()
+                return pSub === subName || pSub === subSlugNorm
+              })
+            }
+          } catch (err) {
+            console.error('Error loading products by category:', err)
+            filtered = []
+          }
+        }
         
         setItems(filtered)
       } catch (err) {
@@ -276,6 +261,100 @@ export default function CategoryPage() {
       saveSearchToHistory(searchTerm.trim())
     }
     setShowSearchHistory(false)
+  }
+
+  // Reset page when filters change
+  useEffect(() => {
+    setCurrentPage(1)
+  }, [searchTerm, stockFilter, priceRange.min, priceRange.max, sortBy, categorySlug, subSlug])
+
+  // Calculate pagination
+  const totalPages = Math.ceil(filteredItems.length / productsPerPage)
+  const startIndex = (currentPage - 1) * productsPerPage
+  const paginatedItems = filteredItems.slice(startIndex, startIndex + productsPerPage)
+
+  const handlePageChange = (page) => {
+    if (page >= 1 && page <= totalPages) {
+      setCurrentPage(page)
+      window.scrollTo({ top: 300, behavior: 'smooth' })
+    }
+  }
+
+  const renderPagination = () => {
+    if (totalPages <= 1) return null
+
+    const pages = []
+    const maxVisible = 5
+    
+    let startPage = Math.max(1, currentPage - Math.floor(maxVisible / 2))
+    let endPage = Math.min(totalPages, startPage + maxVisible - 1)
+    
+    if (endPage - startPage < maxVisible - 1) {
+      startPage = Math.max(1, endPage - maxVisible + 1)
+    }
+
+    // Previous button
+    pages.push(
+      <button
+        key="prev"
+        className="cp-pagination-btn"
+        onClick={() => handlePageChange(currentPage - 1)}
+        disabled={currentPage === 1}
+      >
+        ←
+      </button>
+    )
+
+    // First page
+    if (startPage > 1) {
+      pages.push(
+        <button key={1} className="cp-pagination-btn" onClick={() => handlePageChange(1)}>
+          1
+        </button>
+      )
+      if (startPage > 2) {
+        pages.push(<span key="dots1" className="cp-pagination-dots">...</span>)
+      }
+    }
+
+    // Page numbers
+    for (let i = startPage; i <= endPage; i++) {
+      pages.push(
+        <button
+          key={i}
+          className={`cp-pagination-btn ${currentPage === i ? 'active' : ''}`}
+          onClick={() => handlePageChange(i)}
+        >
+          {i}
+        </button>
+      )
+    }
+
+    // Last page
+    if (endPage < totalPages) {
+      if (endPage < totalPages - 1) {
+        pages.push(<span key="dots2" className="cp-pagination-dots">...</span>)
+      }
+      pages.push(
+        <button key={totalPages} className="cp-pagination-btn" onClick={() => handlePageChange(totalPages)}>
+          {totalPages}
+        </button>
+      )
+    }
+
+    // Next button
+    pages.push(
+      <button
+        key="next"
+        className="cp-pagination-btn"
+        onClick={() => handlePageChange(currentPage + 1)}
+        disabled={currentPage === totalPages}
+      >
+        →
+      </button>
+    )
+
+    return <div className="cp-pagination">{pages}</div>
   }
 
   if (loading) {
@@ -460,13 +539,15 @@ export default function CategoryPage() {
 
         {/* Results count */}
         <div className="cp-results-count">
-          Hiển thị <strong>{filteredItems.length}</strong> / {items.length} sản phẩm
+          Hiển thị <strong>{paginatedItems.length}</strong> / {filteredItems.length} sản phẩm
+          {totalPages > 1 && <span className="cp-page-info"> (Trang {currentPage}/{totalPages})</span>}
         </div>
 
         {/* Products Grid */}
-        {filteredItems.length > 0 ? (
+        {paginatedItems.length > 0 ? (
+          <>
           <div className="cp-products-grid">
-            {filteredItems.map(it => (
+            {paginatedItems.map(it => (
               <article key={it._id} className="cp-product-card">
                 <Link to={`/product/${it._id}`} className="cp-product-image-link">
                   <div className="cp-product-image-wrapper">
@@ -540,6 +621,10 @@ export default function CategoryPage() {
               </article>
             ))}
           </div>
+          
+          {/* Pagination */}
+          {renderPagination()}
+          </>
         ) : (
           <div className="cp-empty">
             <div className="cp-empty-icon">🔍</div>

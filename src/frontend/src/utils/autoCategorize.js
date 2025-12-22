@@ -12,14 +12,21 @@ const CATEGORY_KEYWORDS = {
     subcategories: {
       'hoa-hong': ['hồng', 'hong', 'rose'],
       'hoa-lan': ['lan', 'orchid', 'phong lan'],
-      'hoa-cuc': ['cúc', 'cuc', 'chrysanthemum', 'daisy']
+      'hoa-cuc': ['cúc', 'cuc', 'chrysanthemum', 'daisy'],
+      'hoa-chau-trang-tri': ['chậu trang trí', 'chau trang tri', 'hoa chậu', 'hoa chậu trang trí'],
+      'hoa-san-vuon': ['sân vườn', 'san vuon', 'ngoại thất', 'hoa sân vườn'],
+      'hoa-cat-canh': ['cắt cành', 'cat canh', 'cut flower', 'sự kiện', 'sukien']
     }
   },
   'cay-canh': {
     main: ['cây cảnh', 'cay canh', 'cây', 'tree', 'plant'],
     subcategories: {
       'cay-van-phong': ['văn phòng', 'van phong', 'office', 'bàn làm việc', 'indoor'],
+      'cay-trong-nha': ['trong nhà', 'trong nha', 'indoor plant', 'phòng khách', 'phòng ngủ'],
       'cay-ngoai-troi': ['ngoại trời', 'ngoai troi', 'outdoor', 'sân vườn', 'vườn'],
+      'cay-de-ban': ['để bàn', 'de ban', 'desktop', 'bàn làm việc nhỏ'],
+      'cay-cao-cap': ['cao cấp', 'premium', 'luxury'],
+      'cay-de-cham': ['dễ chăm', 'de cham', 'easy care', 'low maintenance'],
       'cay-phong-thuy': ['phong thủy', 'phong thuy', 'feng shui', 'may mắn', 'tài lộc']
     }
   },
@@ -39,6 +46,24 @@ const CATEGORY_KEYWORDS = {
       'sen-da-hoa': ['hoa', 'flower', 'nở', 'no', 'bloom']
     }
   }
+  ,
+  // Accessories / pots / supplies
+  'phu-kien': {
+    main: ['phụ kiện', 'phu kien', 'accessory', 'decor', 'trang trí', 'phụ kiện trang trí'],
+    subcategories: {
+      'chau-nhua': ['nhựa', 'nhua', 'chau nhua', 'plastic pot', 'chậu nhựa'],
+      'chau-xi-mang': ['xi măng', 'xi mang', 'chau xi mang', 'cement pot', 'chậu xi măng'],
+      'chau-dat-nung': ['đất nung', 'dat nung', 'terracotta', 'chau dat nung', 'chậu đất nung'],
+      'chau-gom': ['gốm', 'gom', 'ceramic', 'chau gom', 'chậu gốm'],
+      'chau-go': ['gỗ', 'go', 'wood', 'chau go', 'chậu gỗ'],
+      'phu-kien-trang-tri': ['phu kien trang tri', 'phụ kiện trang trí', 'decoration', 'decor accessories'],
+      'phan-bon': ['phân bón', 'phan bon', 'fertilizer', 'naw', 'phân'],
+      'dung-cu-lam-vuon': ['dụng cụ', 'dung cu', 'garden tools', 'dụng cụ làm vườn'],
+      'dat-trong': ['đất trồng', 'dat trong', 'soil', 'potting mix', 'đất trồng cây']
+    }
+  },
+
+  
 }
 
 /**

@@ -796,8 +796,8 @@
 }
 
 .brand-logo-large {
-  width: 120px;
-  height: 120px;
+  width: 280px;
+  height: 280px;
   margin: 0 auto 24px;
   background: rgba(255, 255, 255, 0.15);
   border-radius: 30px;
@@ -809,8 +809,8 @@
 }
 
 .brand-logo-large img {
-  width: 80px;
-  height: 80px;
+  width: 240px;
+  height: 240px;
   object-fit: contain;
   filter: brightness(0) invert(1);
 }

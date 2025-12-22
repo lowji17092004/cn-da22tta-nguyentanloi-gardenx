@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import api from '../api'
 import PageBanner from '../components/PageBanner'
+import CouponDisplay from '../components/CouponDisplay'
 
 export default function BlogInspiration(){
   const [articles, setArticles] = useState([])
@@ -13,7 +14,7 @@ export default function BlogInspiration(){
 
   async function loadArticles(){
     try {
-      const res = await api.get('/articles?category=inspiration')
+      const res = await api.get('/articles')
       setArticles(res.data)
     } catch(err) {
       console.error('Lỗi tải bài viết:', err)
@@ -26,6 +27,7 @@ export default function BlogInspiration(){
     <>
       <PageBanner page="blogInspiration" />
       <div className="container">
+        <CouponDisplay categorySlug="inspiration" />
         <div className="blog-page">
           <div className="blog-breadcrumb">
             <Link to="/articles">Blog</Link>

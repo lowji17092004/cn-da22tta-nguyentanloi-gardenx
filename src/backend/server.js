@@ -13,6 +13,8 @@ const reviewRoutes = require('./routes/reviews');
 const profileRoutes = require('./routes/profile');
 const categoryRoutes = require('./routes/categories');
 const messageRoutes = require('./routes/messages');
+const couponRoutes = require('./routes/coupons');
+const paymentRoutes = require('./routes/payments');
 
 const app = express();
 app.use(cors());
@@ -28,6 +30,8 @@ app.use('/api/reviews', reviewRoutes);
 app.use('/api/profile', profileRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/messages', messageRoutes);
+app.use('/api/coupons', couponRoutes);
+app.use('/api/payments', paymentRoutes);
 
 // Serve uploaded files
 app.use('/uploads', require('express').static(require('path').join(__dirname, 'uploads')));

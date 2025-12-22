@@ -137,7 +137,7 @@ export default function AdminUsers() {
             <select value={filterRole} onChange={(e) => setFilterRole(e.target.value)} className="filter-select">
               <option value="">Tất cả vai trò</option>
               <option value="admin">Admin</option>
-              <option value="collaborator">Cộng tác viên</option>
+              <option value="collaborator">Nhân viên</option>
               <option value="user">User</option>
             </select>
             <select value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)} className="filter-select">
@@ -206,7 +206,6 @@ export default function AdminUsers() {
                   <th>Email</th>
                   <th>Số điện thoại</th>
                   <th>Vai trò</th>
-                  <th>Đơn hàng</th>
                   <th>Ngày tạo</th>
                   <th>Trạng thái</th>
                   <th>Thao tác</th>
@@ -257,9 +256,6 @@ export default function AdminUsers() {
                           User
                         </span>
                       )}
-                    </td>
-                    <td>
-                      <span className="order-count">{orderCounts[user._id] || 0}</span>
                     </td>
                     <td>
                       {new Date(user.createdAt).toLocaleDateString('vi-VN', { 

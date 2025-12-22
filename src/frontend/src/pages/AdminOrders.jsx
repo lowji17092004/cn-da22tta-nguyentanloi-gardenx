@@ -1,6 +1,7 @@
 
 
 import React, { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 import api from '../api'
 import AdminLayout from '../components/AdminLayout'
 import { matchesSearchTerm } from '../utils/searchUtils'
@@ -15,6 +16,8 @@ export default function AdminOrders() {
   const [expandedRow, setExpandedRow] = useState(null)
   const [updatingStatus, setUpdatingStatus] = useState(null)
   const [updatingPayment, setUpdatingPayment] = useState(null)
+  const [expandedProducts, setExpandedProducts] = useState({})
+  const [expandedProductsInTable, setExpandedProductsInTable] = useState({})
 
   const paymentStatusLabels = {
     pending: 'Chưa thanh toán',
@@ -24,7 +27,8 @@ export default function AdminOrders() {
 
   const paymentMethodLabels = {
     cod: 'COD',
-    qr: 'QR'
+    qr: 'QR',
+    zalopay: 'ZaloPay'
   }
 
   const statusLabels = {
@@ -55,6 +59,10 @@ export default function AdminOrders() {
     setUpdatingStatus(id + '-' + status)
     try {
       await api.put('/orders/' + id + '/status', { status })
+      // Tự động cập nhật trạng thái thanh toán thành 'đã thanh toán' khi đơn hàng hoàn thành
+      if (status === 'delivered') {
+        await api.put('/orders/' + id + '/payment-status', { paymentStatus: 'paid' })
+      }
       load()
     } catch (e) {
       alert('Cập nhật lỗi')
@@ -65,7 +73,7 @@ export default function AdminOrders() {
   const updatePaymentStatus = async (id, paymentStatus) => {
     setUpdatingPayment(id)
     try {
-      await api.put('/orders/' + id + '/payment', { paymentStatus })
+      await api.put('/orders/' + id + '/payment-status', { paymentStatus })
       load()
     } catch (e) {
       alert('Cập nhật thanh toán lỗi')
@@ -91,6 +99,12 @@ export default function AdminOrders() {
       return `http://localhost:5000${item.product.images[0]}`
     }
     return '/placeholder.png'
+  }
+
+  const getProductName = (item) => {
+    if (item.name) return item.name
+    if (item.product?.name) return item.product.name
+    return 'Sản phẩm'
   }
 
   const filteredOrders = orders
@@ -149,7 +163,7 @@ export default function AdminOrders() {
         {/* Stats Cards */}
         <div className="ao-stats">
           <div className="ao-stat-card">
-            <div className="ao-stat-icon" style={{background: 'linear-gradient(135deg, #d4a574 0%, #c9965f 100%)'}}>
+            <div className="ao-stat-icon" style={{background: 'linear-gradient(135deg, #6b8e23 0%, #556b2f 100%)'}}>
               <svg width="24" height="24" fill="none" stroke="white" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
               </svg>
@@ -160,7 +174,7 @@ export default function AdminOrders() {
             </div>
           </div>
           <div className="ao-stat-card">
-            <div className="ao-stat-icon" style={{background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)'}}>
+            <div className="ao-stat-icon" style={{background: 'linear-gradient(135deg, #fb923c 0%, #ea580c 100%)'}}>
               <svg width="24" height="24" fill="none" stroke="white" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
@@ -278,7 +292,6 @@ export default function AdminOrders() {
                 <tr>
                   <th>Mã đơn</th>
                   <th>Khách hàng</th>
-                  <th>Sản phẩm</th>
                   <th>Tổng tiền</th>
                   <th>PT Thanh toán</th>
                   <th>TT Thanh toán</th>
@@ -312,9 +325,6 @@ export default function AdminOrders() {
                             <div className="customer-name">{order.customerName || order.user?.name || 'Khách hàng'}</div>
                             <div className="customer-contact">
                               <span className="customer-phone">
-                                <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-                                </svg>
                                 {order.phone || 'N/A'}
                               </span>
                             </div>
@@ -322,26 +332,11 @@ export default function AdminOrders() {
                         </div>
                       </td>
                       <td>
-                        <div className="order-items">
-                          <div className="item-images">
-                            {(order.items || []).slice(0, 3).map((item, idx) => (
-                              <img
-                                key={idx}
-                                src={getProductImage(item)}
-                                alt=""
-                                onError={(e) => { e.target.src = '/placeholder.png' }}
-                              />
-                            ))}
-                          </div>
-                          <span className="item-count">{order.items?.length || 0} sản phẩm</span>
-                        </div>
-                      </td>
-                      <td>
                         <div className="order-total">{formatPrice(order.total)}</div>
                       </td>
                       <td>
                         <span className={`payment-method-badge ${order.paymentMethod || 'cod'}`}>
-                          {order.paymentMethod === 'qr' ? (
+                          {order.paymentMethod === 'qr' || order.paymentMethod === 'zalopay' ? (
                             <>
                               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                                 <rect x="3" y="3" width="7" height="7"/>
@@ -352,6 +347,7 @@ export default function AdminOrders() {
                                 <rect x="14" y="18" width="3" height="3"/>
                                 <rect x="18" y="18" width="3" height="3"/>
                               </svg>
+                              {order.paymentMethod === 'zalopay' ? 'ZaloPay' : 'QR'}
                             </>
                           ) : (
                             <>
@@ -359,9 +355,9 @@ export default function AdminOrders() {
                                 <rect x="1" y="4" width="22" height="16" rx="2" ry="2"/>
                                 <line x1="1" y1="10" x2="23" y2="10"/>
                               </svg>
+                              COD
                             </>
                           )}
-                          {paymentMethodLabels[order.paymentMethod] || paymentMethodLabels['cod']}
                         </span>
                       </td>
                       <td>
@@ -381,7 +377,7 @@ export default function AdminOrders() {
                           className={`status-select status-${order.status}`}
                           value={order.status}
                           onChange={(e) => updateStatus(order._id, e.target.value)}
-                          disabled={updatingStatus === order._id + '-' + order.status || order.status === 'delivered' || order.status === 'cancelled'}
+                          disabled={updatingStatus?.startsWith(order._id) || order.status === 'delivered' || order.status === 'cancelled'}
                         >
                           {Object.entries(statusLabels).map(([key, label]) => (
                             <option key={key} value={key}>{label}</option>
@@ -404,15 +400,6 @@ export default function AdminOrders() {
                             </svg>
                           </button>
                           <button
-                            className="action-btn edit"
-                            onClick={() => setExpandedRow(expandedRow === order._id ? null : order._id)}
-                            title="Chỉnh sửa"
-                          >
-                            <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                            </svg>
-                          </button>
-                          <button
                             className="action-btn delete"
                             onClick={() => deleteOrder(order._id)}
                             title="Xóa"
@@ -429,7 +416,7 @@ export default function AdminOrders() {
                         <td colSpan="8">
                           <div className="expanded-content">
                             <div className="expanded-section">
-                              <h4>Chi tiết đơn hàng</h4>
+                              <h4>&lt; Chi tiết đơn hàng</h4>
                               <div className="detail-grid">
                                 <div className="detail-item">
                                   <label>Email:</label>
@@ -445,31 +432,79 @@ export default function AdminOrders() {
                                     <span className="note-text">{order.notes}</span>
                                   </div>
                                 )}
+                                {order.status === 'cancelled' && order.cancelReason && (
+                                  <div className="detail-item full-width cancel-reason-item">
+                                    <label>❌ Lý do hủy:</label>
+                                    <span className="cancel-reason-text">{order.cancelReason}</span>
+                                  </div>
+                                )}
                               </div>
                             </div>
 
                             <div className="expanded-section">
                               <h4>Danh sách sản phẩm</h4>
                               <div className="products-list">
-                                {(order.items || []).map((item, idx) => (
+                                {(order.items || [])
+                                  .slice(0, expandedProducts[order._id] ? order.items.length : 3)
+                                  .map((item, idx) => (
                                   <div key={idx} className="product-row">
-                                    <img
-                                      src={getProductImage(item)}
-                                      alt=""
-                                      onError={(e) => { e.target.src = '/placeholder.png' }}
-                                    />
+                                    <a 
+                                      href={`/product/${item.product?.slug || item.product?._id || item.product}`}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      style={{textDecoration: 'none'}}
+                                    >
+                                      <img
+                                        src={getProductImage(item)}
+                                        alt={getProductName(item)}
+                                        onError={(e) => { e.target.src = '/placeholder.png' }}
+                                      />
+                                    </a>
                                     <div className="product-info">
-                                      <div className="product-name">{item.product?.name || item.name || 'Sản phẩm'}</div>
+                                      <a 
+                                        href={`/product/${item.product?.slug || item.product?._id || item.product}`}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="product-name"
+                                        style={{textDecoration: 'none', color: 'inherit'}}
+                                      >
+                                        {getProductName(item)}
+                                      </a>
                                       <div className="product-price">
-                                        {formatPrice(item.product?.price || item.price)} × {item.quantity}
+                                        {formatPrice(item.price || item.product?.price)} × {item.quantity}
                                       </div>
                                     </div>
                                     <div className="product-subtotal">
-                                      {formatPrice((item.product?.price || item.price || 0) * item.quantity)}
+                                      {formatPrice((item.price || item.product?.price || 0) * item.quantity)}
                                     </div>
                                   </div>
                                 ))}
                               </div>
+                              {(order.items?.length || 0) > 3 && (
+                                <button
+                                  className="toggle-products-btn-admin"
+                                  onClick={() => setExpandedProducts(prev => ({
+                                    ...prev,
+                                    [order._id]: !prev[order._id]
+                                  }))}
+                                >
+                                  {expandedProducts[order._id] ? (
+                                    <>
+                                      <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <polyline strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" points="18 15 12 9 6 15"/>
+                                      </svg>
+                                      Thu gọn
+                                    </>
+                                  ) : (
+                                    <>
+                                      <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <polyline strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" points="6 9 12 15 18 9"/>
+                                      </svg>
+                                      Xem thêm {(order.items?.length || 0) - 3} sản phẩm
+                                    </>
+                                  )}
+                                </button>
+                              )}
                               <div className="products-total">
                                 <span>Tổng cộng:</span>
                                 <strong>{formatPrice(order.total)}</strong>

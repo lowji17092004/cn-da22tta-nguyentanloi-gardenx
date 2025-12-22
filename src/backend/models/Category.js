@@ -11,6 +11,7 @@ const categorySchema = new mongoose.Schema({
   slug: { type: String, required: true, unique: true },
   color: { type: String, default: '#10b981' },
   type: { type: String, enum: ['product', 'blog'], default: 'product' },
+  isVisible: { type: Boolean, default: true }, // Thêm trường ẩn/hiện
   subcategories: [subcategorySchema]
 }, { timestamps: true })
 

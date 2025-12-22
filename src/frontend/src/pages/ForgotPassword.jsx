@@ -80,8 +80,7 @@ export default function ForgotPassword() {
           <div className="forgot-card">
             <div className="card-header">
               <div className="logo">
-                <span className="logo-icon">🌸</span>
-                <span className="logo-text">Florana</span>
+                <img src="/images/logo.png" alt="The Sun Garden Logo" className="forgot-logo-img" onError={(e) => { e.target.style.display = 'none'; }} />
               </div>
               <h1>Khôi phục mật khẩu</h1>
               <p>Nhập email đăng ký để nhận mã OTP</p>
@@ -161,6 +160,12 @@ export default function ForgotPassword() {
             )}
 
             <div className="card-footer">
+              <Link to="/" className="back-link">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
+                </svg>
+                Quay về trang chủ
+              </Link>
               <Link to="/login" className="back-link">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
                   <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>

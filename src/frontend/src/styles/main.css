@@ -1,0 +1,21 @@
+/* ==========================================
+   MAIN CSS - MODULAR STRUCTURE
+   Chia CSS theo chức năng để dễ quản lý
+   ========================================== */
+
+/* Core Styles */
+@import './variables.css';
+
+/* Components */
+@import './buttons.css';
+@import './forms.css';
+@import './cart.css';
+@import './banner.css';
+
+/* Utilities */
+@import './animations.css';
+@import './responsive.css';
+
+/* Legacy - Chứa toàn bộ CSS gốc (10,933 lines) */
+/* TODO: Tách các phần còn lại thành modules riêng */
+@import './legacy.css';

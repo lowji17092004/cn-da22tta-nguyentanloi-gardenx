@@ -124,7 +124,7 @@ const CollaboratorDashboard = () => {
             </svg>
             <span>Florana</span>
           </div>
-          <div className="collab-badge">Cộng tác viên</div>
+          <div className="collab-badge">Nhân viên</div>
         </div>
         <div className="collab-header-right">
           <div className="collab-user-info">
@@ -139,7 +139,7 @@ const CollaboratorDashboard = () => {
                 {user?.name?.charAt(0).toUpperCase() || 'U'}
               </div>
             )}
-            <span className="collab-username">{user?.name || 'Cộng tác viên'}</span>
+            <span className="collab-username">{user?.name || 'Nhân viên'}</span>
           </div>
           <button className="collab-logout-btn" onClick={handleLogout}>
             <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -153,7 +153,7 @@ const CollaboratorDashboard = () => {
       {/* Main Content */}
       <main className="collab-main">
         <div className="collab-welcome">
-          <h1>Xin chào, {user?.name || 'Cộng tác viên'}! 👋</h1>
+          <h1>Xin chào, {user?.name || 'Nhân viên'}! 👋</h1>
           <p>Chọn chức năng bạn muốn thực hiện</p>
         </div>
 

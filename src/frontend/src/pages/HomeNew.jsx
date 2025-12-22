@@ -130,20 +130,34 @@ export default function HomeNew(){
     try { announce && announce(`${p.name} đã được thêm vào giỏ`) } catch(e){}
   }
 
+  function handleBuyNow(p, event){
+    event?.preventDefault()
+    if (!user) {
+      navigate('/login', { state: { from: '/' } })
+      return
+    }
+    if (p.stock === 0) {
+      alert('Sản phẩm hiện đang hết hàng')
+      return
+    }
+    add(p, 1)
+    navigate('/checkout')
+  }
+
   // Render product card
   const renderProductCard = (p) => (
     <article key={p._id} className="product-card-minimal">
-      <Link to={`/product/${p._id}`} className="product-image-link">
-        <div className="product-image-container">
+      <Link to={`/product/${p._id}`} className="product-image-link-minimal">
+        <div className="product-image-wrapper-minimal">
           {p.images && p.images[0] ? (
-            <img src={p.images[0]} alt={p.name} className="product-image" loading="lazy" />
+            <img src={p.images[0]} alt={p.name} className="product-image-minimal" loading="lazy" />
           ) : (
             <div className="product-image-placeholder">
               <span className="placeholder-icon">🌿</span>
             </div>
           )}
           
-          <div className="product-badges-top">
+          <div className="product-badges-minimal">
             {p.stock === 0 && (
               <span className="product-badge out-of-stock">Hết hàng</span>
             )}
@@ -199,7 +213,7 @@ export default function HomeNew(){
       {/* Hero Banner */}
       <div className="home-hero">
         <div className="single-banner">
-          <img src="/images/banner.png" alt="Cửa hàng hoa kiểng" className="banner-image" />
+          <img src="/images/banner.jpg" alt="Cửa hàng hoa kiểng" className="banner-image" />
         </div>
       </div>
 
@@ -211,7 +225,7 @@ export default function HomeNew(){
               <h2 className="section-title-home">⭐ Sản phẩm nổi bật</h2>
               <p className="section-subtitle-home">Những sản phẩm được tuyển chọn đặc biệt dành cho bạn</p>
             </div>
-            <Link to="/shop" className="section-view-all-btn">
+            <Link to="/featured" className="section-view-all-btn">
               Xem tất cả
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <path d="M9 18l6-6-6-6"/>
@@ -232,7 +246,7 @@ export default function HomeNew(){
               <h2 className="section-title-home">🔥 Sản phẩm bán chạy</h2>
               <p className="section-subtitle-home">Những sản phẩm được khách hàng yêu thích nhất (đã bán trên 10 sản phẩm)</p>
             </div>
-            <Link to="/shop" className="section-view-all-btn">
+            <Link to="/bestsellers" className="section-view-all-btn">
               Xem tất cả
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <path d="M9 18l6-6-6-6"/>

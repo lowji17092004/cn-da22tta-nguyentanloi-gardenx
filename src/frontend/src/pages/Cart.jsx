@@ -5,7 +5,7 @@ import axios from 'axios'
 import './Cart.css'
 
 export default function Cart(){
-  const { items, remove, updateQuantity, total, refreshStock } = useCart()
+  const { items, remove, updateQuantity, total, refreshStock, clear } = useCart()
   const navigate = useNavigate()
   const hasRefreshed = useRef(false)
   const [selectedItems, setSelectedItems] = useState([])
@@ -85,8 +85,21 @@ export default function Cart(){
       alert('Vui lòng chọn sản phẩm để xóa')
       return
     }
-    if (confirm(`Xóa ${selectedItems.length} sản phẩm đã chọn?`)) {
-      selectedItems.forEach(productId => remove(productId))
+    if (window.confirm(`Xóa ${selectedItems.length} sản phẩm đã chọn?`)) {
+      // Clone để tránh mutation trong loop
+      const toRemove = [...selectedItems]
+      toRemove.forEach(productId => {
+        remove(productId)
+      })
+      setSelectedItems([])
+    }
+  }
+
+  // Remove all items from cart
+  const removeAll = () => {
+    if (items.length === 0) return
+    if (window.confirm(`Xóa tất cả ${items.length} sản phẩm trong giỏ hàng?`)) {
+      clear()
       setSelectedItems([])
     }
   }
@@ -121,14 +134,24 @@ export default function Cart(){
                 />
                 <span>Chọn tất cả ({items.length})</span>
               </label>
-              {selectedItems.length > 0 && (
-                <button className="btn-delete-selected" onClick={removeSelected}>
-                  <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                  </svg>
-                  Xóa đã chọn ({selectedItems.length})
-                </button>
-              )}
+              <div className="bulk-buttons">
+                {selectedItems.length > 0 && (
+                  <button className="btn-delete-selected" onClick={removeSelected}>
+                    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                    Xóa đã chọn ({selectedItems.length})
+                  </button>
+                )}
+                {items.length > 0 && (
+                  <button className="btn-delete-all" onClick={removeAll}>
+                    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                    Xóa tất cả
+                  </button>
+                )}
+              </div>
             </div>
 
             <table className="cart-table">

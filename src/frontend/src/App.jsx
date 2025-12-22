@@ -9,6 +9,7 @@ import BlogFlorana from './pages/BlogFlorana'
 import BlogInfo from './pages/BlogInfo'
 import BlogCare from './pages/BlogCare'
 import BlogInspiration from './pages/BlogInspiration'
+import BlogPromotion from './pages/BlogPromotion'
 import Admin from './pages/Admin'
 import Login from './pages/Login'
 import Register from './pages/Register'
@@ -21,17 +22,22 @@ import AdminArticles from './pages/AdminArticles'
 import ArticleForm from './pages/ArticleForm'
 import ArticleDetail from './pages/ArticleDetail'
 import Cart from './pages/Cart'
-import Checkout from './pages/Checkout'
+import CheckoutNew from './pages/CheckoutNew'
+import PaymentSuccess from './pages/PaymentSuccess'
 import AdminOrders from './pages/AdminOrders'
 import AdminStats from './pages/AdminStats'
 import AdminCategories from './pages/AdminCategories'
 import AdminUsers from './pages/AdminUsers'
+import AdminCoupons from './pages/AdminCoupons'
 import UserForm from './pages/UserForm'
 import Orders from './pages/Orders'
+import OrderDetailNew from './pages/OrderDetailNew'
 import AdminReviews from './pages/AdminReviews'
 import AdminMessages from './pages/AdminMessages'
-import Profile from './pages/Profile'
+import Profile from './pages/ProfileNew'
 import CollaboratorDashboard from './pages/CollaboratorDashboard'
+import FeaturedPage from './pages/FeaturedPage'
+import Coupons from './pages/Coupons'
 import { AuthProvider } from './contexts/AuthContext'
 import { CartProvider } from './contexts/CartContext'
 import Header from './components/Header'
@@ -42,7 +48,9 @@ import ProtectedRoute from './components/ProtectedRoute'
 function AppContent() {
   const location = useLocation()
   const isAdminRoute = location.pathname.startsWith('/admin') || location.pathname.startsWith('/collaborator')
-  const isAuthRoute = location.pathname === '/login' || location.pathname === '/register'
+  const isAuthRoute = location.pathname === '/login' || location.pathname === '/register' || 
+                      location.pathname === '/forgot-password' || location.pathname === '/verify-otp' || 
+                      location.pathname === '/reset-password'
 
   return (
     <div className="app-layout">
@@ -51,6 +59,8 @@ function AppContent() {
         <Routes>
           <Route path="/" element={<Home/>} />
           <Route path="/shop" element={<Shop/>} />
+          <Route path="/featured" element={<FeaturedPage/>} />
+          <Route path="/bestsellers" element={<FeaturedPage/>} />
           <Route path="/category/:categorySlug" element={<CategoryPage/>} />
           <Route path="/category/:categorySlug/:subSlug" element={<CategoryPage/>} />
           <Route path="/product/:id" element={<ProductDetail/>} />
@@ -59,6 +69,7 @@ function AppContent() {
           <Route path="/articles/info" element={<BlogInfo/>} />
           <Route path="/articles/care" element={<BlogCare/>} />
           <Route path="/articles/inspiration" element={<BlogInspiration/>} />
+          <Route path="/articles/promotion" element={<BlogPromotion/>} />
           <Route path="/article/:slug" element={<ArticleDetail/>} />
           <Route path="/login" element={<Login/>} />
           <Route path="/register" element={<Register/>} />
@@ -67,8 +78,11 @@ function AppContent() {
           <Route path="/reset-password" element={<ResetPassword/>} />
 
           <Route path="/cart" element={<Cart/>} />
-          <Route path="/checkout" element={<Checkout/>} />
+          <Route path="/coupons" element={<Coupons/>} />
+          <Route path="/checkout" element={<CheckoutNew/>} />
+          <Route path="/payment-success" element={<PaymentSuccess/>} />
           <Route path="/orders" element={<ProtectedRoute><Orders/></ProtectedRoute>} />
+          <Route path="/orders/:id" element={<ProtectedRoute><OrderDetailNew/></ProtectedRoute>} />
           <Route path="/profile" element={<ProtectedRoute><Profile/></ProtectedRoute>} />
 
           <Route path="/admin/products" element={<ProtectedRoute role={'admin'}><AdminProducts/></ProtectedRoute>} />
@@ -80,6 +94,8 @@ function AppContent() {
           <Route path="/admin/orders" element={<ProtectedRoute roles={['admin', 'collaborator']}><AdminOrders/></ProtectedRoute>} />
           <Route path="/admin/stats" element={<ProtectedRoute role={'admin'}><AdminStats/></ProtectedRoute>} />
           <Route path="/admin/categories" element={<ProtectedRoute role={'admin'}><AdminCategories/></ProtectedRoute>} />
+          
+          <Route path="/admin/coupons" element={<ProtectedRoute role={'admin'}><AdminCoupons/></ProtectedRoute>} />
           
           <Route path="/admin/users" element={<ProtectedRoute role={'admin'}><AdminUsers/></ProtectedRoute>} />
           <Route path="/admin/users/:id" element={<ProtectedRoute role={'admin'}><UserForm/></ProtectedRoute>} />

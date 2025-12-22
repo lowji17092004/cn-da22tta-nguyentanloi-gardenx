@@ -1,0 +1,71 @@
+/* ==========================================
+   RESPONSIVE STYLES
+   Mobile-first approach
+   ========================================== */
+
+/* Page Banner Responsive */
+@media (max-width: 768px) {
+  .page-banner {
+    height: 220px;
+    margin-bottom: 24px;
+  }
+
+  .page-banner-title {
+    font-size: 28px;
+  }
+
+  .page-banner-slogan {
+    font-size: 14px;
+    padding: 0 16px;
+  }
+
+  .container {
+    padding: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .page-banner {
+    height: 180px;
+  }
+
+  .page-banner-title {
+    font-size: 22px;
+  }
+
+  .page-banner-slogan {
+    font-size: 13px;
+  }
+}
+
+/* Header Responsive */
+@media (max-width: 880px) {
+  .header-container {
+    padding: 12px 20px;
+    gap: 20px;
+  }
+
+  .header-promo {
+    padding: 4px 12px;
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 640px) {
+  .header-container {
+    flex-wrap: wrap;
+    padding: 12px 20px;
+    gap: 12px;
+  }
+
+  .header-search {
+    display: none;
+  }
+
+  .header-actions {
+    width: 100%;
+    justify-content: flex-end;
+    order: 3;
+    gap: 10px;
+  }
+}

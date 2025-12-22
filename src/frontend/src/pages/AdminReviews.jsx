@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 import api from '../api'
 import AdminLayout from '../components/AdminLayout'
 import './AdminReviews.css'
@@ -229,17 +230,38 @@ export default function AdminReviews() {
           {filteredReviews.map(review => (
             <div key={review._id} className="admin-review-card">
               <div className="review-card-header">
-                <div className="review-product-info">
-                  {review.product?.image && (
-                    <img 
-                      src={`http://localhost:5000${review.product.image}`} 
-                      alt={review.product.name} 
-                      className="review-product-thumb"
-                    />
-                  )}
-                  <div className="review-product-details">
-                    <span className="review-product-name">{review.product?.name || 'Sản phẩm đã xóa'}</span>
-                    <span className="review-date">{new Date(review.createdAt).toLocaleString('vi-VN')}</span>
+                <div className="review-user-info">
+                  <div className="user-avatar-wrapper">
+                    {review.user?.avatar ? (
+                      <img 
+                        src={review.user.avatar.startsWith('http') ? review.user.avatar : `http://localhost:5000${review.user.avatar}`}
+                        alt={review.user.name}
+                        className="user-avatar"
+                        onError={(e) => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'flex'; }}
+                      />
+                    ) : null}
+                    <div className="user-avatar-fallback" style={{ display: review.user?.avatar ? 'none' : 'flex' }}>
+                      {(review.user?.name || 'K').charAt(0).toUpperCase()}
+                    </div>
+                  </div>
+                  <div className="user-details">
+                    <div className="user-name">{review.user?.name || 'Khách hàng ẩn danh'}</div>
+                    <div className="review-meta">
+                      <span className="review-date">
+                        <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        {new Date(review.createdAt).toLocaleString('vi-VN')}
+                      </span>
+                      {review.isVerifiedPurchase && (
+                        <span className="verified-badge">
+                          <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                          </svg>
+                          Đã mua hàng
+                        </span>
+                      )}
+                    </div>
                   </div>
                 </div>
                 <div className="review-rating">
@@ -247,24 +269,54 @@ export default function AdminReviews() {
                 </div>
               </div>
 
-              <div className="review-customer">
-                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                </svg>
-                <span>{review.user?.name || 'Khách hàng ẩn danh'}</span>
-                {review.isVerifiedPurchase && (
-                  <span className="verified-badge">
-                    <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+              <div className="review-product-info-modern">
+                {review.product ? (
+                  <Link to={`/product/${review.product._id}`} className="product-link">
+                    {review.product.image && (
+                      <img 
+                        src={`http://localhost:5000${review.product.image}`} 
+                        alt={review.product.name} 
+                        className="review-product-thumb"
+                        onError={(e) => { e.target.src = '/placeholder.png' }}
+                      />
+                    )}
+                    <div className="product-info-text">
+                      <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                      </svg>
+                      <span className="review-product-name">{review.product.name}</span>
+                    </div>
+                  </Link>
+                ) : (
+                  <div className="product-deleted">
+                    <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
                     </svg>
-                    Đã mua hàng
-                  </span>
+                    <span>Sản phẩm đã xóa</span>
+                  </div>
                 )}
               </div>
 
               {review.comment && (
                 <div className="review-comment">
                   <p>{review.comment}</p>
+                </div>
+              )}
+
+              {(review.images?.length > 0 || review.videos?.length > 0) && (
+                <div className="review-media-gallery">
+                  {review.images?.map((img, idx) => (
+                    <div key={`img-${idx}`} className="media-item">
+                      <img src={`http://localhost:5000${img}`} alt="Review" />
+                    </div>
+                  ))}
+                  {review.videos?.map((vid, idx) => (
+                    <div key={`vid-${idx}`} className="media-item video">
+                      <video controls>
+                        <source src={`http://localhost:5000${vid}`} />
+                      </video>
+                    </div>
+                  ))}
                 </div>
               )}
 

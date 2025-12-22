@@ -46,6 +46,64 @@ export const CATEGORY_MAPPING = {
   'sen da mini': 'Sen đá mini',
   'sen da to': 'Sen đá to',
   'sen da hoa': 'Sen đá hoa'
+  ,
+  // Additional pot (chậu) mappings
+  'chau-xi-mang': 'Chậu xi măng',
+  'chau xi mang': 'Chậu xi măng',
+  'chau-xi-măng': 'Chậu xi măng',
+  'chau-nhua': 'Chậu nhựa',
+  'chau nhua': 'Chậu nhựa',
+  'chau-dat-nung': 'Chậu đất nung',
+  'chau dat nung': 'Chậu đất nung',
+  'chau-gom': 'Chậu gốm',
+  'chau gom': 'Chậu gốm',
+  'chau-go': 'Chậu gỗ',
+  'chau go': 'Chậu gỗ',
+  'chau-cay': 'Chậu cây',
+  'chau cay': 'Chậu cây',
+
+  // Plant type mappings
+  'cay-van-phong': 'Cây văn phòng',
+  'cay van phong': 'Cây văn phòng',
+  'cay-trong-nha': 'Cây trong nhà',
+  'cay trong nha': 'Cây trong nhà',
+  'cay-ngoai-troi': 'Cây ngoài trời',
+  'cay ngoai troi': 'Cây ngoài trời',
+  'cay-de-ban': 'Cây để bàn',
+  'cay de ban': 'Cây để bàn',
+  'cay-cao-cap': 'Cây cao cấp',
+  'cay cao cap': 'Cây cao cấp',
+  'cay-de-cham': 'Cây dễ chăm',
+  'cay de cham': 'Cây dễ chăm',
+  'cay-thuy-canh': 'Cây thủy cảnh',
+
+  // Flower mappings
+  'hoa-chau-trang-tri': 'Hoa chậu trang trí',
+  'hoa chau trang tri': 'Hoa chậu trang trí',
+  'hoa-san-vuon': 'Hoa sân vườn - ngoại thất',
+  'hoa-san-vuon-ngoai-that': 'Hoa sân vườn ngoại thất',
+  'hoa-san-vuong-ngoai-that': 'Hoa sân vườn ngoại thất',
+  'hoa san vuon ngoai that': 'Hoa sân vườn ngoại thất',
+  'hoa san vuon': 'Hoa sân vườn ngoại thất',
+  'hoa san vuon': 'Hoa sân vườn - ngoại thất',
+  'hoa-cat-canh': 'Hoa cắt cành - sự kiện',
+  'hoa cat canh': 'Hoa cắt cành - sự kiện',
+  'hoa-lan': 'Hoa Lan',
+  'hoa lan': 'Hoa Lan',
+  'hoa-phong-thuy': 'Hoa phong thủy',
+  'hoa phong thuy': 'Hoa phong thủy',
+
+  // Accessories & supplies
+  'phu-kien-trang-tri': 'Phụ kiện trang trí',
+  'phu kien trang tri': 'Phụ kiện trang trí',
+  'phu-kien': 'Phụ kiện',
+  'phu kien': 'Phụ kiện',
+  'phan-bon': 'Phân bón',
+  'phan bon': 'Phân bón',
+  'dung-cu-lam-vuon': 'Dụng cụ làm vườn',
+  'dung cu lam vuon': 'Dụng cụ làm vườn',
+  'dat-trong': 'Đất trồng cây',
+  'dat trong': 'Đất trồng cây'
 }
 
 /**

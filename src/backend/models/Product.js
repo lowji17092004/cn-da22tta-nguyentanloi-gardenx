@@ -9,7 +9,8 @@ const productSchema = new mongoose.Schema({
   subcategory: String, // Danh mục con
   stock: { type: Number, default: 0 },
   sold: { type: Number, default: 0 }, // Số lượng đã bán
-  isFeatured: { type: Boolean, default: false }
+  isFeatured: { type: Boolean, default: false },
+  isHidden: { type: Boolean, default: false } // Ẩn sản phẩm
 }, { timestamps: true });
 
 // Virtual field: sản phẩm bán chạy nếu sold >= 10

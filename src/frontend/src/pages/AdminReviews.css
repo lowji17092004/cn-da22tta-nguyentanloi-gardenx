@@ -1,7 +1,10 @@
 /* Admin Reviews Page Styles */
 .admin-reviews-page {
   min-height: 100vh;
-  background: linear-gradient(135deg, #faf8f3 0%, #f5f1ea 100%);
+  background: white;
+  padding: 20px;
+  box-sizing: border-box;
+  overflow-x: hidden;
 }
 
 .admin-reviews-list {
@@ -12,7 +15,7 @@
 
 .admin-review-card {
   background: #fff;
-  border: 1px solid #f3e5d8;
+  border: 1px solid #f0f8e8;
   border-radius: 12px;
   padding: 1.25rem;
   transition: all 0.3s ease;
@@ -29,60 +32,179 @@
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  margin-bottom: 0.75rem;
-  padding-bottom: 0.75rem;
-  border-bottom: 1px solid #f3f4f6;
+  margin-bottom: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid #f3f4f6;
 }
 
-.review-product-info {
+.review-user-info {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: 12px;
 }
 
-.review-product-thumb {
+.user-avatar-wrapper {
+  position: relative;
   width: 48px;
   height: 48px;
-  border-radius: 8px;
-  object-fit: cover;
-  border: 1px solid #e5e7eb;
+  flex-shrink: 0;
 }
 
-.review-product-details {
+.user-avatar {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #e5e7eb;
+}
+
+.user-avatar-fallback {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #d4a574 0%, #c19563 100%);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 18px;
+  border: 2px solid #e5e7eb;
+}
+
+.user-details {
   display: flex;
   flex-direction: column;
-  gap: 0.2rem;
+  gap: 4px;
 }
 
-.review-product-name {
-  font-weight: 500;
-  color: #334155;
-  font-size: 0.95rem;
+.user-name {
+  font-weight: 600;
+  color: #1f2937;
+  font-size: 15px;
+}
+
+.review-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
 }
 
 .review-date {
-  font-size: 0.75rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 13px;
   color: #6b7280;
 }
 
-.review-rating {
-  display: flex;
-  align-items: center;
+.review-date svg {
+  flex-shrink: 0;
 }
 
-.star-display {
-  display: flex;
-  gap: 0.1rem;
+.review-product-info-modern {
+  margin-bottom: 12px;
 }
 
-/* Customer Info */
-.review-customer {
+.product-link {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  font-size: 0.9rem;
-  color: #374151;
-  margin-bottom: 0.75rem;
+  gap: 10px;
+  padding: 10px;
+  background: #f8fafc;
+  border-radius: 10px;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  border: 1px solid #e2e8f0;
+}
+
+.product-link:hover {
+  background: #f1f5f9;
+  border-color: #d4a574;
+  transform: translateX(4px);
+}
+
+.product-link .review-product-thumb {
+  width: 56px;
+  height: 56px;
+  border-radius: 8px;
+  object-fit: cover;
+  border: 2px solid #e5e7eb;
+  flex-shrink: 0;
+}
+
+.product-info-text {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+}
+
+.product-info-text svg {
+  color: #d4a574;
+  flex-shrink: 0;
+}
+
+.product-info-text .review-product-name {
+  font-weight: 500;
+  color: #334155;
+  font-size: 14px;
+}
+
+.product-deleted {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px;
+  background: #fef2f2;
+  border-radius: 8px;
+  color: #991b1b;
+  font-size: 13px;
+}
+
+.product-deleted svg {
+  flex-shrink: 0;
+}
+
+.review-media-gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: 8px;
+  margin: 12px 0;
+}
+
+.media-item {
+  position: relative;
+  border-radius: 8px;
+  overflow: hidden;
+  aspect-ratio: 1;
+  border: 2px solid #e5e7eb;
+}
+
+.media-item img,
+.media-item video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.media-item.video::after {
+  content: '▶';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 32px;
+  height: 32px;
+  background: rgba(0, 0, 0, 0.6);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  padding-left: 2px;
 }
 
 .verified-badge {
@@ -240,7 +362,7 @@
 
 .progress-fill {
   height: 100%;
-  background: linear-gradient(135deg, #d4a574 0%, #c9965f 100%);
+  background: linear-gradient(135deg, #d4a574 0%, #c19563 100%);
   border-radius: 2px;
   transition: width 0.3s ease;
 }
@@ -273,7 +395,7 @@
 }
 
 .progress-step.completed .step-circle {
-  background: linear-gradient(135deg, #d4a574 0%, #c9965f 100%);
+  background: linear-gradient(135deg, #d4a574 0%, #c19563 100%);
   border-color: #d4a574;
   color: #fff;
 }

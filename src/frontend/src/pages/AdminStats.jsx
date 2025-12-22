@@ -18,6 +18,12 @@ function LineChart({ data, height = 180 }) {
   
   const areaD = pathD + ` L 100 100 L 0 100 Z`
 
+  const formatValue = (value) => {
+    if (value >= 1000000) return (value / 1000000).toFixed(1) + 'M'
+    if (value >= 1000) return (value / 1000).toFixed(0) + 'K'
+    return value.toLocaleString()
+  }
+
   return (
     <div className="chart-wrapper" style={{ height }}>
       <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="line-chart-svg">
@@ -30,12 +36,24 @@ function LineChart({ data, height = 180 }) {
         <path d={areaD} fill="url(#areaGradient)" />
         <path d={pathD} fill="none" stroke="#d4a574" strokeWidth="2" vectorEffect="non-scaling-stroke" />
         {points.map((p, i) => (
-          <circle key={i} cx={p.x} cy={p.y} r="4" fill="#d4a574" stroke="#fff" strokeWidth="2" vectorEffect="non-scaling-stroke" />
+          <circle 
+            key={i} 
+            cx={p.x} 
+            cy={p.y} 
+            r="4" 
+            fill="#d4a574" 
+            stroke="#fff" 
+            strokeWidth="2" 
+            vectorEffect="non-scaling-stroke"
+            style={{ cursor: 'pointer' }}
+          >
+            <title>{data[i].fullLabel || data[i].label}: {formatValue(data[i].value)}đ</title>
+          </circle>
         ))}
       </svg>
       <div className="chart-x-labels">
         {data.map((d, i) => (
-          <span key={i}>{d.label}</span>
+          <span key={i} title={d.fullLabel || d.label}>{d.label}</span>
         ))}
       </div>
     </div>
@@ -223,7 +241,8 @@ export default function AdminStats() {
       for (let i = 6; i >= 0; i--) {
         const date = new Date(now)
         date.setDate(date.getDate() - i)
-        const dateStr = date.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit' })
+        const dateStr = date.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' })
+        const shortLabel = date.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit' })
         
         const dayRevenue = deliveredOrders
           .filter(o => {
@@ -232,7 +251,7 @@ export default function AdminStats() {
           })
           .reduce((sum, o) => sum + (o.total || 0), 0)
         
-        data.push({ label: dateStr, value: dayRevenue })
+        data.push({ label: shortLabel, fullLabel: dateStr, value: dayRevenue })
       }
     } else if (period === 'week') {
       for (let i = 7; i >= 0; i--) {
@@ -241,7 +260,10 @@ export default function AdminStats() {
         const weekEnd = new Date(weekStart)
         weekEnd.setDate(weekEnd.getDate() + 6)
         
-        const weekLabel = `T${8 - i}`
+        const startStr = weekStart.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit' })
+        const endStr = weekEnd.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit' })
+        const weekLabel = `${startStr}`
+        const fullLabel = `${startStr} - ${endStr}`
         
         const weekRevenue = deliveredOrders
           .filter(o => {
@@ -250,15 +272,16 @@ export default function AdminStats() {
           })
           .reduce((sum, o) => sum + (o.total || 0), 0)
         
-        data.push({ label: weekLabel, value: weekRevenue })
+        data.push({ label: weekLabel, fullLabel: fullLabel, value: weekRevenue })
       }
     } else if (period === 'month') {
-      const monthNames = ['T1', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'T8', 'T9', 'T10', 'T11', 'T12']
       for (let i = 5; i >= 0; i--) {
         const date = new Date(now)
         date.setMonth(date.getMonth() - i)
         const monthIndex = date.getMonth()
         const year = date.getFullYear()
+        const shortLabel = `T${monthIndex + 1}/${year.toString().slice(-2)}`
+        const fullLabel = `Tháng ${monthIndex + 1}/${year}`
         
         const monthRevenue = deliveredOrders
           .filter(o => {
@@ -267,11 +290,12 @@ export default function AdminStats() {
           })
           .reduce((sum, o) => sum + (o.total || 0), 0)
         
-        data.push({ label: monthNames[monthIndex], value: monthRevenue })
+        data.push({ label: shortLabel, fullLabel: fullLabel, value: monthRevenue })
       }
     } else if (period === 'year') {
       for (let i = 4; i >= 0; i--) {
         const year = now.getFullYear() - i
+        const fullLabel = `Năm ${year}`
         
         const yearRevenue = deliveredOrders
           .filter(o => {
@@ -280,7 +304,7 @@ export default function AdminStats() {
           })
           .reduce((sum, o) => sum + (o.total || 0), 0)
         
-        data.push({ label: year.toString(), value: yearRevenue })
+        data.push({ label: year.toString(), fullLabel: fullLabel, value: yearRevenue })
       }
     }
 
@@ -335,13 +359,14 @@ export default function AdminStats() {
         // Calculate initial revenue chart data - will be done after allOrders is set
         const deliveredOrders = orders.filter(o => o.status === 'delivered')
         const now = new Date()
-        const monthNames = ['T1', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'T8', 'T9', 'T10', 'T11', 'T12']
         let initialData = []
         for (let i = 5; i >= 0; i--) {
           const date = new Date(now)
           date.setMonth(date.getMonth() - i)
           const monthIndex = date.getMonth()
           const year = date.getFullYear()
+          const shortLabel = `T${monthIndex + 1}/${year.toString().slice(-2)}`
+          const fullLabel = `Tháng ${monthIndex + 1}/${year}`
           
           const monthRevenue = deliveredOrders
             .filter(o => {
@@ -350,7 +375,7 @@ export default function AdminStats() {
             })
             .reduce((sum, o) => sum + (o.total || 0), 0)
           
-          initialData.push({ label: monthNames[monthIndex], value: monthRevenue })
+          initialData.push({ label: shortLabel, fullLabel: fullLabel, value: monthRevenue })
         }
         setRevenueChartData(initialData)
 

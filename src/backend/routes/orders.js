@@ -2,6 +2,8 @@ const express = require('express');
 const router = express.Router();
 const Order = require('../models/Order');
 const Product = require('../models/Product');
+const Message = require('../models/Message');
+const Coupon = require('../models/Coupon');
 const { requireAuth, requireAdmin, requireAdminOrCollaborator } = require('../middleware/auth');
 
 // Status flow definitions
@@ -25,10 +27,12 @@ const STATUS_NOTES = {
 // create order
 router.post('/', requireAuth, async (req, res) => {
   try{
-    const { customerName, customerEmail, phone, address, items, total, notes } = req.body;
+    const { customerName, customerEmail, phone, address, items, total, notes, couponCode } = req.body;
     
     // Kiểm tra và cập nhật số lượng tồn kho, lấy ảnh và tên sản phẩm
     const itemsWithImages = [];
+    let subtotal = 0;
+    
     for (const item of items) {
       const product = await Product.findById(item.product);
       
@@ -46,32 +50,72 @@ router.post('/', requireAuth, async (req, res) => {
       product.stock -= item.quantity;
       await product.save();
       
+      const itemPrice = item.price || product.price;
+      subtotal += itemPrice * item.quantity;
+      
       // Lưu thông tin item kèm ảnh và tên từ Product
       itemsWithImages.push({
         product: item.product,
         name: product.name, // Lấy tên từ Product database
-        price: item.price || product.price,
+        price: itemPrice,
         quantity: item.quantity,
         image: product.images?.[0] || '',
         reviewed: false
       });
     }
     
+    // Handle coupon if provided
+    let couponData = null;
+    let discountAmount = 0;
+    
+    if (couponCode) {
+      const coupon = await Coupon.findOne({ code: couponCode.toUpperCase() });
+      
+      if (coupon) {
+        const validityCheck = coupon.isValid();
+        
+        if (validityCheck.valid) {
+          const discountResult = coupon.calculateDiscount(subtotal);
+          
+          if (discountResult.valid) {
+            discountAmount = discountResult.discountAmount;
+            couponData = {
+              code: coupon.code,
+              discount: coupon.discount,
+              discountAmount: discountAmount
+            };
+            
+            // Increment usage count
+            coupon.usedCount += 1;
+            await coupon.save();
+          }
+        }
+      }
+    }
+    
     // Calculate estimated delivery (3-5 days from now)
     const estimatedDelivery = new Date();
     estimatedDelivery.setDate(estimatedDelivery.getDate() + 4);
     
-    const o = new Order({ 
+    const orderData = { 
       user: req.user.userId,
       customerName, 
       customerEmail, 
       phone,
       address,
       items: itemsWithImages,
-      total, 
+      subtotal,
+      discount: discountAmount,
+      total: total || (subtotal - discountAmount),
       notes,
       estimatedDelivery
-    });
+    };
+    
+    if (couponData) {
+      orderData.coupon = couponData;
+    }
+    
+    const o = new Order(orderData);
     await o.save();
     res.json(o);
   }catch(err){ 
@@ -190,6 +234,66 @@ router.put('/:id/status', requireAuth, requireAdminOrCollaborator, async (req, r
   }
 });
 
+// Customer cancel order (pending or confirmed only)
+router.put('/:id/cancel', requireAuth, async (req, res) => {
+  try {
+    const { reason } = req.body;
+    const order = await Order.findById(req.params.id);
+    
+    if (!order) {
+      return res.status(404).json({ message: 'Không tìm thấy đơn hàng' });
+    }
+    
+    // Check if user owns this order or is admin
+    if (order.user && order.user.toString() !== req.user.userId && req.user.role !== 'admin') {
+      return res.status(403).json({ message: 'Không có quyền hủy đơn hàng này' });
+    }
+    
+    // Only allow cancellation for non-delivered and non-cancelled orders
+    if (['delivered', 'cancelled'].includes(order.status)) {
+      return res.status(400).json({ 
+        message: 'Không thể hủy đơn hàng đã giao hoặc đã hủy' 
+      });
+    }
+    
+    // Update status to cancelled
+    order.status = 'cancelled';
+    order.cancelReason = reason || 'Khách hàng hủy đơn';
+    
+    // Add to history
+    order.statusHistory.push({
+      status: 'cancelled',
+      note: `Khách hàng hủy đơn. Lý do: ${reason || 'Không có lý do'}`,
+      updatedBy: req.user.userId,
+      updatedAt: new Date()
+    });
+    
+    // Restore stock for cancelled orders
+    for (const item of order.items) {
+      if (item.product) {
+        await Product.findByIdAndUpdate(item.product, {
+          $inc: { stock: item.quantity }
+        });
+      }
+    }
+    
+    await order.save();
+    
+    // Populate and return
+    if (order.items && order.items.length > 0) {
+      await order.populate('items.product');
+    }
+    if (order.statusHistory && order.statusHistory.length > 0) {
+      await order.populate('statusHistory.updatedBy', 'name');
+    }
+    
+    res.json(order);
+  } catch (err) {
+    console.error('Cancel order error:', err);
+    res.status(500).json({ message: err.message });
+  }
+});
+
 // Get available next statuses for an order
 router.get('/:id/next-statuses', requireAuth, requireAdmin, async (req, res) => {
   try {
@@ -232,6 +336,113 @@ router.put('/:id/payment', requireAuth, requireAdminOrCollaborator, async (req, 
     
     res.json(order);
   } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// Alias route for payment-status
+router.put('/:id/payment-status', requireAuth, requireAdminOrCollaborator, async (req, res) => {
+  try {
+    const { paymentStatus } = req.body;
+    const order = await Order.findById(req.params.id);
+    
+    if (!order) {
+      return res.status(404).json({ message: 'Không tìm thấy đơn hàng' });
+    }
+    
+    if (!['pending', 'paid', 'failed'].includes(paymentStatus)) {
+      return res.status(400).json({ message: 'Trạng thái thanh toán không hợp lệ' });
+    }
+    
+    order.paymentStatus = paymentStatus;
+    await order.save();
+    
+    await order.populate('items.product');
+    await order.populate('user', 'name email avatar');
+    
+    res.json(order);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// ZaloPay webhook: auto confirm payment and notify system
+router.post('/payment/zalopay/webhook', async (req, res) => {
+  try {
+    const { orderId, status, amount, description } = req.body;
+
+    if (!orderId) {
+      return res.status(400).json({ message: 'Thiếu orderId' });
+    }
+
+    if (status !== 'success') {
+      return res.status(400).json({ message: 'Thanh toán chưa thành công' });
+    }
+
+    const order = await Order.findById(orderId).populate('user', 'name email');
+    if (!order) {
+      return res.status(404).json({ message: 'Không tìm thấy đơn hàng' });
+    }
+
+    if (order.paymentStatus !== 'paid') {
+      order.paymentStatus = 'paid';
+      order.paymentMethod = 'qr';
+      order.statusHistory.push({
+        status: order.status,
+        note: '✅ ZaloPay xác nhận đã thanh toán thành công',
+        updatedAt: new Date()
+      });
+      await order.save();
+
+      // Send notification to system
+      await Message.create({
+        name: 'Hệ thống ZaloPay',
+        email: 'zalopay@florana.vn',
+        phone: '',
+        subject: '💳 Xác nhận thanh toán tự động',
+        message: `Đơn hàng #${order._id.toString().slice(-8).toUpperCase()} đã được thanh toán qua ZaloPay\\n` +
+                 `Số tiền: ${amount ? Number(amount).toLocaleString('vi-VN') + '₫' : 'N/A'}\\n` +
+                 `Khách hàng: ${order.customerName}\\n` +
+                 `Trạng thái: Đã xác nhận tự động`
+      });
+    }
+
+    res.json({ message: 'Đã cập nhật thanh toán ZaloPay', order });
+  } catch (err) {
+    console.error('Webhook error:', err);
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// Simulate ZaloPay payment (for testing - remove in production)
+router.post('/payment/zalopay/simulate/:orderId', async (req, res) => {
+  try {
+    const { orderId } = req.params;
+    const order = await Order.findById(orderId);
+    
+    if (!order) {
+      return res.status(404).json({ message: 'Không tìm thấy đơn hàng' });
+    }
+
+    // Simulate webhook call
+    const webhookData = {
+      orderId: orderId,
+      status: 'success',
+      amount: order.total,
+      description: 'Thanh toán mô phỏng - TEST'
+    };
+
+    // Call webhook internally
+    const webhookResponse = await fetch(`http://localhost:5000/api/orders/payment/zalopay/webhook`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(webhookData)
+    });
+
+    const result = await webhookResponse.json();
+    res.json({ message: '✅ Mô phỏng thanh toán thành công', result });
+  } catch (err) {
+    console.error('Simulate error:', err);
     res.status(500).json({ message: err.message });
   }
 });
