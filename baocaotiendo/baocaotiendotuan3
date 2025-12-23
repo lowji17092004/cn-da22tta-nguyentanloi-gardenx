@@ -1,0 +1,23 @@
+Báo cáo tiền độ tuần 3
+BÁO CÁO TIẾN ĐỘ THỰC HIỆN CHỨC NĂNG HỆ THỐNG
+
+1. Hoàn thiện chức năng bảo mật và xác thực người dùng
+Đã triển khai kiểm tra không cho phép trùng email tài khoản khi đăng ký nhằm đảm bảo tính duy nhất của người dùng.
+Nâng cao độ tin cậy của mật khẩu thông qua các tiêu chí kiểm tra độ mạnh (độ dài, ký tự đặc biệt, chữ hoa, chữ thường).
+Hoàn tất đăng ký và cấu hình giao thức Gmail phục vụ gửi email hệ thống.
+Triển khai xác thực hai lớp bằng số điện thoại, giúp tăng cường mức độ an toàn cho tài khoản người dùng.
+
+2. Hoàn thiện chức năng quản lý danh mục và sản phẩm
+Xây dựng cơ chế kiểm tra danh mục rỗng, chỉ cho phép xóa danh mục khi không còn sản phẩm liên kết.
+Bổ sung chức năng tắt/mở danh mục và tắt/mở sản phẩm nhằm linh hoạt trong việc quản lý hiển thị.
+Áp dụng màu xanh lá cho danh mục, giúp phân biệt rõ trạng thái và tăng khả năng nhận diện giao diện.
+
+3. Cải tiến chức năng đơn hàng và trạng thái thanh toán
+Thêm thanh trượt số lượng sản phẩm trong đơn hàng, giúp người dùng thao tác nhanh và trực quan hơn.
+Tự động chuyển trạng thái “Đã thanh toán” khi đơn hàng ở trạng thái “Hoàn thành”, đảm bảo tính nhất quán dữ liệu.
+
+4. Nâng cao trải nghiệm giao diện người dùng
+Hoàn thiện chức năng phân trang khi xem tất cả sản phẩm, giúp tăng hiệu suất tải trang và dễ dàng tìm kiếm.
+Bổ sung thanh trượt ngang cho menu danh mục trong trường hợp số lượng danh mục nhiều.
+Thiết kế khu vực ảnh trên menu là khu vực cố định, đảm bảo bố cục ổn định và thẩm mỹ.
+Điều chỉnh giao diện footer, làm nổi bật tên cá nhân, tăng tính nhận diện và chuyên nghiệp của website.
