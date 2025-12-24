@@ -81,13 +81,31 @@ const sendOTPSMS = async (phoneNumber, otp) => {
   return { success: true, message: 'SMS sent (simulated)' };
 };
 
+// Password strength validation
+const validatePassword = (password) => {
+  const errors = [];
+  if (password.length < 8) errors.push('Mật khẩu phải có ít nhất 8 ký tự');
+  if (!/[A-Z]/.test(password)) errors.push('Mật khẩu phải có ít nhất 1 chữ hoa');
+  if (!/[a-z]/.test(password)) errors.push('Mật khẩu phải có ít nhất 1 chữ thường');
+  if (!/[0-9]/.test(password)) errors.push('Mật khẩu phải có ít nhất 1 chữ số');
+  if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)) errors.push('Mật khẩu phải có ít nhất 1 ký tự đặc biệt');
+  return errors;
+};
+
 // Register
 router.post('/register', async (req, res) => {
   try {
     const { name, email, password } = req.body;
-    if (!name || !email || !password) return res.status(400).json({ message: 'Missing fields' });
+    if (!name || !email || !password) return res.status(400).json({ message: 'Vui lòng điền đầy đủ thông tin' });
+    
+    // Validate password strength
+    const passwordErrors = validatePassword(password);
+    if (passwordErrors.length > 0) {
+      return res.status(400).json({ message: passwordErrors[0] });
+    }
+    
     const existing = await User.findOne({ email });
-    if (existing) return res.status(400).json({ message: 'Email in use' });
+    if (existing) return res.status(400).json({ message: 'Email đã được sử dụng' });
     const salt = await bcrypt.genSalt(10);
     const hash = await bcrypt.hash(password, salt);
     const user = new User({ name, email, password: hash });

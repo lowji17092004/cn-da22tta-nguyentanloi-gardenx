@@ -43,6 +43,10 @@ const Checkout = () => {
   const [countdown, setCountdown] = useState(300); // 5 phút
   const [notification, setNotification] = useState(null);
   const [qrCodeUrl, setQrCodeUrl] = useState('');
+  const [couponCode, setCouponCode] = useState('');
+  const [appliedCoupon, setAppliedCoupon] = useState(null);
+  const [couponLoading, setCouponLoading] = useState(false);
+  const [couponError, setCouponError] = useState('');
   const countdownRef = useRef(null);
   const pollingRef = useRef(null);
 
@@ -136,6 +140,43 @@ const Checkout = () => {
     return `http://localhost:5000${img.startsWith('/') ? '' : '/'}${img}`;
   };
 
+  // Apply coupon
+  const handleApplyCoupon = async () => {
+    if (!couponCode.trim()) {
+      setCouponError('Vui lòng nhập mã giảm giá');
+      return;
+    }
+    
+    setCouponLoading(true);
+    setCouponError('');
+    
+    try {
+      const res = await api.post('/coupons/validate', {
+        code: couponCode.toUpperCase(),
+        orderTotal: checkoutTotal
+      });
+      
+      setAppliedCoupon(res.data);
+      setNotification({ message: `Đã áp dụng mã giảm giá: ${res.data.code}`, type: 'success' });
+    } catch (err) {
+      setCouponError(err.response?.data?.message || 'Mã giảm giá không hợp lệ');
+      setAppliedCoupon(null);
+    } finally {
+      setCouponLoading(false);
+    }
+  };
+
+  // Remove coupon
+  const handleRemoveCoupon = () => {
+    setAppliedCoupon(null);
+    setCouponCode('');
+    setCouponError('');
+  };
+
+  // Calculate final total with coupon
+  const discountAmount = appliedCoupon?.discountAmount || 0;
+  const finalTotal = checkoutTotal + 30000 - discountAmount;
+
   // Submit order
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -159,9 +200,14 @@ const Checkout = () => {
           quantity: item.quantity,
           image: item.images?.[0] || item.image || item.imageUrl
         })),
-        total: checkoutTotal + 30000,
+        total: finalTotal,
         notes: formData.note,
-        paymentMethod: paymentMethod
+        paymentMethod: paymentMethod,
+        coupon: appliedCoupon ? {
+          code: appliedCoupon.code,
+          discountAmount: appliedCoupon.discountAmount,
+          userCouponId: appliedCoupon.userCouponId
+        } : null
       };
 
       const res = await api.post('/orders', orderData);
@@ -189,8 +235,8 @@ const Checkout = () => {
       
       // Generate QR code for bank transfer
       const orderCode = newOrderId.slice(-8).toUpperCase();
-      const amount = checkoutTotal + 30000;
-      const description = `FLORANA ${orderCode}`;
+      const amount = finalTotal;
+      const description = `TSG ${orderCode}`;
       
       const qrUrl = `https://img.vietqr.io/image/${BANK_INFO.bankId}-${BANK_INFO.accountNo}-${BANK_INFO.template}.png?amount=${amount}&addInfo=${encodeURIComponent(description)}&accountName=${encodeURIComponent(BANK_INFO.accountName)}`;
       setQrCodeUrl(qrUrl);
@@ -202,7 +248,7 @@ const Checkout = () => {
       // Send system notification
       await api.post('/messages', {
         name: 'Hệ thống',
-        email: 'system@florana.vn',
+        email: 'system@thesungarden.vn',
         phone: '',
         subject: '🛒 Đơn hàng mới',
         message: `Đơn hàng #${orderCode} từ ${formData.fullName}\n` +
@@ -461,10 +507,51 @@ const Checkout = () => {
               <span>Phí vận chuyển:</span>
               <span>{formatPrice(30000)}</span>
             </div>
+            {appliedCoupon && (
+              <div className="summary-row discount">
+                <span>Giảm giá ({appliedCoupon.code}):</span>
+                <span className="discount-value">-{formatPrice(discountAmount)}</span>
+              </div>
+            )}
             <div className="summary-row total">
               <span>Tổng cộng:</span>
-              <span>{formatPrice(checkoutTotal + 30000)}</span>
+              <span>{formatPrice(finalTotal)}</span>
             </div>
+          </div>
+
+          {/* Coupon Section */}
+          <div className="coupon-section">
+            <h3>🎟️ Mã giảm giá</h3>
+            {appliedCoupon ? (
+              <div className="applied-coupon">
+                <div className="coupon-badge">
+                  <span className="coupon-code">{appliedCoupon.code}</span>
+                  <span className="coupon-desc">-{formatPrice(discountAmount)}</span>
+                </div>
+                <button className="remove-coupon-btn" onClick={handleRemoveCoupon}>
+                  ✕
+                </button>
+              </div>
+            ) : (
+              <div className="coupon-input-group">
+                <input
+                  type="text"
+                  placeholder="Nhập mã giảm giá"
+                  value={couponCode}
+                  onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
+                  className="coupon-input"
+                  disabled={couponLoading}
+                />
+                <button 
+                  className="apply-coupon-btn"
+                  onClick={handleApplyCoupon}
+                  disabled={couponLoading}
+                >
+                  {couponLoading ? 'Đang kiểm tra...' : 'Áp dụng'}
+                </button>
+              </div>
+            )}
+            {couponError && <div className="coupon-error">{couponError}</div>}
           </div>
         </div>
       </div>
@@ -492,7 +579,7 @@ const Checkout = () => {
                 <div className="payment-note">
                   <span className="note-icon">⚡</span>
                   <span className="note-text">
-                    Nội dung CK: <strong>FLORANA {orderId?.slice(-8).toUpperCase()}</strong>
+                    Nội dung CK: <strong>TSG {orderId?.slice(-8).toUpperCase()}</strong>
                   </span>
                 </div>
                 <div className="payment-note">

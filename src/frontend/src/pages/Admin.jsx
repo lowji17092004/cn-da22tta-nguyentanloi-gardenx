@@ -126,10 +126,10 @@ export default function Admin() {
 
   const getCategoryColor = (slug) => {
     const colors = {
+      'chau-cay': '#8B4513',
       'hoa-kieng': '#ec4899',
       'cay-canh': '#10b981',
-      'cay-thuy-canh': '#3b82f6',
-      'sen-da': '#f59e0b'
+      'phu-kien': '#8b5cf6'
     }
     return colors[slug] || '#6b7280'
   }

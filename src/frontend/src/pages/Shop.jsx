@@ -13,9 +13,9 @@ import './Shop.css'
 const CATEGORIES = getMainCategories()
 
 // Local storage key for search history
-const SEARCH_HISTORY_KEY = 'florana_search_history'
+const SEARCH_HISTORY_KEY = 'thesungarden_search_history'
 const MAX_SEARCH_HISTORY = 10
-const ITEMS_PER_PAGE = 12
+const ITEMS_PER_PAGE = 15  // 3 hàng x 5 cột
 
 export default function Shop(){
   const [items, setItems] = useState([])
@@ -334,7 +334,7 @@ export default function Shop(){
 
   return (
     <>
-      <PageBanner page="shop" />
+      <PageBanner page="shop" noOverlay />
       <div className="container">
         {/* Search Bar with History */}
         <div className="shop-search-section">
@@ -512,13 +512,19 @@ export default function Shop(){
         </div>
 
       <div className="products-grid">
-        {paginatedItems.map(it => (
+        {paginatedItems.map(it => {
+          // Fix image URL
+          const imageUrl = it.images && it.images[0] 
+            ? (it.images[0].startsWith('http') ? it.images[0] : `http://localhost:5000${it.images[0]}`)
+            : null;
+          
+          return (
           <article key={it._id} className="product-card-minimal">
             {/* Product Image */}
             <Link to={`/product/${it._id}`} className="product-image-link-modern">
               <div className="product-image-wrapper-modern">
-                {it.images && it.images[0] ? (
-                  <img src={it.images[0]} alt={it.name} className="product-image-modern" loading="lazy" />
+                {imageUrl ? (
+                  <img src={imageUrl} alt={it.name} className="product-image-modern" loading="lazy" />
                 ) : (
                   <div className="product-placeholder-modern">
                     <span className="placeholder-icon-modern">🌿</span>
@@ -588,7 +594,8 @@ export default function Shop(){
               </div>
             </div>
           </article>
-        ))}
+        );
+        })}
       </div>
 
       {renderPagination()}

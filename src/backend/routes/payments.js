@@ -31,7 +31,7 @@ const BANKS = {
 // Thông tin tài khoản nhận tiền (thay đổi theo thông tin thực tế)
 const BANK_ACCOUNT = {
   accountNo: process.env.BANK_ACCOUNT_NO || '1234567890',
-  accountName: process.env.BANK_ACCOUNT_NAME || 'FLORANA SHOP',
+  accountName: process.env.BANK_ACCOUNT_NAME || 'THE SUN GARDEN',
   bankCode: process.env.BANK_CODE || 'VCB'
 };
 
@@ -163,17 +163,88 @@ router.post('/zalopay/callback', async (req, res) => {
     const data = JSON.parse(dataStr);
     console.log('ZaloPay callback data:', data);
 
-    // Parse embed_data để lấy orderId
+    // Parse embed_data để lấy orderId và userId
     const embedData = JSON.parse(data.embed_data);
-    const orderId = embedData.orderId;
+    const { orderId, userId, orderData } = embedData;
 
-    // TODO: Cập nhật trạng thái đơn hàng trong database
-    // const Order = require('../models/Order');
-    // await Order.findByIdAndUpdate(orderId, {
-    //   paymentStatus: 'paid',
-    //   paidAt: new Date(),
-    //   zaloPayTransId: data.app_trans_id
-    // });
+    // Import models
+    const Order = require('../models/Order');
+    const Product = require('../models/Product');
+
+    // Nếu có orderData (đặt hàng mới), tạo order mới
+    if (orderData) {
+      // Parse orderData
+      const { customerName, customerEmail, phone, address, items, total, notes } = JSON.parse(orderData);
+      
+      // Chuẩn bị items với thông tin sản phẩm
+      const itemsWithImages = [];
+      let subtotal = 0;
+      
+      for (const item of items) {
+        const product = await Product.findById(item.product);
+        
+        if (!product) {
+          console.error(`Product ${item.product} not found`);
+          continue;
+        }
+        
+        if (product.stock < item.quantity) {
+          console.error(`Product ${product.name} insufficient stock`);
+          continue;
+        }
+        
+        // Trừ stock và cộng sold
+        product.stock -= item.quantity;
+        product.sold = (product.sold || 0) + item.quantity;
+        await product.save();
+        
+        const itemPrice = item.price || product.price;
+        subtotal += itemPrice * item.quantity;
+        
+        itemsWithImages.push({
+          product: item.product,
+          name: product.name,
+          price: itemPrice,
+          quantity: item.quantity,
+          image: product.images?.[0] || '',
+          reviewed: false
+        });
+      }
+      
+      // Tạo order mới
+      const estimatedDelivery = new Date();
+      estimatedDelivery.setDate(estimatedDelivery.getDate() + 4);
+      
+      const newOrder = new Order({
+        user: userId,
+        customerName,
+        customerEmail,
+        phone,
+        address,
+        items: itemsWithImages,
+        subtotal,
+        discount: 0,
+        total: total || subtotal,
+        notes,
+        estimatedDelivery,
+        paymentMethod: 'zalopay',
+        paymentStatus: 'paid',
+        paidAt: new Date(),
+        zaloPayTransId: data.app_trans_id
+      });
+      
+      await newOrder.save();
+      console.log(`Order created: ${newOrder._id}`);
+      
+    } else if (orderId) {
+      // Nếu chỉ có orderId, cập nhật order đã tồn tại
+      await Order.findByIdAndUpdate(orderId, {
+        paymentStatus: 'paid',
+        paidAt: new Date(),
+        zaloPayTransId: data.app_trans_id
+      });
+      console.log(`Order ${orderId} payment updated`);
+    }
 
     res.json({ return_code: 1, return_message: 'Thanh toán thành công' });
   } catch (error) {
@@ -196,7 +267,7 @@ router.post('/vietqr/create', requireAuth, async (req, res) => {
       return res.status(400).json({ message: 'Số tiền không hợp lệ' });
     }
 
-    const description = `FLORANA ${orderCode || orderId}`;
+    const description = `TSG ${orderCode || orderId}`;
     const qrUrl = generateVietQRLink(amount, orderCode || orderId, description);
 
     res.json({

@@ -1,19 +1,20 @@
 /**
  * Category utility functions
  * Handles category name conversions and mappings
+ * 4 Main Categories: Chậu cây, Cây cảnh, Hoa kiểng, Phụ kiện
  */
 
 // Category mapping: slug <-> Vietnamese name
 export const CATEGORY_MAPPING = {
   // Main categories
-  'hoa-kieng': 'Hoa kiểng',
+  'chau-cay': 'Chậu cây',
   'cay-canh': 'Cây cảnh',
-  'cay-thuy-canh': 'Cây thủy cảnh',
-  'sen-da': 'Sen đá',
-  'hoa kieng': 'Hoa kiểng',
+  'hoa-kieng': 'Hoa kiểng',
+  'phu-kien': 'Phụ kiện',
+  'chau cay': 'Chậu cây',
   'cay canh': 'Cây cảnh',
-  'cay thuy canh': 'Cây thủy cảnh',
-  'sen da': 'Sen đá',
+  'hoa kieng': 'Hoa kiểng',
+  'phu kien': 'Phụ kiện',
   
   // Subcategories - Hoa kiểng
   'hoa-hong': 'Hoa hồng',
@@ -31,73 +32,23 @@ export const CATEGORY_MAPPING = {
   'cay ngoai troi': 'Cây ngoại trời',
   'cay phong thuy': 'Cây phong thủy',
   
-  // Subcategories - Cây thủy cảnh
-  'co-thuy-sinh': 'Cỏ thủy sinh',
-  'cay-thuy-sinh': 'Cây thủy sinh',
-  'da-trang-tri': 'Đá trang trí',
-  'co thuy sinh': 'Cỏ thủy sinh',
-  'cay thuy sinh': 'Cây thủy sinh',
-  'da trang tri': 'Đá trang trí',
-  
-  // Subcategories - Sen đá
-  'sen-da-mini': 'Sen đá mini',
-  'sen-da-to': 'Sen đá to',
-  'sen-da-hoa': 'Sen đá hoa',
-  'sen da mini': 'Sen đá mini',
-  'sen da to': 'Sen đá to',
-  'sen da hoa': 'Sen đá hoa'
-  ,
-  // Additional pot (chậu) mappings
+  // Subcategories - Chậu cây
   'chau-xi-mang': 'Chậu xi măng',
   'chau xi mang': 'Chậu xi măng',
-  'chau-xi-măng': 'Chậu xi măng',
   'chau-nhua': 'Chậu nhựa',
   'chau nhua': 'Chậu nhựa',
   'chau-dat-nung': 'Chậu đất nung',
   'chau dat nung': 'Chậu đất nung',
   'chau-gom': 'Chậu gốm',
   'chau gom': 'Chậu gốm',
-  'chau-go': 'Chậu gỗ',
-  'chau go': 'Chậu gỗ',
-  'chau-cay': 'Chậu cây',
-  'chau cay': 'Chậu cây',
-
-  // Plant type mappings
-  'cay-van-phong': 'Cây văn phòng',
-  'cay van phong': 'Cây văn phòng',
-  'cay-trong-nha': 'Cây trong nhà',
-  'cay trong nha': 'Cây trong nhà',
-  'cay-ngoai-troi': 'Cây ngoài trời',
-  'cay ngoai troi': 'Cây ngoài trời',
-  'cay-de-ban': 'Cây để bàn',
-  'cay de ban': 'Cây để bàn',
-  'cay-cao-cap': 'Cây cao cấp',
-  'cay cao cap': 'Cây cao cấp',
-  'cay-de-cham': 'Cây dễ chăm',
-  'cay de cham': 'Cây dễ chăm',
-  'cay-thuy-canh': 'Cây thủy cảnh',
-
-  // Flower mappings
-  'hoa-chau-trang-tri': 'Hoa chậu trang trí',
-  'hoa chau trang tri': 'Hoa chậu trang trí',
-  'hoa-san-vuon': 'Hoa sân vườn - ngoại thất',
-  'hoa-san-vuon-ngoai-that': 'Hoa sân vườn ngoại thất',
-  'hoa-san-vuong-ngoai-that': 'Hoa sân vườn ngoại thất',
-  'hoa san vuon ngoai that': 'Hoa sân vườn ngoại thất',
-  'hoa san vuon': 'Hoa sân vườn ngoại thất',
-  'hoa san vuon': 'Hoa sân vườn - ngoại thất',
-  'hoa-cat-canh': 'Hoa cắt cành - sự kiện',
-  'hoa cat canh': 'Hoa cắt cành - sự kiện',
-  'hoa-lan': 'Hoa Lan',
-  'hoa lan': 'Hoa Lan',
-  'hoa-phong-thuy': 'Hoa phong thủy',
-  'hoa phong thuy': 'Hoa phong thủy',
-
-  // Accessories & supplies
-  'phu-kien-trang-tri': 'Phụ kiện trang trí',
-  'phu kien trang tri': 'Phụ kiện trang trí',
-  'phu-kien': 'Phụ kiện',
-  'phu kien': 'Phụ kiện',
+  
+  // Subcategories - Phụ kiện
+  'phan-bon': 'Phân bón',
+  'phan bon': 'Phân bón',
+  'dat-trong': 'Đất trồng',
+  'dat trong': 'Đất trồng',
+  'dung-cu': 'Dụng cụ',
+  'dung cu': 'Dụng cụ',
   'phan-bon': 'Phân bón',
   'phan bon': 'Phân bón',
   'dung-cu-lam-vuon': 'Dụng cụ làm vườn',
@@ -163,10 +114,10 @@ export const getCategorySlug = (categoryName) => {
  */
 export const getMainCategories = () => {
   return [
-    { slug: 'hoa-kieng', name: 'Hoa kiểng' },
+    { slug: 'chau-cay', name: 'Chậu cây' },
     { slug: 'cay-canh', name: 'Cây cảnh' },
-    { slug: 'cay-thuy-canh', name: 'Cây thủy cảnh' },
-    { slug: 'sen-da', name: 'Sen đá' }
+    { slug: 'hoa-kieng', name: 'Hoa kiểng' },
+    { slug: 'phu-kien', name: 'Phụ kiện' }
   ]
 }
 
@@ -179,10 +130,10 @@ export const getCategoryColor = (category) => {
   const slug = getCategorySlug(category)
   
   const colors = {
-    'hoa-kieng': '#FF6B9D',
+    'chau-cay': '#8B4513',
     'cay-canh': '#10b981',
-    'cay-thuy-canh': '#0093E9',
-    'sen-da': '#F857A6'
+    'hoa-kieng': '#ec4899',
+    'phu-kien': '#8b5cf6'
   }
   
   return colors[slug] || '#6b7280'

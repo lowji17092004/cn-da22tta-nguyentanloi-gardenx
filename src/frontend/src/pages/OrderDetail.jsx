@@ -11,6 +11,11 @@ const OrderDetail = () => {
   const [showReviewModal, setShowReviewModal] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [reviewData, setReviewData] = useState({ rating: 5, comment: '' });
+  const [reviewImages, setReviewImages] = useState([]);
+  const [reviewVideo, setReviewVideo] = useState(null);
+  const [uploadingMedia, setUploadingMedia] = useState(false);
+  const [productReviews, setProductReviews] = useState({});
+  const [editingReview, setEditingReview] = useState(null);
 
   useEffect(() => {
     fetchOrder();
@@ -20,6 +25,26 @@ const OrderDetail = () => {
     try {
       const res = await api.get(`/orders/${id}`);
       setOrder(res.data);
+      
+      // Fetch reviews for products in this order
+      if (res.data.items && res.data.items.length > 0) {
+        const reviewPromises = res.data.items.map(async (item) => {
+          try {
+            const productId = item.product?._id || item.product;
+            const reviewRes = await api.get(`/reviews/user-review/${productId}/${res.data._id}`);
+            return { productId, review: reviewRes.data };
+          } catch (err) {
+            return { productId: item.product?._id || item.product, review: null };
+          }
+        });
+        
+        const reviewsData = await Promise.all(reviewPromises);
+        const reviewsMap = {};
+        reviewsData.forEach(({ productId, review }) => {
+          reviewsMap[productId] = review;
+        });
+        setProductReviews(reviewsMap);
+      }
     } catch (err) {
       console.error('Error fetching order:', err);
     } finally {
@@ -87,7 +112,7 @@ const OrderDetail = () => {
       // Notify system
       await api.post('/messages', {
         name: 'Hệ thống',
-        email: 'system@florana.vn',
+        email: 'system@thesungarden.vn',
         phone: '',
         subject: '❌ Đơn hàng bị hủy',
         message: `Đơn hàng #${id.slice(-8).toUpperCase()} đã bị hủy bởi khách hàng.`
@@ -108,19 +133,96 @@ const OrderDetail = () => {
     }
 
     try {
-      await api.post('/reviews', {
-        product: selectedProduct._id || selectedProduct.product,
-        rating: reviewData.rating,
-        comment: reviewData.comment
-      });
+      setUploadingMedia(true);
+      
+      // Upload images if any
+      let uploadedImages = [];
+      if (reviewImages.length > 0) {
+        for (const img of reviewImages) {
+          const formData = new FormData();
+          formData.append('image', img);
+          const uploadRes = await api.post('/upload', formData, {
+            headers: { 'Content-Type': 'multipart/form-data' }
+          });
+          if (uploadRes.data.imageUrl) {
+            uploadedImages.push(uploadRes.data.imageUrl);
+          }
+        }
+      }
 
-      alert('Đánh giá thành công!');
+      // Upload video if any
+      let uploadedVideo = null;
+      if (reviewVideo) {
+        const formData = new FormData();
+        formData.append('video', reviewVideo);
+        const uploadRes = await api.post('/upload/video', formData, {
+          headers: { 'Content-Type': 'multipart/form-data' }
+        });
+        if (uploadRes.data.videoUrl) {
+          uploadedVideo = uploadRes.data.videoUrl;
+        }
+      }
+
+      if (editingReview) {
+        // Update existing review
+        await api.put(`/reviews/${editingReview._id}`, {
+          rating: reviewData.rating,
+          comment: reviewData.comment,
+          images: uploadedImages,
+          video: uploadedVideo
+        });
+        alert('Cập nhật đánh giá thành công!');
+      } else {
+        // Create new review
+        await api.post('/reviews', {
+          order: order._id,
+          orderItem: selectedProduct._id,
+          product: selectedProduct.product?._id || selectedProduct.product,
+          rating: reviewData.rating,
+          comment: reviewData.comment,
+          images: uploadedImages,
+          video: uploadedVideo
+        });
+        alert('Đánh giá thành công!');
+      }
+
       setShowReviewModal(false);
       setSelectedProduct(null);
       setReviewData({ rating: 5, comment: '' });
+      setReviewImages([]);
+      setReviewVideo(null);
+      setEditingReview(null);
+      
+      // Refresh order to get updated reviews
+      fetchOrder();
     } catch (err) {
       console.error('Review error:', err);
       alert(err.response?.data?.message || 'Không thể gửi đánh giá');
+    } finally {
+      setUploadingMedia(false);
+    }
+  };
+
+  const handleEditReview = (item, review) => {
+    setSelectedProduct(item);
+    setEditingReview(review);
+    setReviewData({
+      rating: review.rating,
+      comment: review.comment
+    });
+    setShowReviewModal(true);
+  };
+
+  const handleDeleteReview = async (reviewId) => {
+    if (!window.confirm('Bạn có chắc muốn xóa đánh giá này?')) return;
+    
+    try {
+      await api.delete(`/reviews/${reviewId}`);
+      alert('Đã xóa đánh giá');
+      fetchOrder();
+    } catch (err) {
+      console.error('Delete review error:', err);
+      alert('Không thể xóa đánh giá');
     }
   };
 
@@ -168,8 +270,9 @@ const OrderDetail = () => {
             <span className="order-code">#{order._id.slice(-8).toUpperCase()}</span>
           </div>
           
-          <div className="order-date">
-            🕐 {formatDate(order.createdAt)}
+          <div className="order-date-prominent">
+            <span className="date-label">Ngày đặt:</span>
+            <span className="date-value">{formatDate(order.createdAt)}</span>
           </div>
 
           <div className={`status-badge-large ${order.status}`}>
@@ -206,57 +309,90 @@ const OrderDetail = () => {
             <h3 className="card-title">
               <span className="icon">🛍️</span>
               Sản phẩm đã đặt ({order.items?.length || 0})
-            </h3>
-            <div className="product-list-vertical">
-              {order.items?.map((item, idx) => (
-                <div className="product-card-vertical" key={idx}>
-                  <a 
-                    href={`/product/${item.product?.slug || item.product?._id || item.product}`}
-                    className="product-image-vertical"
-                    style={{textDecoration: 'none'}}
-                  >
-                    {getProductImage(item) ? (
-                      <img 
-                        src={getProductImage(item)} 
-                        alt={item.name}
-                        onError={(e) => {
-                          e.target.style.display = 'none';
-                        }}
-                      />
-                    ) : (
-                      <span className="emoji">🌸</span>
-                    )}
-                  </a>
-                  <div className="product-info-vertical">
+            </h3>            {order.status === 'delivered' && (
+              <div style={{padding: '12px 16px', background: 'linear-gradient(135deg, #fef3c7, #fde68a)', borderRadius: '10px', marginBottom: '16px', border: '2px dashed #fbbf24'}}>
+                <p style={{margin: 0, color: '#92400e', fontSize: '14px', fontWeight: 600}}>
+                  ⭐ Đơn hàng đã hoàn thành! Bạn có thể đánh giá sản phẩm bên dưới.
+                </p>
+              </div>
+            )}            <div className="product-list-vertical">
+              {order.items?.map((item, idx) => {
+                const productId = item.product?._id || item.product;
+                const existingReview = productReviews[productId];
+                
+                return (
+                  <div className="product-card-vertical" key={idx}>
                     <a 
                       href={`/product/${item.product?.slug || item.product?._id || item.product}`}
-                      className="product-name-vertical"
-                      style={{textDecoration: 'none', color: 'inherit'}}
+                      className="product-image-vertical"
+                      style={{textDecoration: 'none'}}
                     >
-                      {item.name}
+                      {getProductImage(item) ? (
+                        <img 
+                          src={getProductImage(item)} 
+                          alt={item.name}
+                          onError={(e) => {
+                            e.target.style.display = 'none';
+                          }}
+                        />
+                      ) : (
+                        <span className="emoji">🌸</span>
+                      )}
                     </a>
-                    <div className="product-meta">
-                      <span className="product-price-vertical">{formatPrice(item.price)}</span>
-                      <span className="separator">•</span>
-                      <span className="product-quantity-vertical">SL: {item.quantity}</span>
-                    </div>
-                    {order.status === 'delivered' && (
-                      <button 
-                        className="btn-review-product"
-                        onClick={() => {
-                          setSelectedProduct(item);
-                          setShowReviewModal(true);
-                        }}
+                    <div className="product-info-vertical">
+                      <a 
+                        href={`/product/${item.product?.slug || item.product?._id || item.product}`}
+                        className="product-name-vertical"
+                        style={{textDecoration: 'none', color: 'inherit'}}
                       >
-                        ⭐ Đánh giá
-                      </button>
-                    )}
+                        {item.name}
+                      </a>
+                      
+                      {order.status === 'delivered' && (
+                        existingReview ? (
+                          <div className="reviewed-status">
+                            <div className="reviewed-badge">
+                              ✅ Đã đánh giá
+                              <div className="review-stars">
+                                {'★'.repeat(existingReview.rating)}{'☆'.repeat(5 - existingReview.rating)}
+                              </div>
+                            </div>
+                            <div className="review-actions">
+                              <button 
+                                className="btn-edit-review"
+                                onClick={() => handleEditReview(item, existingReview)}
+                              >
+                                ✏️ Sửa
+                              </button>
+                              <button 
+                                className="btn-delete-review"
+                                onClick={() => handleDeleteReview(existingReview._id)}
+                              >
+                                🗑️ Xóa
+                              </button>
+                            </div>
+                          </div>
+                        ) : (
+                          <button 
+                            className="btn-review-product"
+                            onClick={() => {
+                              setSelectedProduct(item);
+                              setEditingReview(null);
+                              setReviewData({ rating: 5, comment: '' });
+                              setShowReviewModal(true);
+                            }}
+                          >
+                            ⭐ Đánh giá
+                          </button>
+                        )
+                      )}
+                    </div>
+                    <div className="product-total-vertical">
+                      {formatPrice(item.price * item.quantity)}
+                    </div>
                   </div>
-                  <div className="product-total-vertical">
-                    {formatPrice(item.price * item.quantity)}
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
 
@@ -266,46 +402,40 @@ const OrderDetail = () => {
               <span className="icon">📦</span>
               Thông tin giao hàng
             </h3>
-            <div className="info-grid">
-              <div className="info-row">
-                <span className="icon">👤</span>
-                <div className="content">
-                  <div className="label">Người nhận</div>
-                  <div className="value">{order.customerName}</div>
-                </div>
+            <div className="shipping-info-simple">
+              <div className="info-row-simple">
+                <span className="icon-simple">👤</span>
+                <strong>{order.customerName}</strong>
               </div>
-              <div className="info-row">
-                <span className="icon">📱</span>
-                <div className="content">
-                  <div className="label">Số điện thoại</div>
-                  <div className="value">{order.phone}</div>
-                </div>
+              <div className="info-row-simple">
+                <span className="icon-simple">📱</span>
+                <span>{order.phone}</span>
               </div>
               {order.customerEmail && (
-                <div className="info-row">
-                  <span className="icon">✉️</span>
-                  <div className="content">
-                    <div className="label">Email</div>
-                    <div className="value">{order.customerEmail}</div>
-                  </div>
+                <div className="info-row-simple">
+                  <span className="icon-simple">✉️</span>
+                  <span>{order.customerEmail}</span>
                 </div>
               )}
-              <div className="info-row">
-                <span className="icon">📍</span>
-                <div className="content">
-                  <div className="label">Địa chỉ</div>
-                  <div className="value">{order.address}</div>
+              <div className="info-row-simple">
+                <span className="icon-simple">📍</span>
+                <span>{order.shippingAddress}</span>
+              </div>
+              {order.note && (
+                <div className="info-row-simple">
+                  <span className="icon-simple">📝</span>
+                  <em>{order.note}</em>
                 </div>
-              </div>
+              )}
             </div>
-
-            {order.notes && (
-              <div className="note-box" style={{marginTop: '16px'}}>
-                <div className="label">📝 Ghi chú</div>
-                <div className="text">{order.notes}</div>
-              </div>
-            )}
           </div>
+
+          {order.notes && (
+            <div className="note-box" style={{marginTop: '16px'}}>
+              <div className="label">📝 Ghi chú</div>
+              <div className="text">{order.notes}</div>
+            </div>
+          )}
         </div>
 
         {/* Sidebar */}
@@ -366,7 +496,7 @@ const OrderDetail = () => {
         <div className="review-modal-overlay" onClick={() => setShowReviewModal(false)}>
           <div className="review-modal" onClick={(e) => e.stopPropagation()}>
             <div className="review-modal-header">
-              <h3>Đánh giá sản phẩm</h3>
+              <h3>{editingReview ? 'Chỉnh sửa đánh giá' : 'Đánh giá sản phẩm'}</h3>
               <button className="close-btn" onClick={() => setShowReviewModal(false)}>×</button>
             </div>
             <div className="review-modal-body">
@@ -397,10 +527,73 @@ const OrderDetail = () => {
                   rows="4"
                 />
               </div>
+
+              {/* Upload hình ảnh */}
+              <div className="review-media-upload">
+                <label>📷 Thêm hình ảnh (tối đa 5 ảnh):</label>
+                <input
+                  type="file"
+                  accept="image/*"
+                  multiple
+                  onChange={(e) => {
+                    const files = Array.from(e.target.files).slice(0, 5);
+                    setReviewImages(files);
+                  }}
+                  className="media-input"
+                />
+                {reviewImages.length > 0 && (
+                  <div className="preview-images">
+                    {reviewImages.map((img, idx) => (
+                      <div key={idx} className="preview-image">
+                        <img src={URL.createObjectURL(img)} alt={`Preview ${idx + 1}`} />
+                        <button 
+                          type="button"
+                          className="remove-preview"
+                          onClick={() => setReviewImages(reviewImages.filter((_, i) => i !== idx))}
+                        >×</button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Upload video */}
+              <div className="review-media-upload">
+                <label>🎥 Thêm video (tối đa 1 video, dưới 50MB):</label>
+                <input
+                  type="file"
+                  accept="video/*"
+                  onChange={(e) => {
+                    const file = e.target.files[0];
+                    if (file && file.size <= 50 * 1024 * 1024) {
+                      setReviewVideo(file);
+                    } else if (file) {
+                      alert('Video phải nhỏ hơn 50MB');
+                    }
+                  }}
+                  className="media-input"
+                />
+                {reviewVideo && (
+                  <div className="preview-video">
+                    <video src={URL.createObjectURL(reviewVideo)} controls width="200" />
+                    <button 
+                      type="button"
+                      className="remove-preview"
+                      onClick={() => setReviewVideo(null)}
+                    >×</button>
+                  </div>
+                )}
+              </div>
             </div>
             <div className="review-modal-footer">
               <button className="btn-cancel" onClick={() => setShowReviewModal(false)}>Hủy</button>
-              <button className="btn-submit" onClick={handleReviewSubmit}>Gửi đánh giá</button>
+              <button 
+                className="btn-submit" 
+                onClick={handleReviewSubmit}
+                disabled={uploadingMedia}
+              >
+                {uploadingMedia ? 'Đang gửi...' : (editingReview ? 'Cập nhật' : 'Gửi đánh giá')}
+              </button>
             </div>
           </div>
         </div>

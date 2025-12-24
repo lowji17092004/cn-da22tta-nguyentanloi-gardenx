@@ -98,6 +98,13 @@ const bannerData = {
     slogan: 'Khám phá bí quyết chăm sóc cây cảnh và tạo không gian xanh lý tưởng',
     icon: '📚'
   },
+  coupons: {
+    image: '/images/banner-coupons.jpg',
+    fallbackImage: 'https://images.unsplash.com/photo-1607083206968-13611e3d76db?w=1920',
+    title: 'Mã Giảm Giá',
+    slogan: 'Lưu mã ưu đãi và tiết kiệm khi mua sắm',
+    icon: '🎫'
+  },
   orders: {
     image: '/images/banner-orders.jpg',
     fallbackImage: 'https://images.unsplash.com/photo-1487530811176-3780de880c2d?w=1920',
@@ -122,7 +129,7 @@ const bannerData = {
   blogFlorana: {
     image: '/images/banner-florana.jpg',
     fallbackImage: 'https://images.unsplash.com/photo-1487530811176-3780de880c2d?w=1920',
-    title: 'Về Florana',
+    title: 'Về The Sun Garden',
     slogan: 'Câu chuyện về đam mê và tình yêu với thiên nhiên',
     icon: '🌸'
   },
@@ -187,13 +194,13 @@ const bannerData = {
   default: {
     image: '/images/banner-default.jpg',
     fallbackImage: 'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=1920',
-    title: 'Florana',
+    title: 'The Sun Garden',
     slogan: 'Mang thiên nhiên vào không gian sống của bạn',
     icon: '🌱'
   }
 }
 
-export default function PageBanner({ page, customTitle, customSlogan, customImage, customGradient }) {
+export default function PageBanner({ page, customTitle, customSlogan, customImage, customGradient, noOverlay }) {
   const data = bannerData[page] || bannerData.default
   
   const handleImageError = (e) => {
@@ -211,12 +218,14 @@ export default function PageBanner({ page, customTitle, customSlogan, customImag
           onError={handleImageError}
         />
       </div>
-      <div 
-        className="page-banner-overlay"
-        style={{
-          background: customGradient || data.gradient || 'linear-gradient(135deg, rgba(0, 0, 0, 0.5) 0%, rgba(0, 0, 0, 0.7) 100%)'
-        }}
-      ></div>
+      {!noOverlay && (
+        <div 
+          className="page-banner-overlay"
+          style={{
+            background: customGradient || data.gradient || 'linear-gradient(135deg, rgba(0, 0, 0, 0.5) 0%, rgba(0, 0, 0, 0.7) 100%)'
+          }}
+        ></div>
+      )}
       <div className="page-banner-content">
         <h1 className="page-banner-title">{customTitle || data.title}</h1>
         <p className="page-banner-slogan">{customSlogan || data.slogan}</p>

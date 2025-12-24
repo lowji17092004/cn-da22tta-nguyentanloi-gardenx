@@ -93,21 +93,33 @@ const Checkout = () => {
       setAddresses(savedAddresses);
       const defaultAddr = savedAddresses.find(a => a.isDefault);
       setSelectedAddress(defaultAddr || savedAddresses[0] || null);
-      
-      // Load saved coupons
-      const saved = JSON.parse(localStorage.getItem(`saved_coupons_${user.id}`) || '[]');
-      setSavedCoupons(saved);
-      
-      // Check if there's a selected coupon from Coupons page
-      const selectedFromCouponsPage = sessionStorage.getItem('selectedCoupon');
-      if (selectedFromCouponsPage) {
-        setCouponCode(selectedFromCouponsPage);
-        sessionStorage.removeItem('selectedCoupon');
-        // Auto apply the coupon
-        setTimeout(() => {
-          applyCoupon();
-        }, 500);
+    }
+    
+    // Load all active coupons for everyone
+    const loadActiveCoupons = async () => {
+      try {
+        const res = await api.get('/coupons/active');
+        setSavedCoupons(res.data.map(c => ({
+          code: c.code,
+          discount: c.discount,
+          description: c.description
+        })));
+      } catch (err) {
+        console.error('Error loading coupons:', err);
       }
+    };
+    
+    loadActiveCoupons();
+
+    // Check if there's a selected coupon from Coupons page
+    const selectedFromCouponsPage = sessionStorage.getItem('selectedCoupon');
+    if (selectedFromCouponsPage) {
+      setCouponCode(selectedFromCouponsPage);
+      sessionStorage.removeItem('selectedCoupon');
+      // Auto apply the coupon
+      setTimeout(() => {
+        applyCoupon();
+      }, 500);
     }
 
     // Load provinces
@@ -222,7 +234,7 @@ const Checkout = () => {
   };
 
   const generateQRCode = (amount, code) => {
-    const description = `FLORANA ${code}`;
+    const description = `TSG ${code}`;
     return `https://img.vietqr.io/image/${BANK_INFO.bankId}-${BANK_INFO.accountNo}-${BANK_INFO.template}.png?amount=${amount}&addInfo=${encodeURIComponent(description)}&accountName=${encodeURIComponent(BANK_INFO.accountName)}`;
   };
 
@@ -376,7 +388,7 @@ const Checkout = () => {
   };
 
   const handlePaymentConfirm = async () => {
-    // Khi xác nhận thanh toán, tạo đơn hàng
+    // Khi xác nhận thanh toán, tạo đơn hàng với trạng thái đã thanh toán
     setLoading(true);
     setShowQR(false);
     
@@ -395,8 +407,8 @@ const Checkout = () => {
         })),
         total: finalTotal,
         notes: note,
-        paymentMethod: paymentMethod,
-        paymentStatus: 'pending',
+        paymentMethod: paymentMethod === 'zalopay' ? 'zalopay' : 'bank',
+        paymentStatus: 'paid', // Đã thanh toán
         couponCode: appliedCoupon?.code || undefined
       };
 
@@ -694,30 +706,19 @@ const Checkout = () => {
                 <h4>🎫 Mã giảm giá</h4>
                 {!appliedCoupon ? (
                   <div className="coupon-input-group">
-                    {savedCoupons.length > 0 ? (
-                      <select
-                        value={couponCode}
-                        onChange={(e) => setCouponCode(e.target.value)}
-                        className="coupon-select"
-                        disabled={couponLoading}
-                      >
-                        <option value="">Chọn mã giảm giá</option>
-                        {savedCoupons.map(coupon => (
-                          <option key={coupon.code} value={coupon.code}>
-                            {coupon.code} - Giảm {coupon.discount}%
-                          </option>
-                        ))}
-                      </select>
-                    ) : (
-                      <input
-                        type="text"
-                        value={couponCode}
-                        onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
-                        placeholder="Nhập mã giảm giá"
-                        className="coupon-input"
-                        disabled={couponLoading}
-                      />
-                    )}
+                    <select
+                      value={couponCode}
+                      onChange={(e) => setCouponCode(e.target.value)}
+                      className="coupon-select"
+                      disabled={couponLoading}
+                    >
+                      <option value="">Chọn mã giảm giá</option>
+                      {savedCoupons.map(coupon => (
+                        <option key={coupon.code} value={coupon.code}>
+                          {coupon.code} - Giảm {coupon.discount}%
+                        </option>
+                      ))}
+                    </select>
                     <button
                       type="button"
                       className="btn-apply-coupon"
@@ -729,22 +730,11 @@ const Checkout = () => {
                   </div>
                 ) : (
                   <div className="applied-coupon">
-                    <div className="coupon-badge">
-                      <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                      </svg>
-                      <span className="coupon-code-text">{appliedCoupon.code}</span>
-                      <span className="coupon-discount">-{appliedCoupon.discount}%</span>
-                    </div>
-                    <button type="button" className="btn-remove-coupon" onClick={removeCoupon}>
-                      <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-                      </svg>
-                    </button>
+                    <span className="coupon-applied-text">
+                      ✓ <strong>{appliedCoupon.code}</strong> (-{appliedCoupon.discount}%)
+                    </span>
+                    <button type="button" className="btn-remove-coupon" onClick={removeCoupon}>×</button>
                   </div>
-                )}
-                {appliedCoupon?.description && (
-                  <p className="coupon-description">{appliedCoupon.description}</p>
                 )}
               </div>
 
@@ -807,7 +797,7 @@ const Checkout = () => {
                     </div>
                     <div className="detail-row highlight">
                       <span className="label">Nội dung</span>
-                      <strong className="code">FLORANA {orderCode}</strong>
+                      <strong className="code">TSG {orderCode}</strong>
                     </div>
                   </div>
                 </div>

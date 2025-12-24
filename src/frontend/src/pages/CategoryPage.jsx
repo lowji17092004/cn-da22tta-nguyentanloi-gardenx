@@ -10,8 +10,15 @@ import { getCategoryDisplayName, getCategorySlug } from '../utils/categoryUtils'
 import './CategoryPage.css'
 
 // Local storage key for search history
-const SEARCH_HISTORY_KEY = 'florana_category_search_history'
+const SEARCH_HISTORY_KEY = 'thesungarden_category_search_history'
 const MAX_SEARCH_HISTORY = 10
+
+// Helper to get image URL with correct base path
+const getImageUrl = (imagePath) => {
+  if (!imagePath) return null
+  if (imagePath.startsWith('http')) return imagePath
+  return `http://localhost:5000${imagePath.startsWith('/') ? '' : '/'}${imagePath}`
+}
 
 export default function CategoryPage() {
   const { categorySlug, subSlug } = useParams()
@@ -26,7 +33,7 @@ export default function CategoryPage() {
   const [searchHistory, setSearchHistory] = useState([])
   const [showSearchHistory, setShowSearchHistory] = useState(false)
   const [currentPage, setCurrentPage] = useState(1)
-  const productsPerPage = 12
+  const productsPerPage = 15  // 3 hàng x 5 cột
   const { add, announce } = useCart()
   const { user } = useAuth()
   const navigate = useNavigate()
@@ -59,6 +66,13 @@ export default function CategoryPage() {
 
   // Banner configuration for each category
   const categoryBanners = {
+    'chau-cay': {
+      title: 'Chậu Cây',
+      slogan: 'Bộ sưu tập chậu cây đa dạng và tinh tế',
+      gradient: 'linear-gradient(135deg, #8B4513 0%, #D2691E 100%)',
+      icon: '🪴',
+      image: 'https://images.unsplash.com/photo-1485955900006-10f4d324d411?w=1200&h=400&fit=crop'
+    },
     'hoa-kieng': {
       title: 'Hoa Kiểng',
       slogan: 'Nết đẹp tinh tế, hoa vàng rực rỡ đến từ thiên nhiên',
@@ -73,19 +87,12 @@ export default function CategoryPage() {
       icon: '🌿',
       image: 'https://images.unsplash.com/photo-1463936575829-25148e1db1b8?w=1200&h=400&fit=crop'
     },
-    'cay-thuy-canh': {
-      title: 'Cây Thủy Cảnh',
-      slogan: 'Thế giới dưới nước tuyệt đẹp trong từng chi tiết',
-      gradient: 'linear-gradient(135deg, #0093E9 0%, #80D0C7 100%)',
-      icon: '🌊',
-      image: 'https://images.unsplash.com/photo-1520986606214-8b456906c813?w=1200&h=400&fit=crop'
-    },
-    'sen-da': {
-      title: 'Sen Đá',
-      slogan: 'Nhỏ nhắn xinh xắn, dễ chăm sóc, đem lại niềm vui',
-      gradient: 'linear-gradient(135deg, #F857A6 0%, #FF5858 100%)',
-      icon: '🌵',
-      image: 'https://images.unsplash.com/photo-1459156212016-c812468e2115?w=1200&h=400&fit=crop'
+    'phu-kien': {
+      title: 'Phụ Kiện',
+      slogan: 'Phụ kiện chăm sóc cây cảnh chuyên nghiệp',
+      gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+      icon: '🛠️',
+      image: 'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=1200&h=400&fit=crop'
     }
   }
 
@@ -147,10 +154,10 @@ export default function CategoryPage() {
   // Get category name from slug
   const getCategoryNameFromSlug = (slug) => {
     const mapping = {
+      'chau-cay': 'chậu cây',
       'hoa-kieng': 'hoa kiểng',
       'cay-canh': 'cây cảnh',
-      'cay-thuy-canh': 'cây thủy cảnh',
-      'sen-da': 'sen đá'
+      'phu-kien': 'phụ kiện'
     }
     return mapping[slug] || slug
   }
@@ -381,6 +388,7 @@ export default function CategoryPage() {
         page={subSlug ? `category-${subSlug}` : `category-${categorySlug}`}
         customTitle={subcategory?.name || category?.name}
         customSlogan={subcategory?.description || (category?.description || bannerConfig.slogan)}
+        noOverlay
       />
       
       <div className="container">
@@ -552,7 +560,7 @@ export default function CategoryPage() {
                 <Link to={`/product/${it._id}`} className="cp-product-image-link">
                   <div className="cp-product-image-wrapper">
                     {it.images?.[0] ? (
-                      <img src={it.images[0]} alt={it.name} className="cp-product-image" loading="lazy" />
+                      <img src={getImageUrl(it.images[0])} alt={it.name} className="cp-product-image" loading="lazy" />
                     ) : (
                       <div className="cp-product-placeholder">
                         <span>🌿</span>

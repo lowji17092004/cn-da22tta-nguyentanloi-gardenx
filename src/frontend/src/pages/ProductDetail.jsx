@@ -24,6 +24,12 @@ export default function ProductDetail() {
   const [expandedReviews, setExpandedReviews] = useState(new Set())
   const [showImageModal, setShowImageModal] = useState(false)
   const [likedReviews, setLikedReviews] = useState(new Set())
+  const [showReviewForm, setShowReviewForm] = useState(false)
+  const [newReview, setNewReview] = useState({ rating: 5, comment: '' })
+  const [reviewImages, setReviewImages] = useState([])
+  const [reviewVideo, setReviewVideo] = useState(null)
+  const [hasPurchased, setHasPurchased] = useState(false)
+  const [uploadingReview, setUploadingReview] = useState(false)
 
   const RELATED_PER_PAGE = 4
 
@@ -50,7 +56,10 @@ export default function ProductDetail() {
     const fetchReviews = async () => {
       try {
         setReviewsLoading(true)
-        const res = await axios.get(`/api/reviews/product/${id}`)
+        const token = localStorage.getItem('token')
+        const config = token ? { headers: { 'Authorization': `Bearer ${token}` } } : {}
+        const res = await axios.get(`/api/reviews/product/${id}`, config)
+        console.log('Reviews fetched:', res.data)
         setReviews(res.data.reviews || [])
         setReviewStats(res.data.stats)
       } catch (error) {
@@ -62,9 +71,28 @@ export default function ProductDetail() {
       }
     }
     
+    const checkPurchaseStatus = async () => {
+      if (user) {
+        try {
+          const res = await axios.get('/api/orders/my-orders')
+          const orders = res.data
+          const purchased = orders.some(order => 
+            order.status === 'delivered' && 
+            order.items?.some(item => 
+              item.product?._id === id || item.product === id
+            )
+          )
+          setHasPurchased(purchased)
+        } catch (error) {
+          console.error('Error checking purchase status:', error)
+        }
+      }
+    }
+    
     fetchProduct()
     fetchReviews()
-  }, [id])
+    checkPurchaseStatus()
+  }, [id, user])
 
   const handleAddToCart = () => {
     if (!user) {
@@ -136,7 +164,10 @@ export default function ProductDetail() {
     }
 
     try {
-      await axios.post(`/api/reviews/${reviewId}/like`)
+      const token = localStorage.getItem('token')
+      await axios.post(`/api/reviews/${reviewId}/like`, {}, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      })
       
       // Toggle local state
       setLikedReviews(prev => {
@@ -162,6 +193,77 @@ export default function ProductDetail() {
       }))
     } catch (error) {
       console.error('Error liking review:', error)
+    }
+  }
+
+  const handleSubmitReview = async () => {
+    if (!newReview.comment.trim()) {
+      alert('Vui lòng nhập nội dung đánh giá')
+      return
+    }
+
+    try {
+      setUploadingReview(true)
+
+      // Upload images first if any
+      let imageUrls = []
+      let videoUrl = null
+
+      if (reviewImages.length > 0) {
+        for (const img of reviewImages) {
+          const formData = new FormData()
+          formData.append('image', img)
+          
+          try {
+            const uploadRes = await axios.post('/api/upload/review', formData, {
+              headers: { 'Content-Type': 'multipart/form-data' }
+            })
+            imageUrls.push(uploadRes.data.url)
+          } catch (err) {
+            console.error('Error uploading image:', err)
+          }
+        }
+      }
+
+      // Upload video if any
+      if (reviewVideo) {
+        const formData = new FormData()
+        formData.append('video', reviewVideo)
+        
+        try {
+          const uploadRes = await axios.post('/api/upload/review-video', formData, {
+            headers: { 'Content-Type': 'multipart/form-data' }
+          })
+          videoUrl = uploadRes.data.url
+        } catch (err) {
+          console.error('Error uploading video:', err)
+        }
+      }
+
+      // Submit review
+      await axios.post('/api/reviews', {
+        product: id,
+        rating: newReview.rating,
+        comment: newReview.comment,
+        images: imageUrls,
+        video: videoUrl
+      })
+
+      alert('Đánh giá thành công!')
+      setShowReviewForm(false)
+      setNewReview({ rating: 5, comment: '' })
+      setReviewImages([])
+      setReviewVideo(null)
+      
+      // Reload reviews
+      const res = await axios.get(`/api/reviews/product/${id}`)
+      setReviews(res.data.reviews || [])
+      setReviewStats(res.data.stats)
+    } catch (error) {
+      console.error('Error submitting review:', error)
+      alert('Có lỗi xảy ra khi gửi đánh giá')
+    } finally {
+      setUploadingReview(false)
     }
   }
 
@@ -587,6 +689,147 @@ export default function ProductDetail() {
 
               {activeTab === 'reviews' && (
                 <div className="pd-tab-panel">
+                  {/* Hiển thị stats đánh giá */}
+                  {reviewStats && reviewStats.totalReviews > 0 && (
+                    <div className="pd-review-stats">
+                      <div className="pd-stats-summary">
+                        <div className="pd-stats-score">
+                          <div className="pd-stats-number">{reviewStats.averageRating.toFixed(1)}</div>
+                          <div className="pd-stats-stars">{renderStars(Math.round(reviewStats.averageRating))}</div>
+                          <div className="pd-stats-count">{reviewStats.totalReviews} đánh giá</div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                  
+                  {/* Form đánh giá cho user đã mua */}
+                  {user ? (
+                    hasPurchased ? (
+                      <div className="pd-write-review-section">
+                        {!showReviewForm ? (
+                          <button 
+                            className="pd-btn-write-review"
+                            onClick={() => setShowReviewForm(true)}
+                          >
+                            ✍️ Viết đánh giá của bạn
+                          </button>
+                        ) : (
+                          <div className="pd-review-form">
+                            <h4>Đánh giá của bạn</h4>
+                            <div className="pd-form-rating">
+                              <label>Xếp hạng:</label>
+                              <div className="pd-star-input">
+                                {[1, 2, 3, 4, 5].map(star => (
+                                  <span
+                                    key={star}
+                                    className={`star ${star <= newReview.rating ? 'active' : ''}`}
+                                    onClick={() => setNewReview({ ...newReview, rating: star })}
+                                  >
+                                    ★
+                                  </span>
+                                ))}
+                              </div>
+                            </div>
+                            <div className="pd-form-comment">
+                              <label>Nhận xét:</label>
+                              <textarea
+                                value={newReview.comment}
+                                onChange={(e) => setNewReview({ ...newReview, comment: e.target.value })}
+                                placeholder="Chia sẻ trải nghiệm của bạn về sản phẩm..."
+                                rows="4"
+                              />
+                            </div>
+                            
+                            {/* Upload hình ảnh */}
+                            <div className="pd-form-media">
+                              <label>📷 Thêm hình ảnh (tối đa 5):</label>
+                              <input
+                                type="file"
+                                accept="image/*"
+                                multiple
+                                onChange={(e) => {
+                                  const files = Array.from(e.target.files).slice(0, 5)
+                                  setReviewImages(files)
+                                }}
+                              />
+                              {reviewImages.length > 0 && (
+                                <div className="pd-preview-images">
+                                  {reviewImages.map((img, idx) => (
+                                    <div key={idx} className="pd-preview-img">
+                                      <img src={URL.createObjectURL(img)} alt={`Preview ${idx + 1}`} />
+                                      <button onClick={() => setReviewImages(reviewImages.filter((_, i) => i !== idx))}>×</button>
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
+
+                            {/* Upload video */}
+                            <div className="pd-form-media">
+                              <label>🎥 Thêm video (tối đa 50MB):</label>
+                              <input
+                                type="file"
+                                accept="video/*"
+                                onChange={(e) => {
+                                  const file = e.target.files[0]
+                                  if (file && file.size <= 50 * 1024 * 1024) {
+                                    setReviewVideo(file)
+                                  } else if (file) {
+                                    alert('Video phải nhỏ hơn 50MB')
+                                  }
+                                }}
+                              />
+                              {reviewVideo && (
+                                <div className="pd-preview-video">
+                                  <video src={URL.createObjectURL(reviewVideo)} controls width="200" />
+                                  <button onClick={() => setReviewVideo(null)}>×</button>
+                                </div>
+                              )}
+                            </div>
+
+                            <div className="pd-form-actions">
+                              <button 
+                                className="pd-btn-cancel"
+                                onClick={() => {
+                                  setShowReviewForm(false)
+                                  setNewReview({ rating: 5, comment: '' })
+                                  setReviewImages([])
+                                  setReviewVideo(null)
+                                }}
+                              >
+                                Hủy
+                              </button>
+                              <button 
+                                className="pd-btn-submit-review"
+                                onClick={handleSubmitReview}
+                                disabled={uploadingReview}
+                              >
+                                {uploadingReview ? 'Đang gửi...' : 'Gửi đánh giá'}
+                              </button>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    ) : null
+                  ) : null}
+                  
+                  {/* Hiển thị message cho user chưa mua */}
+                  {user && !hasPurchased && (
+                    <div className="pd-purchase-hint">
+                      <span className="icon">💡</span>
+                      <p>Mua và nhận sản phẩm để viết đánh giá của bạn</p>
+                    </div>
+                  )}
+                  
+                  {/* Hiển thị message cho user chưa login */}
+                  {!user && (
+                    <div className="pd-login-hint">
+                      <span className="icon">💡</span>
+                      <p><Link to="/login">Đăng nhập</Link> để viết đánh giá</p>
+                    </div>
+                  )}
+                  
+                  {/* Danh sách đánh giá - luôn hiển thị */}
                   {reviewsLoading ? (
                     <div className="pd-reviews-loading">Đang tải đánh giá...</div>
                   ) : reviews.length > 0 ? (
@@ -595,7 +838,23 @@ export default function ProductDetail() {
                         <div key={review._id} className="pd-review-card">
                           <div className="pd-review-header">
                             <div className="pd-review-avatar">
-                              {review.user?.name?.charAt(0).toUpperCase() || 'U'}
+                              {review.user?.avatar ? (
+                                <img 
+                                  src={review.user.avatar.startsWith('http') 
+                                    ? review.user.avatar 
+                                    : review.user.avatar.startsWith('/uploads') 
+                                      ? `http://localhost:5000${review.user.avatar}`
+                                      : `http://localhost:5000/uploads/avatars/${review.user.avatar}`
+                                  }
+                                  alt={review.user?.name || 'User'}
+                                  onError={(e) => { 
+                                    e.target.style.display = 'none'; 
+                                    e.target.parentElement.textContent = review.user?.name?.charAt(0).toUpperCase() || 'U';
+                                  }}
+                                />
+                              ) : (
+                                review.user?.name?.charAt(0).toUpperCase() || 'U'
+                              )}
                             </div>
                             <div className="pd-review-info">
                               <div className="pd-review-name">{review.user?.name || 'Người dùng'}</div>

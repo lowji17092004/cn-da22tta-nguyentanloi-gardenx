@@ -5,7 +5,7 @@ const userSchema = new mongoose.Schema({
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
   role: { type: String, enum: ['admin', 'collaborator', 'user'], default: 'user' },
-  phoneNumber: { type: String },
+  phoneNumber: { type: String, unique: true, sparse: true },
   avatar: { type: String }, // Profile picture
   address: { type: String }, // Delivery address
   isLocked: { type: Boolean, default: false }, // Account lock status

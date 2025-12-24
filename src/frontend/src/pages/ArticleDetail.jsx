@@ -25,7 +25,7 @@ export default function ArticleDetail(){
 
   const getCategoryInfo = (cat) => {
     const categories = {
-      about: { name: 'Florana', link: '/articles/about' },
+      about: { name: 'The Sun Garden', link: '/articles/about' },
       info: { name: 'Thông tin cây hoa', link: '/articles/info' },
       care: { name: 'Kiến thức chăm sóc', link: '/articles/care' },
       inspiration: { name: 'Cảm hứng & Ý tưởng', link: '/articles/inspiration' }

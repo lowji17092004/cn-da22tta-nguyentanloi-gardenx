@@ -31,10 +31,10 @@ import AdminUsers from './pages/AdminUsers'
 import AdminCoupons from './pages/AdminCoupons'
 import UserForm from './pages/UserForm'
 import Orders from './pages/Orders'
-import OrderDetailNew from './pages/OrderDetailNew'
+import OrderDetail from './pages/OrderDetail'
 import AdminReviews from './pages/AdminReviews'
 import AdminMessages from './pages/AdminMessages'
-import Profile from './pages/ProfileNew'
+import Profile from './pages/Profile'
 import CollaboratorDashboard from './pages/CollaboratorDashboard'
 import FeaturedPage from './pages/FeaturedPage'
 import Coupons from './pages/Coupons'
@@ -82,7 +82,7 @@ function AppContent() {
           <Route path="/checkout" element={<CheckoutNew/>} />
           <Route path="/payment-success" element={<PaymentSuccess/>} />
           <Route path="/orders" element={<ProtectedRoute><Orders/></ProtectedRoute>} />
-          <Route path="/orders/:id" element={<ProtectedRoute><OrderDetailNew/></ProtectedRoute>} />
+          <Route path="/orders/:id" element={<ProtectedRoute><OrderDetail/></ProtectedRoute>} />
           <Route path="/profile" element={<ProtectedRoute><Profile/></ProtectedRoute>} />
 
           <Route path="/admin/products" element={<ProtectedRoute role={'admin'}><AdminProducts/></ProtectedRoute>} />

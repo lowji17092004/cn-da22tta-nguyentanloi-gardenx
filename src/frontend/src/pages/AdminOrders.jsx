@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import api from '../api'
 import AdminLayout from '../components/AdminLayout'
+import Toast from '../components/Toast'
 import { matchesSearchTerm } from '../utils/searchUtils'
 import './AdminOrders.css'
 
@@ -18,6 +19,12 @@ export default function AdminOrders() {
   const [updatingPayment, setUpdatingPayment] = useState(null)
   const [expandedProducts, setExpandedProducts] = useState({})
   const [expandedProductsInTable, setExpandedProductsInTable] = useState({})
+  const [toast, setToast] = useState(null)
+
+  const showToast = (message, type = 'success') => {
+    setToast({ message, type })
+    setTimeout(() => setToast(null), 3000)
+  }
 
   const paymentStatusLabels = {
     pending: 'Chưa thanh toán',
@@ -64,8 +71,9 @@ export default function AdminOrders() {
         await api.put('/orders/' + id + '/payment-status', { paymentStatus: 'paid' })
       }
       load()
+      showToast('Cập nhật trạng thái thành công', 'success')
     } catch (e) {
-      alert('Cập nhật lỗi')
+      showToast('Cập nhật trạng thái thất bại', 'error')
     }
     setUpdatingStatus(null)
   }
@@ -75,8 +83,9 @@ export default function AdminOrders() {
     try {
       await api.put('/orders/' + id + '/payment-status', { paymentStatus })
       load()
+      showToast('Cập nhật thanh toán thành công', 'success')
     } catch (e) {
-      alert('Cập nhật thanh toán lỗi')
+      showToast('Cập nhật thanh toán thất bại', 'error')
     }
     setUpdatingPayment(null)
   }
@@ -87,8 +96,9 @@ export default function AdminOrders() {
       await api.delete('/orders/' + id)
       setExpandedRow(null)
       load()
+      showToast('Xóa đơn hàng thành công', 'success')
     } catch (e) {
-      alert('Xóa đơn hàng thất bại')
+      showToast('Xóa đơn hàng thất bại', 'error')
     }
   }
 
@@ -290,13 +300,12 @@ export default function AdminOrders() {
             <table className="ao-table">
               <thead>
                 <tr>
-                  <th>Mã đơn</th>
+                  <th>Mã đơn hàng</th>
                   <th>Khách hàng</th>
-                  <th>Tổng tiền</th>
-                  <th>PT Thanh toán</th>
-                  <th>TT Thanh toán</th>
-                  <th>Trạng thái</th>
                   <th>Thời gian</th>
+                  <th>Tổng tiền</th>
+                  <th>TT Đơn hàng</th>
+                  <th>TT Thanh toán</th>
                   <th>Thao tác</th>
                 </tr>
               </thead>
@@ -310,67 +319,25 @@ export default function AdminOrders() {
                       <td>
                         <div className="customer-info">
                           <div className="customer-avatar">
-                            {(order.user?.avatar) ? (
-                              <img 
-                                src={order.user.avatar.startsWith('http') ? order.user.avatar : `http://localhost:5000${order.user.avatar}`} 
-                                alt="" 
-                                onError={(e) => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'flex'; }}
-                              />
-                            ) : null}
-                            <span className="avatar-fallback" style={{ display: order.user?.avatar ? 'none' : 'flex' }}>
-                              {(order.customerName || order.user?.name || 'K').charAt(0).toUpperCase()}
-                            </span>
+                            {order.user?.avatar ? (
+                              <img src={`http://localhost:5000${order.user.avatar}`} alt={order.customerName || order.user?.name} />
+                            ) : (
+                              <div className="avatar-fallback">
+                                {(order.customerName || order.user?.name || 'K')?.charAt(0).toUpperCase()}
+                              </div>
+                            )}
                           </div>
                           <div className="customer-details">
                             <div className="customer-name">{order.customerName || order.user?.name || 'Khách hàng'}</div>
-                            <div className="customer-contact">
-                              <span className="customer-phone">
-                                {order.phone || 'N/A'}
-                              </span>
-                            </div>
+                            <div className="customer-phone">{order.phone || 'N/A'}</div>
                           </div>
                         </div>
                       </td>
                       <td>
+                        <div className="order-date">{formatDate(order.createdAt)}</div>
+                      </td>
+                      <td>
                         <div className="order-total">{formatPrice(order.total)}</div>
-                      </td>
-                      <td>
-                        <span className={`payment-method-badge ${order.paymentMethod || 'cod'}`}>
-                          {order.paymentMethod === 'qr' || order.paymentMethod === 'zalopay' ? (
-                            <>
-                              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                <rect x="3" y="3" width="7" height="7"/>
-                                <rect x="14" y="3" width="7" height="7"/>
-                                <rect x="3" y="14" width="7" height="7"/>
-                                <rect x="14" y="14" width="3" height="3"/>
-                                <rect x="18" y="14" width="3" height="3"/>
-                                <rect x="14" y="18" width="3" height="3"/>
-                                <rect x="18" y="18" width="3" height="3"/>
-                              </svg>
-                              {order.paymentMethod === 'zalopay' ? 'ZaloPay' : 'QR'}
-                            </>
-                          ) : (
-                            <>
-                              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                <rect x="1" y="4" width="22" height="16" rx="2" ry="2"/>
-                                <line x1="1" y1="10" x2="23" y2="10"/>
-                              </svg>
-                              COD
-                            </>
-                          )}
-                        </span>
-                      </td>
-                      <td>
-                        <select
-                          className={`payment-select payment-${order.paymentStatus || 'pending'}`}
-                          value={order.paymentStatus || 'pending'}
-                          onChange={(e) => updatePaymentStatus(order._id, e.target.value)}
-                          disabled={updatingPayment === order._id}
-                        >
-                          {Object.entries(paymentStatusLabels).map(([key, label]) => (
-                            <option key={key} value={key}>{label}</option>
-                          ))}
-                        </select>
                       </td>
                       <td>
                         <select
@@ -385,7 +352,16 @@ export default function AdminOrders() {
                         </select>
                       </td>
                       <td>
-                        <div className="order-date">{formatDate(order.createdAt)}</div>
+                        <select
+                          className={`payment-select payment-${order.paymentStatus || 'pending'}`}
+                          value={order.paymentStatus || 'pending'}
+                          onChange={(e) => updatePaymentStatus(order._id, e.target.value)}
+                          disabled={updatingPayment === order._id}
+                        >
+                          {Object.entries(paymentStatusLabels).map(([key, label]) => (
+                            <option key={key} value={key}>{label}</option>
+                          ))}
+                        </select>
                       </td>
                       <td>
                         <div className="table-actions">
@@ -413,17 +389,21 @@ export default function AdminOrders() {
                     </tr>
                     {expandedRow === order._id && (
                       <tr className="expanded-row">
-                        <td colSpan="8">
+                        <td colSpan="7">
                           <div className="expanded-content">
                             <div className="expanded-section">
-                              <h4>&lt; Chi tiết đơn hàng</h4>
+                              <h4>Thông tin đơn hàng</h4>
                               <div className="detail-grid">
                                 <div className="detail-item">
                                   <label>Email:</label>
                                   <span>{order.customerEmail || order.user?.email || 'N/A'}</span>
                                 </div>
+                                <div className="detail-item">
+                                  <label>Phương thức thanh toán:</label>
+                                  <span>{paymentMethodLabels[order.paymentMethod] || 'COD'}</span>
+                                </div>
                                 <div className="detail-item full-width">
-                                  <label>Địa chỉ:</label>
+                                  <label>Địa chỉ giao hàng:</label>
                                   <span>{order.address || 'N/A'}</span>
                                 </div>
                                 {order.notes && (
@@ -539,6 +519,13 @@ export default function AdminOrders() {
           </div>
         )}
       </div>
+      {toast && (
+        <Toast 
+          message={toast.message} 
+          type={toast.type} 
+          onClose={() => setToast(null)} 
+        />
+      )}
     </AdminLayout>
   )
 }

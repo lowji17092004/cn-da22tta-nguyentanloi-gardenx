@@ -61,26 +61,18 @@ export const normalizeCategorySlug = (category) => {
   const normalized = String(category).toLowerCase().trim()
   
   const mapping = {
-    // Hoa kiểng
-    'hoa kiểng': 'hoa-kieng',
-    'hoa-kieng': 'hoa-kieng',
-    'hoa kieng': 'hoa-kieng',
-    // Cây cảnh
-    'cây cảnh': 'cay-canh',
-    'cay canh': 'cay-canh',
-    'cay-canh': 'cay-canh',
-    // Cây thủy cảnh
-    'cây thủy cảnh': 'cay-thuy-canh',
-    'cay thuy canh': 'cay-thuy-canh',
-    'cay-thuy-canh': 'cay-thuy-canh',
-    // Sen đá
-    'sen đá': 'sen-da',
-    'sen da': 'sen-da',
-    'sen-da': 'sen-da',
     // Chậu cây
     'chậu cây': 'chau-cay',
     'chau cay': 'chau-cay',
     'chau-cay': 'chau-cay',
+    // Cây cảnh
+    'cây cảnh': 'cay-canh',
+    'cay canh': 'cay-canh',
+    'cay-canh': 'cay-canh',
+    // Hoa kiểng
+    'hoa kiểng': 'hoa-kieng',
+    'hoa-kieng': 'hoa-kieng',
+    'hoa kieng': 'hoa-kieng',
     // Phụ kiện
     'phụ kiện': 'phu-kien',
     'phu kien': 'phu-kien',

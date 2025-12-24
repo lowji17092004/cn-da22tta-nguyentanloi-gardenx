@@ -6,6 +6,129 @@ import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import './AdminArticles.css';
 
+// Article Templates
+const ARTICLE_TEMPLATES = [
+  {
+    id: 'blank',
+    name: 'Trang trắng',
+    icon: '📄',
+    description: 'Bắt đầu từ đầu',
+    content: ''
+  },
+  {
+    id: 'care-guide',
+    name: 'Hướng dẫn chăm sóc',
+    icon: '🌱',
+    description: 'Hướng dẫn chăm sóc cây/hoa chi tiết',
+    content: `<h2>🌿 Giới thiệu</h2>
+<p>Mô tả ngắn gọn về loại cây/hoa và lý do nên chăm sóc đúng cách...</p>
+
+<h2>💧 Tưới nước</h2>
+<ul>
+<li><strong>Tần suất:</strong> Mô tả tần suất tưới...</li>
+<li><strong>Lượng nước:</strong> Hướng dẫn lượng nước phù hợp...</li>
+<li><strong>Lưu ý:</strong> Các điểm cần chú ý khi tưới...</li>
+</ul>
+
+<h2>☀️ Ánh sáng</h2>
+<p>Yêu cầu về ánh sáng và vị trí đặt cây tối ưu...</p>
+
+<h2>🌡️ Nhiệt độ & Độ ẩm</h2>
+<p>Điều kiện nhiệt độ và độ ẩm lý tưởng...</p>
+
+<h2>🌱 Đất & Phân bón</h2>
+<ul>
+<li><strong>Loại đất:</strong> Đất phù hợp nhất...</li>
+<li><strong>Phân bón:</strong> Loại phân và lịch bón...</li>
+</ul>
+
+<h2>⚠️ Các vấn đề thường gặp</h2>
+<p>Các bệnh, sâu hại phổ biến và cách xử lý...</p>
+
+<h2>💡 Mẹo chăm sóc</h2>
+<blockquote>Chia sẻ các mẹo hữu ích từ kinh nghiệm...</blockquote>`
+  },
+  {
+    id: 'flower-meaning',
+    name: 'Ý nghĩa hoa',
+    icon: '💐',
+    description: 'Bài viết về ý nghĩa các loài hoa',
+    content: `<h2>🌸 Nguồn gốc & Lịch sử</h2>
+<p>Giới thiệu về nguồn gốc và lịch sử của loài hoa...</p>
+
+<h2>💝 Ý nghĩa tượng trưng</h2>
+<p>Trong văn hóa và truyền thống, loài hoa này tượng trưng cho...</p>
+<ul>
+<li><strong>Tình yêu:</strong> ...</li>
+<li><strong>May mắn:</strong> ...</li>
+<li><strong>Hạnh phúc:</strong> ...</li>
+</ul>
+
+<h2>🎁 Dịp tặng phù hợp</h2>
+<p>Loài hoa này thường được tặng trong những dịp...</p>
+
+<h2>🎨 Ý nghĩa theo màu sắc</h2>
+<ul>
+<li><strong>Đỏ:</strong> ...</li>
+<li><strong>Trắng:</strong> ...</li>
+<li><strong>Hồng:</strong> ...</li>
+<li><strong>Vàng:</strong> ...</li>
+</ul>
+
+<h2>✨ Kết luận</h2>
+<p>Tóm tắt và lời khuyên khi chọn tặng hoa...</p>`
+  },
+  {
+    id: 'news',
+    name: 'Tin tức & Khuyến mãi',
+    icon: '📢',
+    description: 'Thông báo tin tức, sự kiện, khuyến mãi',
+    content: `<h2>🎉 Tiêu đề sự kiện</h2>
+<p>Mô tả ngắn gọn về chương trình/sự kiện...</p>
+
+<h2>📅 Thời gian</h2>
+<ul>
+<li><strong>Bắt đầu:</strong> Ngày/tháng/năm</li>
+<li><strong>Kết thúc:</strong> Ngày/tháng/năm</li>
+</ul>
+
+<h2>🎁 Ưu đãi chi tiết</h2>
+<p>Chi tiết các ưu đãi trong chương trình...</p>
+
+<h2>📋 Điều kiện áp dụng</h2>
+<ul>
+<li>Điều kiện 1...</li>
+<li>Điều kiện 2...</li>
+</ul>
+
+<h2>📞 Liên hệ</h2>
+<p>Thông tin liên hệ để biết thêm chi tiết...</p>`
+  },
+  {
+    id: 'inspiration',
+    name: 'Cảm hứng & Ý tưởng',
+    icon: '✨',
+    description: 'Bài viết truyền cảm hứng, ý tưởng trang trí',
+    content: `<h2>💫 Giới thiệu</h2>
+<p>Mở đầu thu hút, giới thiệu chủ đề bài viết...</p>
+
+<h2>🌟 Ý tưởng 1</h2>
+<p>Mô tả ý tưởng đầu tiên với hình ảnh minh họa...</p>
+
+<h2>🌟 Ý tưởng 2</h2>
+<p>Mô tả ý tưởng thứ hai...</p>
+
+<h2>🌟 Ý tưởng 3</h2>
+<p>Mô tả ý tưởng thứ ba...</p>
+
+<h2>💡 Mẹo thực hiện</h2>
+<blockquote>Chia sẻ các mẹo giúp thực hiện ý tưởng thành công...</blockquote>
+
+<h2>🎯 Kết luận</h2>
+<p>Tóm tắt và khuyến khích độc giả thử áp dụng...</p>`
+  }
+];
+
 export default function AdminArticles() {
   const [articles, setArticles] = useState([]);
   const [categories, setCategories] = useState([]);
@@ -17,6 +140,8 @@ export default function AdminArticles() {
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [uploadingImage, setUploadingImage] = useState(false);
+  const [activeEditorTab, setActiveEditorTab] = useState('edit'); // 'edit' or 'preview'
+  const [showTemplates, setShowTemplates] = useState(false);
   const [formData, setFormData] = useState({
     title: '',
     category: '',
@@ -101,6 +226,8 @@ export default function AdminArticles() {
       content: article.content || '',
       thumbnail: article.thumbnail || ''
     });
+    setShowTemplates(false);
+    setActiveEditorTab('edit');
     setShowModal(true);
   };
 
@@ -109,10 +236,21 @@ export default function AdminArticles() {
       title: '',
       category: '',
       summary: '',
-      content: '<h2>Giới thiệu</h2><p>Viết đoạn giới thiệu về chủ đề bài viết của bạn...</p><h2>Nội dung chính</h2><p>Chi tiết về nội dung...</p><ul><li>Điểm quan trọng 1</li><li>Điểm quan trọng 2</li><li>Điểm quan trọng 3</li></ul><h2>Kết luận</h2><p>Tóm tắt và kết luận...</p>',
+      content: '',
       thumbnail: ''
     });
     setEditingArticle(null);
+    setActiveEditorTab('edit');
+    setShowTemplates(true);
+  };
+
+  const applyTemplate = (template) => {
+    setFormData(prev => ({
+      ...prev,
+      content: template.content
+    }));
+    setShowTemplates(false);
+    setActiveEditorTab('edit');
   };
 
   const handleImageUpload = async (e) => {
@@ -154,6 +292,7 @@ export default function AdminArticles() {
   const handleCloseModal = () => {
     setShowModal(false);
     resetForm();
+    setShowTemplates(false);
   };
 
   // Filter and pagination
@@ -232,12 +371,6 @@ export default function AdminArticles() {
               <p>{filteredArticles.length} bài viết</p>
             </div>
           </div>
-          <button className="btn-primary" onClick={() => setShowModal(true)}>
-            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
-            </svg>
-            Tạo bài viết mới
-          </button>
         </div>
 
         {/* Filters */}
@@ -271,6 +404,13 @@ export default function AdminArticles() {
               <option key={cat._id} value={cat.slug}>{cat.name}</option>
             ))}
           </select>
+
+          <button className="btn-primary" onClick={() => setShowModal(true)}>
+            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
+            </svg>
+            Tạo bài viết
+          </button>
         </div>
 
         {/* Articles Table */}
@@ -384,126 +524,286 @@ export default function AdminArticles() {
         {/* Modal */}
         {showModal && (
           <div className="modal-overlay" onClick={handleCloseModal}>
-            <div className="modal-content article-modal" onClick={(e) => e.stopPropagation()}>
-              <div className="modal-header">
-                <h2>{editingArticle ? 'Chỉnh sửa bài viết' : 'Tạo bài viết mới'}</h2>
-                <button className="btn-close" onClick={handleCloseModal}>
-                  <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-                  </svg>
+            <div className="modal-content article-modal-pro" onClick={(e) => e.stopPropagation()}>
+              {/* Modal Header */}
+              <div className="modal-header-pro">
+                <div className="modal-header-left">
+                  <div className="modal-icon">
+                    <svg width="28" height="28" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                    </svg>
+                  </div>
+                  <div>
+                    <h2>{editingArticle ? 'Chỉnh sửa bài viết' : 'Tạo bài viết mới'}</h2>
+                    <p className="modal-subtitle">
+                      {editingArticle ? 'Cập nhật nội dung bài viết của bạn' : 'Sử dụng mẫu có sẵn hoặc bắt đầu từ đầu'}
+                    </p>
+                  </div>
+                </div>
+                <button className="btn-close-pro" onClick={handleCloseModal} title="Đóng">
+                  ✕
                 </button>
               </div>
 
-              <form onSubmit={handleSubmit} className="modal-body">
-                <div className="form-row">
-                  <div className="form-group full-width">
-                    <label>Tiêu đề <span className="required">*</span></label>
-                    <input
-                      type="text"
-                      value={formData.title}
-                      onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                      placeholder="Nhập tiêu đề bài viết..."
-                      required
-                    />
+              {/* Template Selection - Only show for new articles */}
+              {!editingArticle && showTemplates && (
+                <div className="template-section">
+                  <div className="template-header">
+                    <h3>🎨 Chọn mẫu bài viết</h3>
+                    <p>Bắt đầu nhanh hơn với các mẫu được thiết kế sẵn</p>
                   </div>
+                  <div className="template-grid">
+                    {ARTICLE_TEMPLATES.map(template => (
+                      <button
+                        key={template.id}
+                        className="template-card"
+                        onClick={() => applyTemplate(template)}
+                      >
+                        <span className="template-icon">{template.icon}</span>
+                        <strong>{template.name}</strong>
+                        <span className="template-desc">{template.description}</span>
+                      </button>
+                    ))}
+                  </div>
+                  <button className="btn-skip-template" onClick={() => setShowTemplates(false)}>
+                    Bỏ qua và tự viết
+                    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                    </svg>
+                  </button>
                 </div>
+              )}
 
-                <div className="form-row">
-                  <div className="form-group">
-                    <label>Danh mục <span className="required">*</span></label>
-                    <select
-                      value={formData.category}
-                      onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                      required
-                    >
-                      <option value="">Chọn danh mục</option>
-                      {categories.map(cat => (
-                        <option key={cat._id} value={cat.slug}>{cat.name}</option>
-                      ))}
-                    </select>
-                  </div>
+              {/* Article Form */}
+              {(!showTemplates || editingArticle) && (
+                <form onSubmit={handleSubmit} className="article-form-pro">
+                  {/* Top Info Section */}
+                  <div className="form-section-pro">
+                    <div className="section-title">
+                      <span className="section-number">1</span>
+                      <span>Thông tin cơ bản</span>
+                    </div>
+                    
+                    <div className="form-grid-pro">
+                      <div className="form-group-pro title-group">
+                        <label>
+                          <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
+                          </svg>
+                          Tiêu đề bài viết <span className="required">*</span>
+                        </label>
+                        <input
+                          type="text"
+                          value={formData.title}
+                          onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                          placeholder="Nhập tiêu đề thu hút người đọc..."
+                          required
+                          className="input-pro"
+                        />
+                        <span className="char-count">{formData.title.length}/100</span>
+                      </div>
 
-                  <div className="form-group">
-                    <label>Ảnh đại diện</label>
-                    <div className="image-upload-wrapper">
-                      <input
-                        type="file"
-                        accept="image/*"
-                        onChange={handleImageUpload}
-                        id="thumbnail-upload"
-                        style={{ display: 'none' }}
-                      />
-                      <label htmlFor="thumbnail-upload" className="btn-upload-image">
-                        {uploadingImage ? (
-                          <>
-                            <span className="spinner-small"></span>
-                            <span>Đang upload...</span>
-                          </>
-                        ) : (
-                          <>
-                            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <div className="form-row-pro">
+                        <div className="form-group-pro">
+                          <label>
+                            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+                            </svg>
+                            Danh mục <span className="required">*</span>
+                          </label>
+                          <select
+                            value={formData.category}
+                            onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                            required
+                            className="select-pro"
+                          >
+                            <option value="">Chọn danh mục</option>
+                            {categories.map(cat => (
+                              <option key={cat._id} value={cat.slug}>{cat.name}</option>
+                            ))}
+                          </select>
+                        </div>
+
+                        <div className="form-group-pro">
+                          <label>
+                            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                             </svg>
-                            <span>Chọn ảnh</span>
-                          </>
-                        )}
-                      </label>
-                      {formData.thumbnail && (
-                        <div className="image-preview">
-                          <img src={formData.thumbnail} alt="Preview" />
+                            Ảnh đại diện
+                          </label>
+                          <div className="thumbnail-upload-pro">
+                            {formData.thumbnail ? (
+                              <div className="thumbnail-preview-pro">
+                                <img src={formData.thumbnail} alt="Preview" />
+                                <div className="thumbnail-overlay">
+                                  <button
+                                    type="button"
+                                    onClick={() => setFormData({ ...formData, thumbnail: '' })}
+                                    className="btn-remove-thumb"
+                                  >
+                                    <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                    </svg>
+                                  </button>
+                                </div>
+                              </div>
+                            ) : (
+                              <label htmlFor="thumbnail-upload" className="upload-zone">
+                                <input
+                                  type="file"
+                                  accept="image/*"
+                                  onChange={handleImageUpload}
+                                  id="thumbnail-upload"
+                                />
+                                {uploadingImage ? (
+                                  <div className="upload-loading">
+                                    <span className="spinner-pro"></span>
+                                    <span>Đang tải...</span>
+                                  </div>
+                                ) : (
+                                  <>
+                                    <svg width="32" height="32" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                                    </svg>
+                                    <span>Kéo thả hoặc click để tải ảnh</span>
+                                    <small>PNG, JPG tối đa 5MB</small>
+                                  </>
+                                )}
+                              </label>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="form-group-pro">
+                        <label>
+                          <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h7" />
+                          </svg>
+                          Tóm tắt
+                        </label>
+                        <textarea
+                          value={formData.summary}
+                          onChange={(e) => setFormData({ ...formData, summary: e.target.value })}
+                          placeholder="Viết tóm tắt ngắn gọn để thu hút người đọc (hiển thị trong danh sách bài viết)..."
+                          rows="2"
+                          className="textarea-pro"
+                        />
+                        <span className="char-count">{formData.summary.length}/200</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Content Section */}
+                  <div className="form-section-pro">
+                    <div className="section-header-pro">
+                      <div className="section-title">
+                        <span className="section-number">2</span>
+                        <span>Nội dung bài viết</span>
+                      </div>
+                      
+                      {/* Editor Tabs */}
+                      <div className="editor-tabs">
+                        <button
+                          type="button"
+                          className={`editor-tab ${activeEditorTab === 'edit' ? 'active' : ''}`}
+                          onClick={() => setActiveEditorTab('edit')}
+                        >
+                          <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                          </svg>
+                          Soạn thảo
+                        </button>
+                        <button
+                          type="button"
+                          className={`editor-tab ${activeEditorTab === 'preview' ? 'active' : ''}`}
+                          onClick={() => setActiveEditorTab('preview')}
+                        >
+                          <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                          </svg>
+                          Xem trước
+                        </button>
+                      </div>
+                    </div>
+
+                    {activeEditorTab === 'edit' ? (
+                      <div className="editor-wrapper-pro">
+                        <ReactQuill
+                          theme="snow"
+                          value={formData.content}
+                          onChange={(value) => setFormData({ ...formData, content: value })}
+                          modules={quillModules}
+                          formats={quillFormats}
+                          placeholder="Bắt đầu viết nội dung bài viết của bạn..."
+                        />
+                        {!editingArticle && (
                           <button
                             type="button"
-                            className="btn-remove-image"
-                            onClick={() => setFormData({ ...formData, thumbnail: '' })}
+                            className="btn-show-templates"
+                            onClick={() => setShowTemplates(true)}
                           >
-                            ×
+                            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z" />
+                            </svg>
+                            Chọn mẫu khác
                           </button>
+                        )}
+                      </div>
+                    ) : (
+                      <div className="preview-wrapper-pro">
+                        <div className="preview-container">
+                          {formData.thumbnail && (
+                            <div className="preview-thumbnail">
+                              <img src={formData.thumbnail} alt="Preview" />
+                            </div>
+                          )}
+                          <h1 className="preview-title">{formData.title || 'Tiêu đề bài viết'}</h1>
+                          {formData.summary && (
+                            <p className="preview-summary">{formData.summary}</p>
+                          )}
+                          <div className="preview-meta">
+                            <span className="preview-category">
+                              {getCategoryName(formData.category) || 'Danh mục'}
+                            </span>
+                            <span className="preview-date">
+                              {new Date().toLocaleDateString('vi-VN')}
+                            </span>
+                          </div>
+                          <div 
+                            className="preview-content ql-editor"
+                            dangerouslySetInnerHTML={{ __html: formData.content || '<p>Nội dung bài viết sẽ hiển thị ở đây...</p>' }}
+                          />
                         </div>
-                      )}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Footer */}
+                  <div className="modal-footer-pro">
+                    <div className="footer-left">
+                      <span className="word-count">
+                        <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                        {formData.content.replace(/<[^>]*>/g, '').length} ký tự
+                      </span>
+                    </div>
+                    <div className="footer-right">
+                      <button type="button" className="btn-cancel-pro" onClick={handleCloseModal}>
+                        Hủy bỏ
+                      </button>
+                      <button type="submit" className="btn-submit-pro">
+                        <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                        </svg>
+                        {editingArticle ? 'Cập nhật bài viết' : 'Xuất bản bài viết'}
+                      </button>
                     </div>
                   </div>
-                </div>
-
-                <div className="form-row">
-                  <div className="form-group full-width">
-                    <label>Tóm tắt</label>
-                    <textarea
-                      value={formData.summary}
-                      onChange={(e) => setFormData({ ...formData, summary: e.target.value })}
-                      placeholder="Nhập tóm tắt ngắn gọn về bài viết..."
-                      rows="3"
-                    />
-                  </div>
-                </div>
-
-                <div className="form-row">
-                  <div className="form-group full-width">
-                    <label>Nội dung <span className="required">*</span></label>
-                    <div className="quill-wrapper">
-                      <ReactQuill
-                        theme="snow"
-                        value={formData.content}
-                        onChange={(value) => setFormData({ ...formData, content: value })}
-                        modules={quillModules}
-                        formats={quillFormats}
-                        placeholder="Viết nội dung bài viết của bạn..."
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                <div className="modal-footer">
-                  <button type="button" className="btn-secondary" onClick={handleCloseModal}>
-                    Hủy
-                  </button>
-                  <button type="submit" className="btn-primary">
-                    <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
-                    </svg>
-                    {editingArticle ? 'Cập nhật' : 'Tạo mới'}
-                  </button>
-                </div>
-              </form>
+                </form>
+              )}
             </div>
           </div>
         )}

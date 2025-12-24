@@ -360,3 +360,95 @@
     font-size: 14px;
   }
 }
+
+/* OAuth Divider & Buttons */
+.auth-divider {
+  position: relative;
+  text-align: center;
+  margin: 24px 0 20px;
+}
+
+.auth-divider::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: #e5e7eb;
+}
+
+.auth-divider span {
+  position: relative;
+  display: inline-block;
+  padding: 0 12px;
+  background: white;
+  font-size: 13px;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.oauth-buttons {
+  display: flex;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.btn-oauth {
+  flex: 1;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: white;
+  border: 2px solid #e5e7eb;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #374151;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-oauth::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, transparent, rgba(255,255,255,0.3));
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.btn-oauth:hover::before {
+  opacity: 1;
+}
+
+.btn-oauth:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+.btn-oauth:active {
+  transform: translateY(0);
+}
+
+.btn-google:hover {
+  border-color: #4285F4;
+  background: #f8faff;
+}
+
+.btn-facebook:hover {
+  border-color: #1877F2;
+  background: #f0f7ff;
+}
+
+.btn-oauth svg {
+  flex-shrink: 0;
+}
+
+.btn-oauth span {
+  font-weight: 600;
+}

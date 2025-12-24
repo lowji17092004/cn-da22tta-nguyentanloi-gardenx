@@ -31,8 +31,8 @@ const orderSchema = new mongoose.Schema({
   notes: String,
   paymentMethod: { 
     type: String, 
-    enum: ['cod', 'qr', 'zalopay'], 
-    default: 'zalopay' 
+    enum: ['cod', 'qr', 'zalopay', 'bank'], 
+    default: 'cod' 
   },
   paymentStatus: { 
     type: String, 

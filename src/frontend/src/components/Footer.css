@@ -1,113 +1,192 @@
 /* ==========================================
-   FOOTER - CREAM THEME WITH PLANT BACKGROUND
+   FOOTER - PROFESSIONAL & CLEAN DESIGN
    ========================================== */
 
 .site-footer {
-  background: linear-gradient(rgba(250, 248, 243, 0.95), rgba(250, 248, 243, 0.95)),
-              url('https://images.unsplash.com/photo-1463320726281-696a485928c7?w=1920') center/cover;
-  padding: 60px 0 0;
-  margin-top: 80px;
+  position: relative;
+  margin-top: 60px;
+}
+
+/* ================= THESIS BANNER ================= */
+.thesis-banner {
+  background: linear-gradient(135deg, rgba(26, 71, 42, 0.8) 0%, rgba(21, 128, 61, 0.7) 100%);
+  padding: 25px 20px;
+  text-align: center;
+  border-top: none;
   position: relative;
 }
 
-.site-footer::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, #d4a574, transparent);
+.thesis-container {
+  max-width: 900px;
+  margin: 0 auto;
+  position: relative;
 }
 
+.thesis-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.2);
+  padding: 8px 20px;
+  border-radius: 20px;
+  margin-bottom: 12px;
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  backdrop-filter: blur(10px);
+}
+
+.badge-icon {
+  font-size: 18px;
+}
+
+.badge-text {
+  font-size: 12px;
+  font-weight: 700;
+  color: white;
+  letter-spacing: 1.5px;
+}
+
+.thesis-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: white;
+  margin: 0 0 16px;
+  line-height: 1.4;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.thesis-author {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: center;
+}
+
+.author-info {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+}
+
+.author-name {
+  background: white;
+  color: #15803d;
+  padding: 6px 16px;
+  border-radius: 20px;
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.author-divider {
+  color: rgba(255, 255, 255, 0.7);
+  font-weight: 400;
+  font-size: 14px;
+}
+
+.author-class, .author-id {
+  background: rgba(255, 255, 255, 0.2);
+  padding: 6px 14px;
+  border-radius: 20px;
+  color: white;
+  font-weight: 600;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+.school-info {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+/* ================= FOOTER MAIN ================= */
 .footer-container {
+  background: linear-gradient(180deg, #f9fafb 0%, #f3f4f6 100%);
+  position: relative;
+  padding: 0;
+}
+
+.footer-grid {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 0 20px;
-}
-
-/* Footer Grid */
-.footer-grid {
+  padding: 50px 30px 40px;
   display: grid;
-  grid-template-columns: 2fr 1fr 1.5fr;
-  gap: 50px;
-  padding-bottom: 50px;
-  border-bottom: 1px solid rgba(139, 111, 71, 0.15);
+  grid-template-columns: 1.5fr 1fr 1fr 1.2fr;
+  gap: 40px;
+  border-bottom: 1px solid #e5e7eb;
 }
 
-/* Footer Column - About */
+/* Footer Brand */
 .footer-col-about {
-  max-width: 400px;
+  max-width: 340px;
 }
 
 .footer-brand {
   display: flex;
   align-items: center;
-  gap: 14px;
-  margin-bottom: 20px;
+  gap: 12px;
+  margin-bottom: 16px;
 }
 
-.footer-logo {
-  width: 50px;
-  height: 50px;
+.footer-logo-img {
+  width: 100px;
+  height: 100px;
+  border-radius: 10px;
   object-fit: contain;
 }
 
 .footer-brand h3 {
-  font-size: 32px;
-  font-weight: 900;
-  color: #2d5a3d;
+  font-size: 22px;
+  font-weight: 700;
+  color: #1a472a;
   margin: 0;
-  font-family: 'Playfair Display', Georgia, serif;
-  text-shadow: 0 2px 4px rgba(45, 90, 61, 0.1);
 }
 
 .footer-desc {
-  font-size: 15px;
-  line-height: 1.8;
-  color: #555;
-  margin: 0 0 24px;
-  font-weight: 500;
+  font-size: 14px;
+  line-height: 1.7;
+  color: #4b5563;
+  margin: 0 0 20px;
 }
 
-.footer-badge {
-  margin-bottom: 20px;
+/* Social Links */
+.footer-social {
+  display: flex;
+  gap: 10px;
 }
 
-.dmca-badge {
-  width: 80px;
-  height: auto;
-  opacity: 0.7;
+.social-link {
+  width: 40px;
+  height: 40px;
+  background: #e5e7eb;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  color: #374151;
 }
 
-.footer-company-info {
-  padding: 16px;
-  background: rgba(255, 255, 255, 0.6);
-  border-left: 3px solid #d4a574;
-  border-radius: 6px;
+.social-link:hover {
+  background: #22c55e;
+  color: white;
 }
 
-.footer-company-info p {
-  font-size: 13px;
-  color: #555;
-  margin: 4px 0;
-  line-height: 1.6;
-}
-
-.footer-company-info strong {
-  color: #2d5a3d;
-  font-weight: 600;
+.social-link svg {
+  width: 18px;
+  height: 18px;
+  fill: currentColor;
 }
 
 /* Footer Columns */
 .footer-col h4 {
-  font-size: 16px;
-  font-weight: 900;
-  color: #2d5a3d;
-  margin: 0 0 20px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #1a472a;
+  margin: 0 0 18px;
   letter-spacing: 1.2px;
   text-transform: uppercase;
-  text-shadow: 0 1px 2px rgba(45, 90, 61, 0.1);
 }
 
 .footer-links {
@@ -117,165 +196,192 @@
 }
 
 .footer-links li {
-  margin-bottom: 12px;
+  margin-bottom: 10px;
 }
 
 .footer-links a {
-  color: #555;
+  color: #4b5563;
   text-decoration: none;
-  font-size: 15px;
-  font-weight: 600;
-  transition: all 0.3s;
+  font-size: 14px;
+  font-weight: 400;
+  transition: color 0.2s;
   display: inline-block;
 }
 
 .footer-links a:hover {
-  color: #2d5a3d;
-  transform: translateX(5px);
+  color: #16a34a;
 }
 
 /* Footer Contact */
 .footer-contact {
   list-style: none;
   padding: 0;
-  margin: 0 0 24px;
+  margin: 0;
 }
 
 .footer-contact li {
-  margin-bottom: 14px;
-  font-size: 15px;
-  font-weight: 600;
-  line-height: 1.6;
-  color: #444;
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 16px;
+}
+
+.contact-icon {
+  display: none;
+}
+
+.contact-content {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
 .contact-label {
-  display: inline-block;
-  min-width: 80px;
-  color: #888;
-  font-weight: 500;
+  color: #6b7280;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
 }
 
 .footer-contact a {
-  color: #2d5a3d;
+  color: #16a34a;
   text-decoration: none;
   font-weight: 600;
-  transition: color 0.3s;
+  font-size: 14px;
+  transition: color 0.2s;
 }
 
 .footer-contact a:hover {
-  color: #1a472a;
+  color: #22c55e;
 }
 
-.footer-address {
-  display: flex;
-  gap: 8px;
+.contact-address {
+  color: #4b5563;
+  font-size: 14px;
+  line-height: 1.6;
 }
 
-.footer-address span {
-  color: #666;
-}
-
-/* Social Links */
-.footer-social {
-  display: flex;
-  gap: 12px;
-}
-
-.social-link {
-  width: 40px;
-  height: 40px;
-  background: rgba(45, 90, 61, 0.1);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.3s;
-  border: 1px solid rgba(45, 90, 61, 0.2);
-}
-
-.social-link:hover {
-  background: #2d5a3d;
-  transform: translateY(-3px);
-  box-shadow: 0 4px 12px rgba(45, 90, 61, 0.3);
-}
-
-.social-link img {
-  width: 20px;
-  height: 20px;
-  filter: brightness(0) saturate(100%) invert(39%) sepia(17%) saturate(1089%) hue-rotate(95deg);
-  transition: filter 0.3s;
-}
-
-.social-link:hover img {
-  filter: brightness(0) invert(1);
-}
-
-/* Footer Map Section */
+/* Map Section */
 .footer-map-section {
-  padding: 40px 0;
-  border-bottom: 1px solid rgba(139, 111, 71, 0.15);
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 40px 30px;
 }
 
 .map-title {
   font-size: 16px;
-  font-weight: 700;
-  color: #2d5a3d;
-  margin: 0 0 20px;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0 0 16px;
   text-align: center;
 }
 
 .footer-map {
   border-radius: 12px;
   overflow: hidden;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  border: 2px solid #e5e7eb;
 }
 
 /* Footer Bottom */
 .footer-bottom {
-  padding: 24px 0;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px 30px;
   text-align: center;
+  border-top: 1px solid #e5e7eb;
 }
 
 .footer-bottom p {
   margin: 0;
   font-size: 13px;
-  color: #888;
+  color: #6b7280;
 }
 
-/* Responsive */
-@media (max-width: 900px) {
+.footer-bottom strong {
+  color: #16a34a;
+  font-weight: 600;
+}
+
+/* ================= RESPONSIVE ================= */
+@media (max-width: 1100px) {
   .footer-grid {
     grid-template-columns: 1fr 1fr;
     gap: 40px;
+    padding: 50px 30px 45px;
   }
   
   .footer-col-about {
     grid-column: 1 / -1;
     max-width: 100%;
+    text-align: center;
+  }
+  
+  .footer-brand {
+    justify-content: center;
+  }
+  
+  .footer-social {
+    justify-content: center;
+  }
+  
+  .footer-col h4::after {
+    left: 50%;
+    transform: translateX(-50%);
   }
 }
 
-@media (max-width: 600px) {
-  .site-footer {
-    padding: 40px 0 0;
-    margin-top: 60px;
+@media (max-width: 700px) {
+  .thesis-banner {
+    padding: 28px 16px;
+  }
+  
+  .thesis-title {
+    font-size: 20px;
+  }
+  
+  .author-info {
+    gap: 10px;
+  }
+  
+  .author-name {
+    padding: 8px 18px;
+    font-size: 14px;
+  }
+  
+  .author-class, .author-id {
+    padding: 6px 14px;
+    font-size: 13px;
   }
   
   .footer-grid {
     grid-template-columns: 1fr;
-    gap: 30px;
+    gap: 35px;
+    padding: 45px 20px 40px;
   }
   
-  .footer-brand h3 {
-    font-size: 24px;
+  .footer-col {
+    text-align: center;
+  }
+  
+  .footer-col h4::after {
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  
+  .footer-contact li {
+    justify-content: center;
+    text-align: left;
   }
   
   .footer-map-section {
-    padding: 30px 0;
+    padding: 35px 20px;
   }
   
   .footer-map iframe {
     height: 250px;
+  }
+  
+  .footer-bottom {
+    padding: 22px 20px;
   }
 }

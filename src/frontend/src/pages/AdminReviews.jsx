@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import api from '../api'
 import AdminLayout from '../components/AdminLayout'
+import Toast from '../components/Toast'
 import './AdminReviews.css'
 
 export default function AdminReviews() {
@@ -13,6 +14,12 @@ export default function AdminReviews() {
   const [replyingTo, setReplyingTo] = useState(null)
   const [replyContent, setReplyContent] = useState('')
   const [submittingReply, setSubmittingReply] = useState(false)
+  const [toast, setToast] = useState(null)
+
+  const showToast = (message, type = 'success') => {
+    setToast({ message, type })
+    setTimeout(() => setToast(null), 3000)
+  }
 
   const loadReviews = async () => {
     setLoading(true)
@@ -33,7 +40,7 @@ export default function AdminReviews() {
 
   const handleReply = async (reviewId) => {
     if (!replyContent.trim()) {
-      alert('Vui lòng nhập nội dung phản hồi')
+      showToast('Vui lòng nhập nội dung phản hồi', 'warning')
       return
     }
 
@@ -43,8 +50,9 @@ export default function AdminReviews() {
       setReplyContent('')
       setReplyingTo(null)
       loadReviews()
+      showToast('Phản hồi đánh giá thành công', 'success')
     } catch (e) {
-      alert('Có lỗi xảy ra khi gửi phản hồi')
+      showToast('Có lỗi xảy ra khi gửi phản hồi', 'error')
     }
     setSubmittingReply(false)
   }
@@ -55,8 +63,9 @@ export default function AdminReviews() {
     try {
       await api.delete(`/reviews/${reviewId}`)
       loadReviews()
+      showToast('Xóa đánh giá thành công', 'success')
     } catch (e) {
-      alert('Có lỗi xảy ra khi xóa đánh giá')
+      showToast('Có lỗi xảy ra khi xóa đánh giá', 'error')
     }
   }
 
@@ -234,10 +243,18 @@ export default function AdminReviews() {
                   <div className="user-avatar-wrapper">
                     {review.user?.avatar ? (
                       <img 
-                        src={review.user.avatar.startsWith('http') ? review.user.avatar : `http://localhost:5000${review.user.avatar}`}
-                        alt={review.user.name}
+                        src={review.user.avatar.startsWith('http') 
+                          ? review.user.avatar 
+                          : review.user.avatar.startsWith('/uploads') 
+                            ? `http://localhost:5000${review.user.avatar}`
+                            : `http://localhost:5000/uploads/avatars/${review.user.avatar}`
+                        }
+                        alt={review.user?.name || 'User'}
                         className="user-avatar"
-                        onError={(e) => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'flex'; }}
+                        onError={(e) => { 
+                          e.target.style.display = 'none'; 
+                          if (e.target.nextSibling) e.target.nextSibling.style.display = 'flex'; 
+                        }}
                       />
                     ) : null}
                     <div className="user-avatar-fallback" style={{ display: review.user?.avatar ? 'none' : 'flex' }}>
@@ -390,6 +407,13 @@ export default function AdminReviews() {
             </div>
           ))}
         </div>
+      )}
+      {toast && (
+        <Toast 
+          message={toast.message} 
+          type={toast.type} 
+          onClose={() => setToast(null)} 
+        />
       )}
     </AdminLayout>
   )

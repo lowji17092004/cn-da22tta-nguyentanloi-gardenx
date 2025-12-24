@@ -7,23 +7,24 @@ import { flyToCart } from '../utils/cartAnimation'
 import './HomeNew.css'
 
 const CATEGORIES = {
-  'hoa-kieng': 'Hoa kiểng',
+  'chau-cay': 'Chậu cây',
   'cay-canh': 'Cây cảnh',
-  'cay-thuy-canh': 'Cây thủy cảnh',
-  'sen-da': 'Sen đá'
+  'hoa-kieng': 'Hoa kiểng',
+  'phu-kien': 'Phụ kiện'
 }
 
 const normalizeCategorySlug = (category) => {
   if (!category) return ''
   const normalized = category.toLowerCase().trim()
   const mapping = {
+    'chậu cây': 'chau-cay',
+    'chau cay': 'chau-cay',
     'hoa kiểng': 'hoa-kieng',
+    'hoa kieng': 'hoa-kieng',
     'cây cảnh': 'cay-canh',
     'cay canh': 'cay-canh',
-    'cây thủy cảnh': 'cay-thuy-canh',
-    'cay thuy canh': 'cay-thuy-canh',
-    'sen đá': 'sen-da',
-    'sen da': 'sen-da'
+    'phụ kiện': 'phu-kien',
+    'phu kien': 'phu-kien'
   }
   return mapping[normalized] || category
 }
@@ -97,11 +98,11 @@ export default function HomeNew(){
         
         // Chỉ lấy sản phẩm được gắn tag nổi bật (isFeatured = true)
         const featuredProducts = products.filter(p => p.isFeatured === true)
-        setFeatured(featuredProducts.slice(0, 8))
+        setFeatured(featuredProducts.slice(0, 10))
         
         // Chỉ lấy sản phẩm đã bán >= 10 (bestsellers)
         const bestSellerProducts = products.filter(p => (p.sold || 0) >= 10)
-        setBestsellers(bestSellerProducts.slice(0, 8))
+        setBestsellers(bestSellerProducts.slice(0, 10))
       } catch(e) {
         console.error('Failed to load products', e)
       }
@@ -264,7 +265,7 @@ export default function HomeNew(){
         <div className="container">
           <div className="section-header-home center">
             <h2 className="section-title-home">🏆 Tại sao chọn chúng tôi?</h2>
-            <p className="section-subtitle-home">Những lý do khiến Florana trở thành lựa chọn hàng đầu của bạn</p>
+            <p className="section-subtitle-home">Những lý do khiến The Sun Garden trở thành lựa chọn hàng đầu của bạn</p>
           </div>
           
           <div className="why-choose-grid">
@@ -284,7 +285,7 @@ export default function HomeNew(){
         <div className="container">
           <div className="section-header-home center">
             <h2 className="section-title-home">💬 Khách hàng nói gì về chúng tôi?</h2>
-            <p className="section-subtitle-home">Những đánh giá chân thực từ khách hàng đã mua sắm tại Florana</p>
+            <p className="section-subtitle-home">Những đánh giá chân thực từ khách hàng đã mua sắm tại The Sun Garden</p>
           </div>
           
           <div className="testimonials-grid">
@@ -313,8 +314,8 @@ export default function HomeNew(){
       <section className="home-section cta-section">
         <div className="container">
           <div className="cta-content">
-            <h2 className="cta-title"> Bắt đầu hành trình xanh cùng Florana</h2>
-            <p className="cta-desc">Khám phá bộ sưu tập cây cảnh đa dạng và nhận ngay ưu đãi cho đơn hàng đầu tiên</p>
+            <h2 className="cta-title">Tạo không gian sống xanh - Tận hưởng cuộc sống khỏe</h2>
+            <p className="cta-desc">Mang thiên nhiên vào nhà bạn với bộ sưu tập cây cảnh đa dạng. Ưu đãi đặc biệt cho đơn hàng đầu tiên!</p>
             <Link to="/shop" className="cta-button">
               Khám phá ngay
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">

@@ -29,9 +29,9 @@ export default function BlogFlorana(){
       <div className="container">
         <div className="blog-page">
           <div className="blog-breadcrumb">
-            <Link to="/articles">Blog</Link>
+            <Link to="/articles">Hướng dẫn</Link>
             <span>/</span>
-            <span>Florana</span>
+            <span>The Sun Garden</span>
           </div>
 
           <div className="blog-page-content">
@@ -41,14 +41,14 @@ export default function BlogFlorana(){
             <div className="empty-state">
               <span className="empty-icon">📝</span>
               <h3>Chưa có bài viết</h3>
-              <p>Các bài viết về Florana sẽ sớm được cập nhật.</p>
+              <p>Các bài viết về The Sun Garden sẽ sớm được cập nhật.</p>
             </div>
           ) : (
             <div className="articles-grid">
               {articles.map(article => (
                 <Link to={`/article/${article.slug}`} key={article._id} className="article-card-grid">
                   <div className="article-image">
-                    <img src={article.featuredImage || article.images?.[0] || 'https://via.placeholder.com/400x250?text=Florana'} alt={article.title} />
+                    <img src={article.featuredImage || article.images?.[0] || 'https://via.placeholder.com/400x250?text=TheSunGarden'} alt={article.title} />
                   </div>
                   <div className="article-content">
                     <h3 className="article-title">{article.title}</h3>

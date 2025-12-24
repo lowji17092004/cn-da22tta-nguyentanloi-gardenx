@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useRef, useState, useCallback, useMemo } from 'react'
 import { useCart } from '../contexts/CartContext'
 import { Link, useNavigate } from 'react-router-dom'
 import axios from 'axios'
@@ -8,13 +8,24 @@ export default function Cart(){
   const { items, remove, updateQuantity, total, refreshStock, clear } = useCart()
   const navigate = useNavigate()
   const hasRefreshed = useRef(false)
-  const [selectedItems, setSelectedItems] = useState([])
+  const [selectedItems, setSelectedItems] = useState(() => {
+    // Initialize from items
+    return []
+  })
 
-  // Initialize selected items when items change
+  // Sync selectedItems when items change - keep valid selections
   useEffect(() => {
-    // Select all items by default
-    setSelectedItems(items.map(item => item.product))
-  }, [items.length])
+    const validProductIds = items.map(item => item.product)
+    setSelectedItems(prev => {
+      // Keep only selections that still exist in items
+      const stillValid = prev.filter(id => validProductIds.includes(id))
+      // If nothing selected yet, select all
+      if (stillValid.length === 0 && items.length > 0) {
+        return validProductIds
+      }
+      return stillValid
+    })
+  }, [items])
 
   useEffect(() => {
     const fetchStock = async () => {
@@ -33,27 +44,29 @@ export default function Cart(){
   }, [])
 
   // Toggle select single item
-  const toggleSelectItem = (productId) => {
+  const toggleSelectItem = useCallback((productId) => {
     setSelectedItems(prev => 
       prev.includes(productId) 
         ? prev.filter(id => id !== productId)
         : [...prev, productId]
     )
-  }
+  }, [])
 
   // Toggle select all items
-  const toggleSelectAll = () => {
+  const toggleSelectAll = useCallback(() => {
     if (selectedItems.length === items.length) {
       setSelectedItems([])
     } else {
       setSelectedItems(items.map(item => item.product))
     }
-  }
+  }, [selectedItems.length, items])
 
-  // Calculate total for selected items only
-  const selectedTotal = items
-    .filter(item => selectedItems.includes(item.product))
-    .reduce((sum, item) => sum + (item.price * item.quantity), 0)
+  // Calculate total for selected items only - memoized
+  const selectedTotal = useMemo(() => {
+    return items
+      .filter(item => selectedItems.includes(item.product))
+      .reduce((sum, item) => sum + (item.price * item.quantity), 0)
+  }, [items, selectedItems])
 
   const selectedCount = selectedItems.length
   
@@ -80,29 +93,29 @@ export default function Cart(){
   }
 
   // Remove selected items
-  const removeSelected = () => {
+  const removeSelected = useCallback(() => {
     if (selectedItems.length === 0) {
       alert('Vui lòng chọn sản phẩm để xóa')
       return
     }
     if (window.confirm(`Xóa ${selectedItems.length} sản phẩm đã chọn?`)) {
-      // Clone để tránh mutation trong loop
       const toRemove = [...selectedItems]
+      // Remove items and clear selection
       toRemove.forEach(productId => {
         remove(productId)
       })
       setSelectedItems([])
     }
-  }
+  }, [selectedItems, remove])
 
   // Remove all items from cart
-  const removeAll = () => {
+  const removeAll = useCallback(() => {
     if (items.length === 0) return
     if (window.confirm(`Xóa tất cả ${items.length} sản phẩm trong giỏ hàng?`)) {
       clear()
       setSelectedItems([])
     }
-  }
+  }, [items.length, clear])
   
   const shippingFee = selectedTotal >= 500000 ? 0 : 30000
   const finalTotal = selectedTotal + shippingFee

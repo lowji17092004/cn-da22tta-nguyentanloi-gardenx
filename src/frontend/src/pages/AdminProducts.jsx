@@ -2,6 +2,7 @@ import React, { useEffect, useState, useMemo, useCallback } from 'react'
 import api from '../api'
 import { Link } from 'react-router-dom'
 import AdminLayout from '../components/AdminLayout'
+import Toast from '../components/Toast'
 import { normalizeCategorySlug, matchesSearchTerm } from '../utils/searchUtils'
 import { getCategoryDisplayName } from '../utils/categoryUtils'
 import './AdminProducts.css'
@@ -18,6 +19,12 @@ export default function AdminProducts(){
   const [sortBy, setSortBy] = useState('name')
   const [viewMode, setViewMode] = useState('table')
   const [deleteModal, setDeleteModal] = useState({ show: false, item: null })
+  const [toast, setToast] = useState(null)
+
+  const showToast = useCallback((message, type = 'success') => {
+    setToast({ message, type })
+    setTimeout(() => setToast(null), 3000)
+  }, [])
 
   // pagination (client-side)
   const [page, setPage] = useState(1)
@@ -168,11 +175,12 @@ export default function AdminProducts(){
       await api.delete('/products/' + item._id)
       setItems(prev => prev.filter(p => p._id !== item._id))
       setDeleteModal({ show: false, item: null })
+      showToast('Xóa sản phẩm thành công', 'success')
     }catch(e){
       console.error('Delete failed', e)
-      alert('Xóa thất bại')
+      showToast('Xóa sản phẩm thất bại', 'error')
     }
-  }, [deleteModal])
+  }, [deleteModal, showToast])
 
   const toggleVisibility = useCallback(async (item) => {
     try {
@@ -180,11 +188,12 @@ export default function AdminProducts(){
       setItems(prev => prev.map(p => 
         p._id === item._id ? { ...p, isHidden: res.data.isHidden } : p
       ))
+      showToast(res.data.isHidden ? 'Đã ẩn sản phẩm' : 'Đã hiện sản phẩm', 'success')
     } catch(e) {
       console.error('Toggle visibility failed', e)
-      alert('Không thể thay đổi trạng thái hiển thị')
+      showToast('Không thể thay đổi trạng thái hiển thị', 'error')
     }
-  }, [])
+  }, [showToast])
 
   const remove = useCallback((item) => {
     setDeleteModal({ show: true, item })
@@ -196,12 +205,12 @@ export default function AdminProducts(){
     try{
       await api.delete('/products')
       setItems([])
-      alert('Đã xóa tất cả sản phẩm thành công')
+      showToast('Đã xóa tất cả sản phẩm thành công', 'success')
     }catch(e){
       console.error('Remove all failed', e)
-      alert('Xóa thất bại: ' + (e.response?.data?.message || e.message))
+      showToast('Xóa thất bại: ' + (e.response?.data?.message || e.message), 'error')
     }
-  }, [])
+  }, [showToast])
 
   // small helpers
   const formatCurrency = useCallback((v) => {
@@ -466,12 +475,12 @@ export default function AdminProducts(){
                                 >
                                   {it.isHidden ? (
                                     <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                                      <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                      <path strokeLinecap="round" strokeLinejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                      <path strokeLinecap="round" strokeLinejoin="round" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
                                     </svg>
                                   ) : (
                                     <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                                      <path strokeLinecap="round" strokeLinejoin="round" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
+                                      <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                      <path strokeLinecap="round" strokeLinejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                                     </svg>
                                   )}
                                 </button>
@@ -603,6 +612,13 @@ export default function AdminProducts(){
             </div>
           </div>
         </div>
+      )}
+      {toast && (
+        <Toast 
+          message={toast.message} 
+          type={toast.type} 
+          onClose={() => setToast(null)} 
+        />
       )}
     </AdminLayout>
   )

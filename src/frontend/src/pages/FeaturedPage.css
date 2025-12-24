@@ -111,11 +111,11 @@
 
 /* Products Grid - Same as HomeNew */
 .products-grid {
-  max-width: 1200px;
+  max-width: 1400px;
   margin: 0 auto;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: 24px;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 20px;
   margin-bottom: 40px;
 }
 
@@ -297,6 +297,7 @@
   line-height: 1.4;
   display: -webkit-box;
   -webkit-line-clamp: 2;
+  line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
   transition: color 0.2s ease;

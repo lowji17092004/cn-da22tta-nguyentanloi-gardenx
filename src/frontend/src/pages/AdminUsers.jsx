@@ -2,6 +2,7 @@ import React, { useEffect, useState, useMemo } from 'react'
 import api from '../api'
 import { Link } from 'react-router-dom'
 import AdminLayout from '../components/AdminLayout'
+import Toast from '../components/Toast'
 import './AdminUsers.css'
 
 export default function AdminUsers() {
@@ -12,6 +13,12 @@ export default function AdminUsers() {
   const [filterStatus, setFilterStatus] = useState('')
   const [lockModal, setLockModal] = useState({ show: false, user: null, action: '' })
   const [orderCounts, setOrderCounts] = useState({})
+  const [toast, setToast] = useState(null)
+
+  const showToast = (message, type = 'success') => {
+    setToast({ message, type })
+    setTimeout(() => setToast(null), 3000)
+  }
 
   const load = async () => {
     setLoading(true)
@@ -66,8 +73,9 @@ export default function AdminUsers() {
       await api.put(`/users/${lockModal.user._id}/${endpoint}`)
       load()
       setLockModal({ show: false, user: null, action: '' })
+      showToast(lockModal.action === 'lock' ? 'Đã khóa tài khoản' : 'Đã mở khóa tài khoản', 'success')
     } catch (e) {
-      alert('Thao tác thất bại')
+      showToast('Thao tác thất bại', 'error')
     }
   }
 
@@ -360,6 +368,13 @@ export default function AdminUsers() {
             </div>
           </div>
         </div>
+      )}
+      {toast && (
+        <Toast 
+          message={toast.message} 
+          type={toast.type} 
+          onClose={() => setToast(null)} 
+        />
       )}
     </AdminLayout>
   )

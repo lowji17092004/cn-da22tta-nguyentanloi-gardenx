@@ -87,7 +87,7 @@ export default function ChatBubble() {
     return d.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })
   }
 
-  if (!user) return null
+  // Luôn hiển thị chat bubble
 
   return (
     <>
@@ -133,7 +133,29 @@ export default function ChatBubble() {
 
           {/* Messages */}
           <div className="chat-bubble-messages">
-            {loading ? (
+            {!user ? (
+              <div className="chat-bubble-login-prompt">
+                <svg width="64" height="64" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+                </svg>
+                <h3>Chào mừng bạn!</h3>
+                <p>Đăng nhập để chat với chúng tôi và nhận hỗ trợ nhanh chóng</p>
+                <a href="/login" className="chat-login-btn">
+                  Đăng nhập ngay
+                </a>
+                <div className="chat-contact-alt">
+                  <span>Hoặc liên hệ qua:</span>
+                  <div className="chat-contact-links">
+                    <a href="https://zalo.me/0368920249" target="_blank" rel="noopener noreferrer">
+                      📱 Zalo
+                    </a>
+                    <a href="https://www.facebook.com/lowji.ngt" target="_blank" rel="noopener noreferrer">
+                      💬 Facebook
+                    </a>
+                  </div>
+                </div>
+              </div>
+            ) : loading ? (
               <div className="chat-bubble-loading">
                 <div className="spinner"></div>
                 <p>Đang tải...</p>
@@ -191,26 +213,28 @@ export default function ChatBubble() {
             )}
           </div>
 
-          {/* Input */}
-          <form className="chat-bubble-input" onSubmit={handleSend}>
-            <input
-              type="text"
-              placeholder="Nhập tin nhắn..."
-              value={newMessage}
-              onChange={(e) => setNewMessage(e.target.value)}
-              disabled={sending}
-            />
-            <button type="submit" disabled={!newMessage.trim() || sending} title="Gửi tin nhắn">
-              {sending ? (
-                <div className="spinner-small"></div>
-              ) : (
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M22 2L11 13" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                  <path d="M22 2L15 22L11 13L2 9L22 2Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                </svg>
-              )}
-            </button>
-          </form>
+          {/* Input - chỉ hiển thị khi đã đăng nhập */}
+          {user && (
+            <form className="chat-bubble-input" onSubmit={handleSend}>
+              <input
+                type="text"
+                placeholder="Nhập tin nhắn..."
+                value={newMessage}
+                onChange={(e) => setNewMessage(e.target.value)}
+                disabled={sending}
+              />
+              <button type="submit" disabled={!newMessage.trim() || sending} title="Gửi tin nhắn">
+                {sending ? (
+                  <div className="spinner-small"></div>
+                ) : (
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M22 2L11 13" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    <path d="M22 2L15 22L11 13L2 9L22 2Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                )}
+              </button>
+            </form>
+          )}
         </div>
       )}
     </>

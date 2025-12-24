@@ -4,13 +4,18 @@ import { useAuth } from '../contexts/AuthContext'
 import { useCart } from '../contexts/CartContext'
 import { useEffect, useState } from 'react'
 import api from '../api'
+import './Header.css'
 
-const BLOG_CATEGORIES = [
-  { id: 'about', title: 'FLORANA', desc: 'Giới thiệu về Florana - Cửa hàng hoa và cây cảnh uy tín.', fallback: '/images/hoakieng.jpg' },
-  { id: 'info', title: 'THÔNG TIN VỀ CÂY', desc: 'Hồ sơ thông tin về các loại cây cảnh, hình ảnh, đặc điểm.', fallback: '/images/caycanh.jpg' },
-  { id: 'care', title: 'KIẾN THỨC & CHĂM SÓC', desc: 'Hướng dẫn chăm sóc & thông tin hữu ích về cây cảnh.', fallback: '/images/caythuycanh.jpg' },
-  { id: 'inspiration', title: 'CẢM HỨNG & Ý TƯỞNG', desc: 'Mẹo và ý tưởng về cây giúp bạn có không gian lý tưởng.', fallback: '/images/senda.jpg' }
-]
+// Icon map cho các danh mục
+const CATEGORY_ICONS = {
+  'chau-cay': '🪴',
+  'cay-canh': '🌱',
+  'hoa-kieng': '🌸',
+  'phu-kien': '🛠️',
+  'default': '🌿'
+}
+
+const getCategoryIcon = (slug) => CATEGORY_ICONS[slug] || CATEGORY_ICONS['default']
 
 export default function Header(){
   const { user, logout } = useAuth()
@@ -20,8 +25,11 @@ export default function Header(){
   const [isScrolled, setIsScrolled] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const [productCategories, setProductCategories] = useState([])
-  const [blogCategories, setBlogCategories] = useState([])
-  const [blogImages, setBlogImages] = useState({})
+  const [searchHistory, setSearchHistory] = useState([])
+  const [showSearchHistory, setShowSearchHistory] = useState(false)
+
+  const SEARCH_HISTORY_KEY = 'thesungarden_search_history'
+  const MAX_SEARCH_HISTORY = 5
 
   useEffect(() => {
     const pref = localStorage.getItem('theme') || (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
@@ -30,7 +38,16 @@ export default function Header(){
     document.body.classList.toggle('dark-theme', isDark)
 
     loadCategories()
-    loadBlogImages()
+    
+    // Load search history
+    const saved = localStorage.getItem(SEARCH_HISTORY_KEY)
+    if (saved) {
+      try {
+        setSearchHistory(JSON.parse(saved))
+      } catch (e) {
+        console.error('Error parsing search history', e)
+      }
+    }
   }, [])
 
   useEffect(() => {
@@ -42,27 +59,10 @@ export default function Header(){
 
   const loadCategories = async () => {
     try {
-      const res = await api.get('/categories')
-      const cats = res.data
-      setProductCategories(cats.filter(c => c.type === 'product' || !c.type))
-      setBlogCategories(cats.filter(c => c.type === 'blog'))
+      const res = await api.get('/categories/stats')
+      setProductCategories(res.data.productCategories || [])
     } catch (err) {
       console.error('Error loading categories:', err)
-    }
-  }
-
-  const loadBlogImages = async () => {
-    try {
-      const images = {}
-      for (const cat of BLOG_CATEGORIES) {
-        const res = await api.get(`/articles?category=${cat.id}&limit=1`)
-        if (res.data.articles && res.data.articles.length > 0 && res.data.articles[0].thumbnail) {
-          images[cat.id] = res.data.articles[0].thumbnail
-        }
-      }
-      setBlogImages(images)
-    } catch (err) {
-      console.error('Error loading blog images:', err)
     }
   }
 
@@ -76,9 +76,20 @@ export default function Header(){
   function handleSearch(e){
     e.preventDefault()
     if (searchQuery.trim()) {
-      navigate(`/shop?search=${encodeURIComponent(searchQuery.trim())}`)
+      // Save to history
+      const newHistory = [searchQuery.trim(), ...searchHistory.filter(h => h !== searchQuery.trim())].slice(0, MAX_SEARCH_HISTORY)
+      setSearchHistory(newHistory)
+      localStorage.setItem(SEARCH_HISTORY_KEY, JSON.stringify(newHistory))
+      
+      navigate(`/products?search=${encodeURIComponent(searchQuery.trim())}`)
       setSearchQuery('')
+      setShowSearchHistory(false)
     }
+  }
+
+  const clearSearchHistory = () => {
+    setSearchHistory([])
+    localStorage.removeItem(SEARCH_HISTORY_KEY)
   }
 
   return (
@@ -86,21 +97,37 @@ export default function Header(){
       <a href="#main-content" className="skip-link">Bỏ qua tới nội dung</a>
 
       <header className={`site-header ${isScrolled ? 'is-scrolled' : ''}`}>
-        <div className="header-top header-top--premium">
-          <div className="header-container header-top-inner">
-            <Link to="/" className="header-logo-center" aria-label="Về trang chủ">
-              <img 
-                src="/images/logo.png" 
-                alt="The Sun Garden Logo" 
-                className="logo-img logo-large" 
-                onError={(e) => { e.target.src = '/images/hoakieng.jpg'; }} 
-              />
-            </Link>
+        {/* Marquee Text */}
+        <div className="header-marquee">
+          <div className="marquee-content">
+            <span>🌿 Cây xanh - Sống khỏe • </span>
+            <span>🌱 Miễn phí giao hàng cho đơn từ 500k • </span>
+            <span>🌺 Chăm sóc cây trọn đời • </span>
+            <span>🎁 Quà tặng hấp dẫn cho khách mới • </span>
+            <span>🌿 Cây xanh - Sống khỏe • </span>
+            <span>🌱 Miễn phí giao hàng cho đơn từ 500k • </span>
+            <span>🌺 Chăm sóc cây trọn đời • </span>
+            <span>🎁 Quà tặng hấp dẫn cho khách mới • </span>
           </div>
         </div>
 
-        <div className="header-main header-main--premium">
+        {/* Header Main - Logo + Navigation */}
+        <div className="header-main">
           <div className="header-container">
+            {/* Logo with Text */}
+            <Link to="/" className="header-logo" aria-label="Về trang chủ">
+              <img 
+                src="/images/logo.png" 
+                alt="The Sun Garden Logo" 
+                className="logo-img" 
+                onError={(e) => { e.target.src = '/images/hoakieng.jpg'; }} 
+              />
+              <div className="logo-text-wrapper">
+                <span className="logo-title">The Sun Garden</span>
+                <span className="logo-tagline">Hoa & Cây Cảnh</span>
+              </div>
+            </Link>
+
             <nav className="nav-menu">
               <Link to="/" className="nav-item nav-item--premium">
                 <span>Trang chủ</span>
@@ -114,74 +141,144 @@ export default function Header(){
                   </svg>
                 </Link>
 
-                <div className="nav-dropdown-menu nav-dropdown-simple">
-                  {productCategories.length > 0 ? (
-                    productCategories.map(cat => (
-                      <div key={cat._id} className="dropdown-category-group">
-                        <Link to={`/category/${cat.slug}`} className="dropdown-category-link main-category">
-                          {cat.name}
-                        </Link>
-                        {cat.subcategories && cat.subcategories.length > 0 && (
-                          <div className="dropdown-subcategories">
-                            {cat.subcategories.map(sub => (
-                              <Link
-                                key={sub._id}
-                                to={`/category/${cat.slug}/${sub.slug}`}
-                                className="dropdown-category-link sub-category"
-                              >
-                                {sub.name}
+                <div className="nav-dropdown-menu mega-menu">
+                  <div className="mega-menu-container">
+                    {/* Left: Categories */}
+                    <div className="mega-menu-categories">
+                      {/* Mega Menu Columns */}
+                      <div className="mega-menu-columns">
+                        {productCategories.length > 0 ? (
+                          productCategories.map(cat => (
+                            <div key={cat._id} className="mega-menu-column">
+                              <Link to={`/category/${cat.slug}`} className="mega-column-title">
+                                {cat.name}
                               </Link>
-                            ))}
-                          </div>
+                              {cat.subcategories && cat.subcategories.length > 0 && (
+                                <div className="mega-column-links">
+                                  {cat.subcategories.map(sub => (
+                                    <Link
+                                      key={sub._id}
+                                      to={`/category/${cat.slug}/${sub.slug}`}
+                                      className="mega-sub-link"
+                                    >
+                                      &gt; {sub.name}
+                                    </Link>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
+                          ))
+                        ) : (
+                          // Fallback khi chưa load được API
+                          <>
+                            <div className="mega-menu-column">
+                              <Link to="/category/chau-cay" className="mega-column-title">Chậu cây</Link>
+                              <div className="mega-column-links">
+                                <Link to="/category/chau-cay/chau-xi-mang" className="mega-sub-link">&gt; Chậu xi măng</Link>
+                                <Link to="/category/chau-cay/chau-nhua" className="mega-sub-link">&gt; Chậu nhựa</Link>
+                                <Link to="/category/chau-cay/chau-dat-nung" className="mega-sub-link">&gt; Chậu đất nung</Link>
+                                <Link to="/category/chau-cay/chau-gom" className="mega-sub-link">&gt; Chậu gốm</Link>
+                              </div>
+                            </div>
+                            <div className="mega-menu-column">
+                              <Link to="/category/cay-canh" className="mega-column-title">Cây cảnh</Link>
+                              <div className="mega-column-links">
+                                <Link to="/category/cay-canh/cay-van-phong" className="mega-sub-link">&gt; Cây văn phòng</Link>
+                                <Link to="/category/cay-canh/cay-ngoai-troi" className="mega-sub-link">&gt; Cây ngoại trời</Link>
+                                <Link to="/category/cay-canh/cay-phong-thuy" className="mega-sub-link">&gt; Cây phong thủy</Link>
+                              </div>
+                            </div>
+                            <div className="mega-menu-column">
+                              <Link to="/category/hoa-kieng" className="mega-column-title">Hoa kiểng</Link>
+                              <div className="mega-column-links">
+                                <Link to="/category/hoa-kieng/hoa-hong" className="mega-sub-link">&gt; Hoa hồng</Link>
+                                <Link to="/category/hoa-kieng/hoa-lan" className="mega-sub-link">&gt; Hoa lan</Link>
+                                <Link to="/category/hoa-kieng/hoa-cuc" className="mega-sub-link">&gt; Hoa cúc</Link>
+                              </div>
+                            </div>
+                            <div className="mega-menu-column">
+                              <Link to="/category/phu-kien" className="mega-column-title">Phụ kiện</Link>
+                              <div className="mega-column-links">
+                                <Link to="/category/phu-kien/phan-bon" className="mega-sub-link">&gt; Phân bón</Link>
+                                <Link to="/category/phu-kien/dat-trong" className="mega-sub-link">&gt; Đất trồng</Link>
+                                <Link to="/category/phu-kien/dung-cu" className="mega-sub-link">&gt; Dụng cụ</Link>
+                              </div>
+                            </div>
+                          </>
                         )}
                       </div>
-                    ))
-                  ) : (
-                    <>
-                      <div className="dropdown-category-group">
-                        <Link to="/category/hoa-kieng" className="dropdown-category-link main-category">Hoa Kiểng</Link>
-                      </div>
-                      <div className="dropdown-category-group">
-                        <Link to="/category/cay-canh" className="dropdown-category-link main-category">Cây Cảnh</Link>
-                      </div>
-                      <div className="dropdown-category-group">
-                        <Link to="/category/cay-thuy-canh" className="dropdown-category-link main-category">Cây Thủy Canh</Link>
-                      </div>
-                      <div className="dropdown-category-group">
-                        <Link to="/category/sen-da" className="dropdown-category-link main-category">Sen Đá</Link>
-                      </div>
-                    </>
-                  )}
-
-                  <div className="dropdown-menu-image">
-                    <img src="/images/caycanh.jpg" alt="Sản phẩm cây cảnh" />
-                    <div className="dropdown-image-overlay">
-                      <span className="dropdown-image-text">Khám phá bộ sưu tập</span>
-                      <span className="dropdown-image-cta">Xem tất cả →</span>
+                    </div>
+                    
+                    {/* Right: Featured Image */}
+                    <div className="mega-menu-image">
+                      <img 
+                        src="/images/caycanh.jpg" 
+                        alt="Cây cảnh đa dạng" 
+                        onError={(e) => { e.target.src = '/images/hoakieng.jpg'; }}
+                      />
                     </div>
                   </div>
                 </div>
               </div>
 
               <Link to="/articles" className="nav-item nav-item--premium">
-                <span>Blog</span>
+                <span>Hướng dẫn</span>
               </Link>
             </nav>
 
             <form className="header-search header-search--premium" onSubmit={handleSearch}>
+              <svg className="search-icon-header" width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
               <input
                 type="search"
                 placeholder="Tìm kiếm sản phẩm..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
+                onFocus={() => setShowSearchHistory(true)}
+                onBlur={() => setTimeout(() => setShowSearchHistory(false), 200)}
                 className="header-search-input"
                 aria-label="Tìm kiếm sản phẩm"
               />
+              {searchQuery && (
+                <button type="button" className="search-clear-header" onClick={() => setSearchQuery('')}>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <line x1="18" y1="6" x2="6" y2="18"/>
+                    <line x1="6" y1="6" x2="18" y2="18"/>
+                  </svg>
+                </button>
+              )}
               <button type="submit" className="header-search-btn" aria-label="Tìm kiếm">
                 <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </svg>
               </button>
+              
+              {/* Search History Dropdown */}
+              {showSearchHistory && searchHistory.length > 0 && !searchQuery && (
+                <div className="header-search-history">
+                  <div className="search-history-header">
+                    <span>Tìm kiếm gần đây</span>
+                    <button type="button" onClick={clearSearchHistory}>Xóa</button>
+                  </div>
+                  {searchHistory.map((term, idx) => (
+                    <div 
+                      key={idx} 
+                      className="search-history-item"
+                      onMouseDown={() => {
+                        setSearchQuery(term)
+                        setShowSearchHistory(false)
+                        navigate(`/shop?search=${encodeURIComponent(term)}`)
+                      }}
+                    >
+                      <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      <span>{term}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
             </form>
 
             <div className="header-actions">

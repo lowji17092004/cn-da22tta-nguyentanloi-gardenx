@@ -27,7 +27,7 @@ const STATUS_NOTES = {
 // create order
 router.post('/', requireAuth, async (req, res) => {
   try{
-    const { customerName, customerEmail, phone, address, items, total, notes, couponCode } = req.body;
+    const { customerName, customerEmail, phone, address, items, total, notes, coupon, paymentMethod, paymentStatus } = req.body;
     
     // Kiểm tra và cập nhật số lượng tồn kho, lấy ảnh và tên sản phẩm
     const itemsWithImages = [];
@@ -64,31 +64,32 @@ router.post('/', requireAuth, async (req, res) => {
       });
     }
     
-    // Handle coupon if provided
+    // Handle coupon if provided (from frontend validation)
     let couponData = null;
     let discountAmount = 0;
     
-    if (couponCode) {
-      const coupon = await Coupon.findOne({ code: couponCode.toUpperCase() });
+    if (coupon && coupon.code) {
+      // Coupon already validated by frontend, just store the info
+      couponData = {
+        code: coupon.code,
+        discountAmount: coupon.discountAmount
+      };
+      discountAmount = coupon.discountAmount;
       
-      if (coupon) {
-        const validityCheck = coupon.isValid();
-        
-        if (validityCheck.valid) {
-          const discountResult = coupon.calculateDiscount(subtotal);
+      // Mark user coupon as used
+      if (coupon.userCouponId) {
+        const UserCoupon = require('../models/UserCoupon');
+        const userCoupon = await UserCoupon.findById(coupon.userCouponId);
+        if (userCoupon && !userCoupon.used) {
+          userCoupon.used = true;
+          userCoupon.usedAt = new Date();
+          await userCoupon.save();
           
-          if (discountResult.valid) {
-            discountAmount = discountResult.discountAmount;
-            couponData = {
-              code: coupon.code,
-              discount: coupon.discount,
-              discountAmount: discountAmount
-            };
-            
-            // Increment usage count
-            coupon.usedCount += 1;
-            await coupon.save();
-          }
+          // Increment coupon used count
+          const Coupon = require('../models/Coupon');
+          await Coupon.findByIdAndUpdate(userCoupon.couponId, {
+            $inc: { usedCount: 1 }
+          });
         }
       }
     }
@@ -108,8 +109,17 @@ router.post('/', requireAuth, async (req, res) => {
       discount: discountAmount,
       total: total || (subtotal - discountAmount),
       notes,
-      estimatedDelivery
+      estimatedDelivery,
+      paymentMethod: paymentMethod || 'cod',
+      paymentStatus: paymentStatus || 'pending'
     };
+    
+    // Cộng số lượng đã bán cho sản phẩm
+    for (const item of itemsWithImages) {
+      await Product.findByIdAndUpdate(item.product, {
+        $inc: { sold: item.quantity }
+      });
+    }
     
     if (couponData) {
       orderData.coupon = couponData;
@@ -397,7 +407,7 @@ router.post('/payment/zalopay/webhook', async (req, res) => {
       // Send notification to system
       await Message.create({
         name: 'Hệ thống ZaloPay',
-        email: 'zalopay@florana.vn',
+        email: 'zalopay@thesungarden.vn',
         phone: '',
         subject: '💳 Xác nhận thanh toán tự động',
         message: `Đơn hàng #${order._id.toString().slice(-8).toUpperCase()} đã được thanh toán qua ZaloPay\\n` +

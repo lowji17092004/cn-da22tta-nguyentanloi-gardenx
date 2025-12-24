@@ -423,9 +423,15 @@
 /* Products Display */
 .products-display.grid-view {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(5, 1fr);
   gap: 20px;
   margin-bottom: 48px;
+}
+
+@media (max-width: 1400px) {
+  .products-display.grid-view {
+    grid-template-columns: repeat(4, 1fr);
+  }
 }
 
 @media (max-width: 1200px) {
@@ -659,6 +665,7 @@
   transition: color 0.2s ease;
   display: -webkit-box;
   -webkit-line-clamp: 2;
+  line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }

@@ -765,6 +765,129 @@
   color: #94a3b8;
 }
 
+.ac-field textarea {
+  width: 100%;
+  padding: 14px 18px;
+  background: #f8fafc;
+  border: 2px solid #e2e8f0;
+  border-radius: 14px;
+  font-size: 15px;
+  color: #1e293b;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+  resize: vertical;
+  font-family: inherit;
+  min-height: 60px;
+}
+
+.ac-field textarea:focus {
+  outline: none;
+  background: white;
+  border-color: #6366f1;
+  box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+}
+
+.ac-hint {
+  display: block;
+  font-size: 12px;
+  color: #94a3b8;
+  margin-top: 6px;
+}
+
+/* Image Upload */
+.ac-image-upload {
+  width: 100%;
+}
+
+.ac-upload-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 32px 20px;
+  background: #f8fafc;
+  border: 2px dashed #d1d5db;
+  border-radius: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.ac-upload-btn:hover {
+  background: #f1f5f9;
+  border-color: #6366f1;
+}
+
+.ac-upload-btn svg {
+  width: 40px;
+  height: 40px;
+  color: #94a3b8;
+}
+
+.ac-upload-btn span {
+  font-size: 14px;
+  color: #64748b;
+  font-weight: 500;
+}
+
+.ac-uploading {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #6366f1;
+  font-size: 14px;
+}
+
+.ac-spinner-small {
+  width: 18px;
+  height: 18px;
+  border: 2px solid #e2e8f0;
+  border-top-color: #6366f1;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+.ac-image-preview {
+  position: relative;
+  width: 100%;
+  border-radius: 14px;
+  overflow: hidden;
+  border: 2px solid #e2e8f0;
+}
+
+.ac-image-preview img {
+  width: 100%;
+  height: 160px;
+  object-fit: cover;
+}
+
+.ac-image-remove {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 32px;
+  height: 32px;
+  background: rgba(239, 68, 68, 0.9);
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.ac-image-remove:hover {
+  background: #ef4444;
+  transform: scale(1.05);
+}
+
+.ac-image-remove svg {
+  width: 16px;
+  height: 16px;
+  color: white;
+}
+
 .ac-error {
   display: block;
   font-size: 13px;

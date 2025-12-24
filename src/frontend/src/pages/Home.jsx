@@ -6,23 +6,24 @@ import { useAuth } from '../contexts/AuthContext'
 import axios from 'axios'
 
 const CATEGORIES = [
-  { slug: 'hoa-kieng', name: 'Hoa kiểng' },
+  { slug: 'chau-cay', name: 'Chậu cây' },
   { slug: 'cay-canh', name: 'Cây cảnh' },
-  { slug: 'cay-thuy-canh', name: 'Cây thủy cảnh' },
-  { slug: 'sen-da', name: 'Sen đá' }
+  { slug: 'hoa-kieng', name: 'Hoa kiểng' },
+  { slug: 'phu-kien', name: 'Phụ kiện' }
 ]
 
 const normalizeCategorySlug = (category) => {
   if (!category) return ''
   const normalized = category.toLowerCase().trim()
   const mapping = {
+    'chậu cây': 'chau-cay',
+    'chau cay': 'chau-cay',
     'hoa kiểng': 'hoa-kieng',
+    'hoa kieng': 'hoa-kieng',
     'cây cảnh': 'cay-canh',
     'cay canh': 'cay-canh',
-    'cây thủy cảnh': 'cay-thuy-canh',
-    'cay thuy canh': 'cay-thuy-canh',
-    'sen đá': 'sen-da',
-    'sen da': 'sen-da'
+    'phụ kiện': 'phu-kien',
+    'phu kien': 'phu-kien'
   }
   return mapping[normalized] || category
 }
@@ -30,6 +31,13 @@ const normalizeCategorySlug = (category) => {
 const getCategoryName = (slug) => {
   const category = CATEGORIES.find(c => c.slug === slug)
   return category ? category.name : slug
+}
+
+// Helper to get image URL with correct base path
+const getImageUrl = (imagePath) => {
+  if (!imagePath) return null
+  if (imagePath.startsWith('http')) return imagePath
+  return `http://localhost:5000${imagePath.startsWith('/') ? '' : '/'}${imagePath}`
 }
 
 export default function Home(){
@@ -114,7 +122,7 @@ export default function Home(){
                   <Link to={`/product/${product._id}`} className="product-image-link">
                     <div className="product-image-container">
                       {product.images && product.images[0] ? (
-                        <img src={product.images[0]} alt={product.name} className="product-image" loading="lazy" />
+                        <img src={getImageUrl(product.images[0])} alt={product.name} className="product-image" loading="lazy" />
                       ) : (
                         <div className="product-image-placeholder">
                           <span className="placeholder-icon">🌿</span>
@@ -182,6 +190,7 @@ export default function Home(){
       {/* New Products Section */}
       {newProducts.length > 0 && (
         <section className="home-section home-section-gray">
+          
           <div className="container">
             <div className="section-header">
               <h2 className="section-title">Sản phẩm mới nhất</h2>
@@ -200,7 +209,7 @@ export default function Home(){
                   <Link to={`/product/${product._id}`} className="product-image-link">
                     <div className="product-image-container">
                       {product.images && product.images[0] ? (
-                        <img src={product.images[0]} alt={product.name} className="product-image" loading="lazy" />
+                        <img src={getImageUrl(product.images[0])} alt={product.name} className="product-image" loading="lazy" />
                       ) : (
                         <div className="product-image-placeholder">
                           <span className="placeholder-icon">🌿</span>

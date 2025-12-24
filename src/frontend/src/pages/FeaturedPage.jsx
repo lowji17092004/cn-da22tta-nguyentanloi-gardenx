@@ -9,10 +9,10 @@ import './FeaturedPage.css';
 // Category name helper
 const getCategoryName = (slug) => {
   const map = {
-    'hoa-kieng': 'Hoa Kiểng',
+    'chau-cay': 'Chậu Cây',
     'cay-canh': 'Cây Cảnh',
-    'cay-thuy-canh': 'Cây Thủy Cảnh',
-    'sen-da': 'Sen Đá'
+    'hoa-kieng': 'Hoa Kiểng',
+    'phu-kien': 'Phụ Kiện'
   };
   return map[slug] || slug;
 };
@@ -36,13 +36,13 @@ const FeaturedPage = () => {
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const productsPerPage = 12;
+  const productsPerPage = 15;  // 3 hàng x 5 cột
 
   // Determine which type from URL
   const isFeatured = location.pathname.includes('featured');
   const title = isFeatured ? '⭐ Sản phẩm nổi bật' : '🔥 Sản phẩm bán chạy';
   const subtitle = isFeatured 
-    ? 'Những sản phẩm được yêu thích nhất tại Florana'
+    ? 'Những sản phẩm được yêu thích nhất tại The Sun Garden'
     : 'Những sản phẩm đã bán trên 10 đơn hàng';
 
   useEffect(() => {

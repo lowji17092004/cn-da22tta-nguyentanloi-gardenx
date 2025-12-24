@@ -22,12 +22,23 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage })
 
-// Upload a single file
-router.post('/', upload.single('file'), (req, res) => {
-  if (!req.file) return res.status(400).json({ message: 'No file' })
-  const urlPath = `/uploads/${req.file.filename}`
-  res.json({ path: urlPath, filename: req.file.filename })
-})
+// Upload a single file (accepts both 'file' and 'image' field names)
+router.post('/', (req, res) => {
+  const uploadSingle = upload.single('image') || upload.single('file');
+  
+  uploadSingle(req, res, (err) => {
+    if (err) {
+      return res.status(400).json({ message: 'Upload failed', error: err.message });
+    }
+    
+    if (!req.file) {
+      return res.status(400).json({ message: 'No file uploaded' });
+    }
+    
+    const urlPath = `/uploads/${req.file.filename}`;
+    res.json({ url: urlPath, path: urlPath, filename: req.file.filename });
+  });
+});
 
 // Delete a file (admin only)
 router.delete('/:filename', requireAuth, requireAdmin, (req, res) => {

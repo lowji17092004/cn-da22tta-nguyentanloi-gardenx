@@ -50,6 +50,14 @@ router.put('/me', requireAuth, async (req, res) => {
       }
     }
 
+    // Check if phone is already taken by another user
+    if (phone && phone !== user.phoneNumber) {
+      const phoneExists = await User.findOne({ phoneNumber: phone, _id: { $ne: req.user.id } });
+      if (phoneExists) {
+        return res.status(400).json({ message: 'Số điện thoại đã được sử dụng' });
+      }
+    }
+
     // Update fields
     if (name) user.name = name;
     if (email) user.email = email;

@@ -126,13 +126,7 @@ const Orders = () => {
   return (
     <div className="orders-page">
       {/* Banner */}
-      <PageBanner page="orders" />
-      
-      {/* Header */}
-      <div className="orders-header">
-        <h1>🛍️ Đơn hàng của tôi</h1>
-        <p>Theo dõi và quản lý đơn hàng</p>
-      </div>
+      <PageBanner page="orders" noOverlay />
 
       {/* Stats */}
       <div className="orders-stats">

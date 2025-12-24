@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import api from '../api'
 import AdminLayout from '../components/AdminLayout'
+import Toast from '../components/Toast'
 import './AdminCategories.css'
 
 export default function AdminCategories() {
@@ -14,9 +15,16 @@ export default function AdminCategories() {
   const [subModal, setSubModal] = useState({ show: false, parentId: null, item: null, mode: 'add' })
   const [createModal, setCreateModal] = useState(false)
   
-  const [newCat, setNewCat] = useState({ name: '' })
+  const [newCat, setNewCat] = useState({ name: '', description: '', image: '' })
   const [errors, setErrors] = useState({})
   const [expandedCats, setExpandedCats] = useState({})
+  const [uploading, setUploading] = useState(false)
+  const [toast, setToast] = useState(null)
+
+  const showToast = (message, type = 'success') => {
+    setToast({ message, type })
+    setTimeout(() => setToast(null), 3000)
+  }
 
   useEffect(() => { loadData() }, [])
 
@@ -49,9 +57,55 @@ export default function AdminCategories() {
     const errs = validate(newCat)
     if (Object.keys(errs).length) { setErrors(errs); return }
     try {
-      await api.post('/categories', { name: newCat.name.trim(), slug: generateSlug(newCat.name), type: activeTab })
-      setNewCat({ name: '' }); setCreateModal(false); setErrors({}); loadData()
-    } catch (e) { alert(e.response?.data?.message || 'Tạo thất bại') }
+      const categoryData = { 
+        name: newCat.name.trim(), 
+        slug: generateSlug(newCat.name), 
+        type: activeTab 
+      }
+      // Thêm các trường bổ sung cho danh mục hướng dẫn
+      if (activeTab === 'blog') {
+        if (newCat.description) categoryData.description = newCat.description
+        if (newCat.image) categoryData.image = newCat.image
+      }
+      await api.post('/categories', categoryData)
+      setNewCat({ name: '', description: '', image: '' }); setCreateModal(false); setErrors({}); loadData()
+      showToast('Tạo danh mục thành công', 'success')
+    } catch (e) { showToast(e.response?.data?.message || 'Tạo danh mục thất bại', 'error') }
+  }
+
+  // Upload ảnh danh mục
+  const handleImageUpload = async (e, isEdit = false) => {
+    const file = e.target.files[0]
+    if (!file) return
+    
+    // Validate file
+    if (!file.type.startsWith('image/')) {
+      showToast('Vui lòng chọn file ảnh', 'error')
+      return
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      showToast('Ảnh không được vượt quá 5MB', 'error')
+      return
+    }
+    
+    setUploading(true)
+    try {
+      const formData = new FormData()
+      formData.append('image', file)
+      const res = await api.post('/upload', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      })
+      
+      if (isEdit) {
+        setEditModal({ ...editModal, item: { ...editModal.item, image: res.data.url } })
+      } else {
+        setNewCat({ ...newCat, image: res.data.url })
+      }
+    } catch (err) {
+      showToast('Upload ảnh thất bại', 'error')
+      console.error(err)
+    }
+    setUploading(false)
   }
 
   const saveEdit = async () => {
@@ -60,7 +114,8 @@ export default function AdminCategories() {
     try {
       await api.put('/categories/' + editModal.item._id, { ...editModal.item, slug: generateSlug(editModal.item.name) })
       setEditModal({ show: false, item: null }); setErrors({}); loadData()
-    } catch (e) { alert(e.response?.data?.message || 'Cập nhật thất bại') }
+      showToast('Cập nhật danh mục thành công', 'success')
+    } catch (e) { showToast(e.response?.data?.message || 'Cập nhật thất bại', 'error') }
   }
 
   const confirmDelete = async () => {
@@ -71,7 +126,8 @@ export default function AdminCategories() {
         await api.delete('/categories/' + deleteModal.item._id)
       }
       setDeleteModal({ show: false, item: null, type: 'category', parentId: null }); loadData()
-    } catch (e) { alert(e.response?.data?.message || 'Xóa thất bại') }
+      showToast('Xóa danh mục thành công', 'success')
+    } catch (e) { showToast(e.response?.data?.message || 'Xóa thất bại', 'error') }
   }
 
   const toggleExpand = (id) => setExpandedCats(p => ({ ...p, [id]: !p[id] }))
@@ -83,19 +139,22 @@ export default function AdminCategories() {
       const data = { name: subModal.item.name.trim(), slug: generateSlug(subModal.item.name) }
       if (subModal.mode === 'add') {
         await api.post(`/categories/${subModal.parentId}/subcategories`, data)
+        showToast('Thêm danh mục con thành công', 'success')
       } else {
         await api.put(`/categories/${subModal.parentId}/subcategories/${subModal.item._id}`, data)
+        showToast('Cập nhật danh mục con thành công', 'success')
       }
       setSubModal({ show: false, parentId: null, item: null, mode: 'add' }); setErrors({}); loadData()
-    } catch (e) { alert(e.response?.data?.message || 'Thao tác thất bại') }
+    } catch (e) { showToast(e.response?.data?.message || 'Thao tác thất bại', 'error') }
   }
 
   const toggleVisibility = async (categoryId, currentVisibility) => {
     try {
       await api.put(`/categories/${categoryId}`, { isVisible: !currentVisibility })
       loadData()
+      showToast(!currentVisibility ? 'Đã hiện danh mục' : 'Đã ẩn danh mục', 'success')
     } catch (e) {
-      alert(e.response?.data?.message || 'Cập nhật thất bại')
+      showToast(e.response?.data?.message || 'Cập nhật thất bại', 'error')
     }
   }
 
@@ -192,7 +251,7 @@ export default function AdminCategories() {
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
                 <path d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"/>
               </svg>
-              Blog
+              Hướng dẫn
               <span className="ac-tab-count">{blogCategories.length}</span>
             </button>
           </div>
@@ -251,13 +310,13 @@ export default function AdminCategories() {
                       >
                         {cat.isVisible === false ? (
                           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
-                            <circle cx="12" cy="12" r="3"/>
+                            <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
+                            <line x1="1" y1="1" x2="23" y2="23"/>
                           </svg>
                         ) : (
                           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                            <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
-                            <line x1="1" y1="1" x2="23" y2="23"/>
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                            <circle cx="12" cy="12" r="3"/>
                           </svg>
                         )}
                       </button>
@@ -331,7 +390,7 @@ export default function AdminCategories() {
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
                       <path d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"/>
                     </svg>
-                    <span>Blog</span>
+                    <span>Hướng dẫn</span>
                   </button>
                 </div>
                 <div className="ac-field">
@@ -340,12 +399,59 @@ export default function AdminCategories() {
                     type="text" 
                     placeholder="Nhập tên danh mục..." 
                     value={newCat.name} 
-                    onChange={e => setNewCat({ name: e.target.value })}
+                    onChange={e => setNewCat({ ...newCat, name: e.target.value })}
                     className={errors.name ? 'error' : ''}
                     autoFocus
                   />
                   {errors.name && <span className="ac-error">{errors.name}</span>}
                 </div>
+                
+                {/* Các trường bổ sung cho danh mục Hướng dẫn */}
+                {activeTab === 'blog' && (
+                  <>
+                    <div className="ac-field">
+                      <label>Mô tả ngắn</label>
+                      <textarea 
+                        placeholder="Mô tả về danh mục này..." 
+                        value={newCat.description} 
+                        onChange={e => setNewCat({ ...newCat, description: e.target.value })}
+                        rows={2}
+                      />
+                    </div>
+                    <div className="ac-field">
+                      <label>Ảnh đại diện</label>
+                      <div className="ac-image-upload">
+                        {newCat.image ? (
+                          <div className="ac-image-preview">
+                            <img src={newCat.image.startsWith('http') ? newCat.image : `http://localhost:5000${newCat.image}`} alt="Preview" />
+                            <button type="button" className="ac-image-remove" onClick={() => setNewCat({ ...newCat, image: '' })}>
+                              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                <path d="M18 6L6 18M6 6l12 12"/>
+                              </svg>
+                            </button>
+                          </div>
+                        ) : (
+                          <label className="ac-upload-btn">
+                            <input type="file" accept="image/*" onChange={(e) => handleImageUpload(e, false)} hidden />
+                            {uploading ? (
+                              <span className="ac-uploading">
+                                <div className="ac-spinner-small"></div>
+                                Đang tải...
+                              </span>
+                            ) : (
+                              <>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                                  <path d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                </svg>
+                                <span>Chọn ảnh từ máy</span>
+                              </>
+                            )}
+                          </label>
+                        )}
+                      </div>
+                    </div>
+                  </>
+                )}
               </div>
               <div className="ac-modal-footer">
                 <button className="ac-btn-cancel" onClick={() => setCreateModal(false)}>
@@ -387,6 +493,53 @@ export default function AdminCategories() {
                   />
                   {errors.name && <span className="ac-error">{errors.name}</span>}
                 </div>
+                
+                {/* Các trường bổ sung cho danh mục Hướng dẫn */}
+                {editModal.item?.type === 'blog' && (
+                  <>
+                    <div className="ac-field">
+                      <label>Mô tả ngắn</label>
+                      <textarea 
+                        placeholder="Mô tả về danh mục này..." 
+                        value={editModal.item?.description || ''} 
+                        onChange={e => setEditModal({ ...editModal, item: { ...editModal.item, description: e.target.value }})}
+                        rows={2}
+                      />
+                    </div>
+                    <div className="ac-field">
+                      <label>Ảnh đại diện</label>
+                      <div className="ac-image-upload">
+                        {editModal.item?.image ? (
+                          <div className="ac-image-preview">
+                            <img src={editModal.item.image.startsWith('http') ? editModal.item.image : `http://localhost:5000${editModal.item.image}`} alt="Preview" />
+                            <button type="button" className="ac-image-remove" onClick={() => setEditModal({ ...editModal, item: { ...editModal.item, image: '' }})}>
+                              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                <path d="M18 6L6 18M6 6l12 12"/>
+                              </svg>
+                            </button>
+                          </div>
+                        ) : (
+                          <label className="ac-upload-btn">
+                            <input type="file" accept="image/*" onChange={(e) => handleImageUpload(e, true)} hidden />
+                            {uploading ? (
+                              <span className="ac-uploading">
+                                <div className="ac-spinner-small"></div>
+                                Đang tải...
+                              </span>
+                            ) : (
+                              <>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                                  <path d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                </svg>
+                                <span>Chọn ảnh từ máy</span>
+                              </>
+                            )}
+                          </label>
+                        )}
+                      </div>
+                    </div>
+                  </>
+                )}
               </div>
               <div className="ac-modal-footer">
                 <button className="ac-btn-cancel" onClick={() => setEditModal({ show: false, item: null })}>
@@ -481,6 +634,13 @@ export default function AdminCategories() {
               </div>
             </div>
           </div>
+        )}
+        {toast && (
+          <Toast 
+            message={toast.message} 
+            type={toast.type} 
+            onClose={() => setToast(null)} 
+          />
         )}
       </div>
     </AdminLayout>

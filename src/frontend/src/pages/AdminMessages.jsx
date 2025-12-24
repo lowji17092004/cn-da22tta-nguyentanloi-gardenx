@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react'
 import api from '../api'
 import AdminLayout from '../components/AdminLayout'
+import Toast from '../components/Toast'
 import './AdminMessages.css'
 
 export default function AdminMessages() {
@@ -11,8 +12,14 @@ export default function AdminMessages() {
   const [searchTerm, setSearchTerm] = useState('')
   const [newMessage, setNewMessage] = useState('')
   const [sending, setSending] = useState(false)
+  const [toast, setToast] = useState(null)
   const messagesEndRef = useRef(null)
   const pollingInterval = useRef(null)
+
+  const showToast = (message, type = 'success') => {
+    setToast({ message, type })
+    setTimeout(() => setToast(null), 3000)
+  }
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -87,7 +94,7 @@ export default function AdminMessages() {
       await loadMessages(selectedConversation.userId)
       await loadConversations()
     } catch (e) {
-      alert('Có lỗi xảy ra khi gửi tin nhắn')
+      showToast('Có lỗi xảy ra khi gửi tin nhắn', 'error')
     }
     setSending(false)
   }
@@ -270,6 +277,13 @@ export default function AdminMessages() {
           )}
         </div>
       </div>
+      {toast && (
+        <Toast 
+          message={toast.message} 
+          type={toast.type} 
+          onClose={() => setToast(null)} 
+        />
+      )}
     </AdminLayout>
   )
 }
