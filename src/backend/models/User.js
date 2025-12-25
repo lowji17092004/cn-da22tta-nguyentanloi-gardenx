@@ -9,6 +9,7 @@ const userSchema = new mongoose.Schema({
   avatar: { type: String }, // Profile picture
   address: { type: String }, // Delivery address
   isLocked: { type: Boolean, default: false }, // Account lock status
+  googleId: { type: String }, // Google OAuth ID
   resetPasswordOtp: { type: String },
   resetPasswordExpires: { type: Date }
 }, { timestamps: true });

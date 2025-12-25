@@ -23,14 +23,36 @@ export const CATEGORY_MAPPING = {
   'hoa hong': 'Hoa hồng',
   'hoa lan': 'Hoa lan',
   'hoa cuc': 'Hoa cúc',
+  'hoa-chau-trang-tri': 'Hoa chậu trang trí',
+  'hoa chau trang tri': 'Hoa chậu trang trí',
+  'hoa-san-vuon-ngoai-that': 'Hoa sân vườn - ngoại thất',
+  'hoa san vuon ngoai that': 'Hoa sân vườn - ngoại thất',
+  'hoa-cat-canh-su-kien': 'Hoa cắt cành - sự kiện',
+  'hoa cat canh su kien': 'Hoa cắt cành - sự kiện',
+  'hoa-lan-cac-giong-lan-pho-bien': 'Hoa Lan - các giống Lan phổ biến',
+  'hoa lan cac giong lan pho bien': 'Hoa Lan - các giống Lan phổ biến',
+  'hoa-phong-thuy': 'Hoa phong thủy',
+  'hoa phong thuy': 'Hoa phong thủy',
   
   // Subcategories - Cây cảnh
   'cay-van-phong': 'Cây văn phòng',
-  'cay-ngoai-troi': 'Cây ngoại trời',
+  'cay-ngoai-troi': 'Cây ngoài trời',
   'cay-phong-thuy': 'Cây phong thủy',
+  'cay-thuy-canh': 'Cây thủy cảnh',
+  'sen-da': 'Sen đá',
   'cay van phong': 'Cây văn phòng',
-  'cay ngoai troi': 'Cây ngoại trời',
+  'cay ngoai troi': 'Cây ngoài trời',
   'cay phong thuy': 'Cây phong thủy',
+  'cay thuy canh': 'Cây thủy cảnh',
+  'sen da': 'Sen đá',
+  'cay-trong-nha': 'Cây trong nhà',
+  'cay trong nha': 'Cây trong nhà',
+  'cay-de-ban': 'Cây để bàn',
+  'cay de ban': 'Cây để bàn',
+  'cay-cao-cap': 'Cây cao cấp',
+  'cay cao cap': 'Cây cao cấp',
+  'cay-de-cham': 'Cây dễ chăm',
+  'cay de cham': 'Cây dễ chăm',
   
   // Subcategories - Chậu cây
   'chau-xi-mang': 'Chậu xi măng',
@@ -41,6 +63,10 @@ export const CATEGORY_MAPPING = {
   'chau dat nung': 'Chậu đất nung',
   'chau-gom': 'Chậu gốm',
   'chau gom': 'Chậu gốm',
+  'chau-su': 'Chậu sứ',
+  'chau su': 'Chậu sứ',
+  'chau-go': 'Chậu gỗ',
+  'chau go': 'Chậu gỗ',
   
   // Subcategories - Phụ kiện
   'phan-bon': 'Phân bón',
@@ -49,12 +75,12 @@ export const CATEGORY_MAPPING = {
   'dat trong': 'Đất trồng',
   'dung-cu': 'Dụng cụ',
   'dung cu': 'Dụng cụ',
-  'phan-bon': 'Phân bón',
-  'phan bon': 'Phân bón',
   'dung-cu-lam-vuon': 'Dụng cụ làm vườn',
   'dung cu lam vuon': 'Dụng cụ làm vườn',
-  'dat-trong': 'Đất trồng cây',
-  'dat trong': 'Đất trồng cây'
+  'phu-kien-trang-tri': 'Phụ kiện trang trí',
+  'phu kien trang tri': 'Phụ kiện trang trí',
+  'dat-trong-cay': 'Đất trồng cây',
+  'dat trong cay': 'Đất trồng cây'
 }
 
 /**

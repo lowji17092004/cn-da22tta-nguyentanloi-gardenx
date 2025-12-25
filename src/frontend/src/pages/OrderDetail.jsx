@@ -481,12 +481,6 @@ const OrderDetail = () => {
             <Link to="/orders" className="action-btn secondary">
               📋 Xem tất cả đơn hàng
             </Link>
-
-            {(order.status === 'pending' || order.status === 'confirmed') && (
-              <button className="action-btn danger" onClick={handleCancelOrder}>
-                ❌ Hủy đơn hàng
-              </button>
-            )}
           </div>
         </div>
       </div>

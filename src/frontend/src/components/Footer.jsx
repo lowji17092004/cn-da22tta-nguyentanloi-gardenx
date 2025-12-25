@@ -7,37 +7,14 @@ export default function Footer(){
   
   return (
     <footer className="site-footer">
-      {/* Thesis Info Banner */}
-      <div className="thesis-banner">
-        <div className="thesis-container">
-          <div className="thesis-badge">
-            <span className="badge-icon">🎓</span>
-            <span className="badge-text">ĐỒ ÁN CHUYÊN NGÀNH</span>
-          </div>
-          <h2 className="thesis-title">Xây dựng website quảng bá và kinh doanh hoa kiểng</h2>
-          <div className="thesis-author">
-            <div className="author-info">
-              <span className="author-name">👤 Nguyễn Tấn Lợi</span>
-              <span className="author-divider">|</span>
-              <span className="author-class">🏫 Lớp: DA22TTA</span>
-              <span className="author-divider">|</span>
-              <span className="author-id">🆔 MSSV: 110122014</span>
-            </div>
-            <div className="school-info">
-              <span>🏛️ Trường Đại học Trà Vinh</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
       {/* Footer Main */}
       <div className="footer-container">
         <div className="footer-grid">
           {/* Column 1 - About */}
           <div className="footer-col footer-col-about">
-            <div className="footer-brand">
+            <Link to="/" className="footer-brand">
               <img src="/images/logo.png" alt="The Sun Garden" className="footer-logo-img" />
-            </div>
+            </Link>
             <p className="footer-desc">
               The Sun Garden mang đến không gian xanh tươi mát, kết nối bạn với thiên nhiên qua những sản phẩm hoa và cây cảnh chất lượng cao.
             </p>
@@ -73,11 +50,11 @@ export default function Footer(){
           <div className="footer-col">
             <h4>CHÍNH SÁCH</h4>
             <ul className="footer-links">
-              <li><Link to="/blog/about">Giới thiệu</Link></li>
-              <li><Link to="/blog/info">Chính sách bảo mật</Link></li>
-              <li><Link to="/blog/care">Chính sách bảo hành</Link></li>
-              <li><Link to="/blog/inspiration">Phương thức thanh toán</Link></li>
-              <li><Link to="/blog/care">Phương thức vận chuyển</Link></li>
+              <li><Link to="/policy/about">Giới thiệu</Link></li>
+              <li><Link to="/policy/privacy">Chính sách bảo mật</Link></li>
+              <li><Link to="/policy/warranty">Chính sách bảo hành</Link></li>
+              <li><Link to="/policy/payment">Phương thức thanh toán</Link></li>
+              <li><Link to="/policy/shipping">Phương thức vận chuyển</Link></li>
             </ul>
           </div>
 
@@ -128,7 +105,7 @@ export default function Footer(){
 
         {/* Footer Bottom */}
         <div className="footer-bottom">
-          <p>© {currentYear} <strong>The Sun Garden</strong> - Đồ án chuyên ngành - Đại học Trà Vinh. All rights reserved.</p>
+          <p><strong>Đồ án chuyên ngành - Xây dựng website quảng bá và kinh doanh hoa kiểng - Nguyễn Tấn Lợi - DA22TTA - 110122014</strong> </p>
         </div>
       </div>
     </footer>

@@ -117,9 +117,32 @@ router.put('/:id/unlock', requireAuth, requireAdmin, async (req, res) => {
   }
 });
 
-// Delete user - REMOVED (Admin can only lock/unlock)
-// router.delete('/:id', requireAuth, requireAdmin, async (req, res) => {
-//   Users cannot be deleted, only locked
-// });
+// Delete user (Admin only)
+router.delete('/:id', requireAuth, requireAdmin, async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id);
+    if (!user) return res.status(404).json({ message: 'User not found' });
+    
+    // Không cho phép xóa admin
+    if (user.role === 'admin') {
+      return res.status(403).json({ message: 'Không thể xóa tài khoản admin' });
+    }
+    
+    // Kiểm tra user có đơn hàng không
+    const Order = require('../models/Order');
+    const orderCount = await Order.countDocuments({ userId: req.params.id });
+    
+    if (orderCount > 0) {
+      return res.status(400).json({ 
+        message: `Không thể xóa người dùng này vì họ có ${orderCount} đơn hàng. Hãy khóa tài khoản thay vì xóa.` 
+      });
+    }
+    
+    await User.findByIdAndDelete(req.params.id);
+    res.json({ message: 'Đã xóa người dùng thành công' });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
 
 module.exports = router;

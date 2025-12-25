@@ -10,6 +10,11 @@ import BlogInfo from './pages/BlogInfo'
 import BlogCare from './pages/BlogCare'
 import BlogInspiration from './pages/BlogInspiration'
 import BlogPromotion from './pages/BlogPromotion'
+import PolicyAbout from './pages/PolicyAbout'
+import PolicyPrivacy from './pages/PolicyPrivacy'
+import PolicyWarranty from './pages/PolicyWarranty'
+import PolicyPayment from './pages/PolicyPayment'
+import PolicyShipping from './pages/PolicyShipping'
 import Admin from './pages/Admin'
 import Login from './pages/Login'
 import Register from './pages/Register'
@@ -71,6 +76,14 @@ function AppContent() {
           <Route path="/articles/inspiration" element={<BlogInspiration/>} />
           <Route path="/articles/promotion" element={<BlogPromotion/>} />
           <Route path="/article/:slug" element={<ArticleDetail/>} />
+          
+          {/* Policy Routes */}
+          <Route path="/policy/about" element={<PolicyAbout/>} />
+          <Route path="/policy/privacy" element={<PolicyPrivacy/>} />
+          <Route path="/policy/warranty" element={<PolicyWarranty/>} />
+          <Route path="/policy/payment" element={<PolicyPayment/>} />
+          <Route path="/policy/shipping" element={<PolicyShipping/>} />
+          
           <Route path="/login" element={<Login/>} />
           <Route path="/register" element={<Register/>} />
           <Route path="/forgot-password" element={<ForgotPassword/>} />

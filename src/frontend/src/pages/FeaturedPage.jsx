@@ -3,28 +3,9 @@ import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useCart } from '../contexts/CartContext';
 import { flyToCart } from '../utils/cartAnimation';
+import { getCategoryDisplayName } from '../utils/categoryUtils';
 import api from '../api';
 import './FeaturedPage.css';
-
-// Category name helper
-const getCategoryName = (slug) => {
-  const map = {
-    'chau-cay': 'Chậu Cây',
-    'cay-canh': 'Cây Cảnh',
-    'hoa-kieng': 'Hoa Kiểng',
-    'phu-kien': 'Phụ Kiện'
-  };
-  return map[slug] || slug;
-};
-
-const normalizeCategorySlug = (cat) => {
-  if (!cat) return '';
-  return cat.toLowerCase()
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .replace(/đ/g, 'd')
-    .replace(/\s+/g, '-');
-};
 
 const FeaturedPage = () => {
   const navigate = useNavigate();
@@ -253,7 +234,7 @@ const FeaturedPage = () => {
       <div className="product-info-minimal">
         {p.category && (
           <span className="product-category-tag">
-            {getCategoryName(normalizeCategorySlug(p.category))}
+            {getCategoryDisplayName(p.category)}
           </span>
         )}
         

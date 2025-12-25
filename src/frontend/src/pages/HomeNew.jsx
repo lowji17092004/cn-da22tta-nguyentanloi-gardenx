@@ -4,6 +4,7 @@ import { useCart } from '../contexts/CartContext'
 import { useAuth } from '../contexts/AuthContext'
 import api from '../api'
 import { flyToCart } from '../utils/cartAnimation'
+import { getCategoryDisplayName } from '../utils/categoryUtils'
 import './HomeNew.css'
 
 const CATEGORIES = {
@@ -12,24 +13,6 @@ const CATEGORIES = {
   'hoa-kieng': 'Hoa kiểng',
   'phu-kien': 'Phụ kiện'
 }
-
-const normalizeCategorySlug = (category) => {
-  if (!category) return ''
-  const normalized = category.toLowerCase().trim()
-  const mapping = {
-    'chậu cây': 'chau-cay',
-    'chau cay': 'chau-cay',
-    'hoa kiểng': 'hoa-kieng',
-    'hoa kieng': 'hoa-kieng',
-    'cây cảnh': 'cay-canh',
-    'cay canh': 'cay-canh',
-    'phụ kiện': 'phu-kien',
-    'phu kien': 'phu-kien'
-  }
-  return mapping[normalized] || category
-}
-
-const getCategoryName = (slug) => CATEGORIES[slug] || slug
 
 // Dữ liệu đánh giá khách hàng
 const TESTIMONIALS = [
@@ -191,7 +174,7 @@ export default function HomeNew(){
       <div className="product-info-minimal">
         {p.category && (
           <span className="product-category-tag">
-            {getCategoryName(normalizeCategorySlug(p.category))}
+            {getCategoryDisplayName(p.category)}
           </span>
         )}
         

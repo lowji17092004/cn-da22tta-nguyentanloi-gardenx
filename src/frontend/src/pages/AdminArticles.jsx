@@ -3,6 +3,7 @@ import api from '../api';
 import AdminLayout from '../components/AdminLayout';
 import Toast from '../components/Toast';
 import ReactQuill from 'react-quill';
+import { getCategoryDisplayName } from '../utils/categoryUtils';
 import 'react-quill/dist/quill.snow.css';
 import './AdminArticles.css';
 
@@ -321,11 +322,6 @@ export default function AdminArticles() {
     });
   };
 
-  const getCategoryName = (slug) => {
-    const cat = categories.find(c => c.slug === slug);
-    return cat?.name || slug;
-  };
-
   // React Quill modules
   const quillModules = {
     toolbar: [
@@ -460,7 +456,7 @@ export default function AdminArticles() {
                         </div>
                       </td>
                       <td>
-                        <span className="category-badge">{getCategoryName(article.category)}</span>
+                        <span className="category-badge">{getCategoryDisplayName(article.category)}</span>
                       </td>
                       <td>{formatDate(article.createdAt)}</td>
                       <td>
@@ -765,7 +761,7 @@ export default function AdminArticles() {
                           )}
                           <div className="preview-meta">
                             <span className="preview-category">
-                              {getCategoryName(formData.category) || 'Danh mục'}
+                              {getCategoryDisplayName(formData.category) || 'Danh mục'}
                             </span>
                             <span className="preview-date">
                               {new Date().toLocaleDateString('vi-VN')}

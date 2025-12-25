@@ -12,6 +12,7 @@ export default function AdminUsers() {
   const [filterRole, setFilterRole] = useState('')
   const [filterStatus, setFilterStatus] = useState('')
   const [lockModal, setLockModal] = useState({ show: false, user: null, action: '' })
+  const [deleteModal, setDeleteModal] = useState({ show: false, user: null })
   const [orderCounts, setOrderCounts] = useState({})
   const [toast, setToast] = useState(null)
 
@@ -76,6 +77,23 @@ export default function AdminUsers() {
       showToast(lockModal.action === 'lock' ? 'Đã khóa tài khoản' : 'Đã mở khóa tài khoản', 'success')
     } catch (e) {
       showToast('Thao tác thất bại', 'error')
+    }
+  }
+
+  const handleDeleteUser = (user) => {
+    setDeleteModal({ show: true, user })
+  }
+
+  const confirmDeleteUser = async () => {
+    if (!deleteModal.user) return
+    try {
+      await api.delete(`/users/${deleteModal.user._id}`)
+      load()
+      setDeleteModal({ show: false, user: null })
+      showToast('Đã xóa người dùng thành công', 'success')
+    } catch (e) {
+      showToast(e.response?.data?.message || 'Xóa người dùng thất bại', 'error')
+      setDeleteModal({ show: false, user: null })
     }
   }
 
@@ -309,6 +327,13 @@ export default function AdminUsers() {
                             </svg>
                           </button>
                         )}
+                        {user.role !== 'admin' && (
+                          <button onClick={() => handleDeleteUser(user)} className="btn-icon danger" title="Xóa">
+                            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            </svg>
+                          </button>
+                        )}
                       </div>
                     </td>
                   </tr>
@@ -369,6 +394,40 @@ export default function AdminUsers() {
           </div>
         </div>
       )}
+
+      {deleteModal.show && (
+        <div className="modal-overlay" onClick={() => setDeleteModal({ show: false, user: null })}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3 className="modal-title">Xóa người dùng</h3>
+              <button className="modal-close" onClick={() => setDeleteModal({ show: false, user: null })}>×</button>
+            </div>
+            <div className="modal-body">
+              <p>
+                Bạn có chắc chắn muốn xóa người dùng <strong>{deleteModal.user?.name}</strong>?
+              </p>
+              <p className="text-muted">
+                Hành động này không thể hoàn tác. Người dùng có đơn hàng sẽ không thể bị xóa.
+              </p>
+            </div>
+            <div className="modal-footer">
+              <button className="btn btn-ghost" onClick={() => setDeleteModal({ show: false, user: null })}>
+                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+                Hủy
+              </button>
+              <button className="btn btn-danger" onClick={confirmDeleteUser}>
+                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                </svg>
+                Xóa người dùng
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {toast && (
         <Toast 
           message={toast.message} 

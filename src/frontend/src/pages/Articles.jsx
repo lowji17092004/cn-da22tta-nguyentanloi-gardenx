@@ -291,7 +291,6 @@ export default function Articles(){
                 <p>Cần tư vấn? Liên hệ với chúng tôi</p>
                 <button 
                   onClick={() => {
-                    // Find and click chat bubble button to open chat
                     const chatBubble = document.querySelector('.chat-bubble-button');
                     if (chatBubble) chatBubble.click();
                   }} 

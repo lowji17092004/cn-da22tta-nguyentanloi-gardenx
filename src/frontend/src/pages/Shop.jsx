@@ -574,11 +574,6 @@ export default function Shop(){
                   {getCategoryDisplayName(it.category)}
                 </span>
               )}
-              {it.subcategory && (
-                <span className="product-subcategory-tag">
-                  {getCategoryDisplayName(it.subcategory)}
-                </span>
-              )}
               
               {/* Product Name */}
               <Link to={`/product/${it._id}`} className="product-name-link">

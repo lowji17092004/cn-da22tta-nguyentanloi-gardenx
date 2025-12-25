@@ -4,6 +4,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { useCart } from '../contexts/CartContext'
 import { useAuth } from '../contexts/AuthContext'
 import axios from 'axios'
+import { getCategoryDisplayName } from '../utils/categoryUtils'
 
 const CATEGORIES = [
   { slug: 'chau-cay', name: 'Chậu cây' },
@@ -11,27 +12,6 @@ const CATEGORIES = [
   { slug: 'hoa-kieng', name: 'Hoa kiểng' },
   { slug: 'phu-kien', name: 'Phụ kiện' }
 ]
-
-const normalizeCategorySlug = (category) => {
-  if (!category) return ''
-  const normalized = category.toLowerCase().trim()
-  const mapping = {
-    'chậu cây': 'chau-cay',
-    'chau cay': 'chau-cay',
-    'hoa kiểng': 'hoa-kieng',
-    'hoa kieng': 'hoa-kieng',
-    'cây cảnh': 'cay-canh',
-    'cay canh': 'cay-canh',
-    'phụ kiện': 'phu-kien',
-    'phu kien': 'phu-kien'
-  }
-  return mapping[normalized] || category
-}
-
-const getCategoryName = (slug) => {
-  const category = CATEGORIES.find(c => c.slug === slug)
-  return category ? category.name : slug
-}
 
 // Helper to get image URL with correct base path
 const getImageUrl = (imagePath) => {
@@ -165,7 +145,7 @@ export default function Home(){
                   <div className="product-info-minimal">
                     {product.category && (
                       <span className="product-category-tag">
-                        {getCategoryName(normalizeCategorySlug(product.category))}
+                        {getCategoryDisplayName(product.category)}
                       </span>
                     )}
                     
@@ -252,7 +232,7 @@ export default function Home(){
                   <div className="product-info-minimal">
                     {product.category && (
                       <span className="product-category-tag">
-                        {getCategoryName(normalizeCategorySlug(product.category))}
+                        {getCategoryDisplayName(product.category)}
                       </span>
                     )}
                     

@@ -3,8 +3,12 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 const nodemailer = require('nodemailer');
+const { OAuth2Client } = require('google-auth-library');
 const router = express.Router();
 const User = require('../models/User');
+
+// Google OAuth Client
+const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 // Email transporter configuration
 const transporter = nodemailer.createTransport({
@@ -23,39 +27,216 @@ const generateOTP = () => {
 // Send OTP via Email
 const sendOTPEmail = async (email, otp, userName) => {
   const mailOptions = {
-    from: process.env.EMAIL_USER || 'your-email@gmail.com',
+    from: `"The Sun Garden" <${process.env.EMAIL_USER || 'your-email@gmail.com'}>`,
     to: email,
-    subject: '🌸 Mã OTP đặt lại mật khẩu - Hoa Kiểng',
+    subject: '🌻 Mã OTP đặt lại mật khẩu - The Sun Garden',
     html: `
       <!DOCTYPE html>
       <html>
       <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <style>
-          body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-          .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-          .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
-          .content { background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px; }
-          .otp-box { background: white; border: 2px dashed #667eea; padding: 20px; text-align: center; margin: 20px 0; border-radius: 8px; }
-          .otp-code { font-size: 32px; font-weight: bold; color: #667eea; letter-spacing: 5px; }
-          .warning { color: #e74c3c; font-size: 14px; margin-top: 20px; }
-          .footer { text-align: center; color: #999; font-size: 12px; margin-top: 20px; }
+          body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            line-height: 1.6; 
+            color: #333; 
+            margin: 0;
+            padding: 0;
+            background: #f4f4f4;
+          }
+          .wrapper {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+          }
+          .container { 
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+          }
+          .header { 
+            background: linear-gradient(135deg, #2d5a27 0%, #4a7c43 50%, #6b9d64 100%);
+            color: white; 
+            padding: 40px 30px; 
+            text-align: center; 
+          }
+          .logo-container {
+            background: white;
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+          }
+          .logo-icon {
+            font-size: 40px;
+          }
+          .brand-name {
+            font-size: 28px;
+            font-weight: 700;
+            margin: 0 0 5px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+          }
+          .brand-tagline {
+            font-size: 14px;
+            opacity: 0.9;
+            margin: 0;
+          }
+          .content { 
+            padding: 40px 30px; 
+          }
+          .greeting {
+            font-size: 18px;
+            color: #2d5a27;
+            margin-bottom: 15px;
+          }
+          .message {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 15px;
+          }
+          .otp-section {
+            background: linear-gradient(135deg, #f8fdf7 0%, #e8f5e6 100%);
+            border: 2px solid #4a7c43;
+            border-radius: 12px;
+            padding: 30px;
+            text-align: center;
+            margin: 25px 0;
+          }
+          .otp-label {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+          }
+          .otp-code { 
+            font-size: 42px; 
+            font-weight: 700; 
+            color: #2d5a27; 
+            letter-spacing: 8px;
+            font-family: 'Courier New', monospace;
+            margin: 10px 0;
+          }
+          .otp-expire {
+            font-size: 13px;
+            color: #888;
+            margin-top: 15px;
+          }
+          .otp-expire strong {
+            color: #e74c3c;
+          }
+          .info-box {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px 20px;
+            margin: 25px 0;
+            border-radius: 0 8px 8px 0;
+          }
+          .info-box p {
+            margin: 0;
+            color: #856404;
+            font-size: 14px;
+          }
+          .warning { 
+            background: #fee;
+            border-left: 4px solid #e74c3c;
+            padding: 15px 20px;
+            margin: 25px 0;
+            border-radius: 0 8px 8px 0;
+          }
+          .warning p {
+            margin: 0;
+            color: #c0392b;
+            font-size: 14px;
+          }
+          .divider {
+            height: 1px;
+            background: linear-gradient(to right, transparent, #ddd, transparent);
+            margin: 30px 0;
+          }
+          .footer { 
+            background: #f9f9f9;
+            text-align: center; 
+            padding: 25px 30px; 
+            border-top: 1px solid #eee;
+          }
+          .footer-logo {
+            font-size: 24px;
+            margin-bottom: 10px;
+          }
+          .footer-text {
+            color: #999; 
+            font-size: 12px; 
+            margin: 5px 0;
+          }
+          .social-links {
+            margin: 15px 0;
+          }
+          .social-links a {
+            display: inline-block;
+            margin: 0 8px;
+            color: #4a7c43;
+            text-decoration: none;
+          }
+          .contact-info {
+            font-size: 12px;
+            color: #888;
+            margin-top: 15px;
+          }
         </style>
       </head>
       <body>
-        <div class="container">
-          <div class="header">
-            <h1>🌸 Đặt lại mật khẩu</h1>
-          </div>
-          <div class="content">
-            <p>Xin chào <strong>${userName}</strong>,</p>
-            <p>Bạn đã yêu cầu đặt lại mật khẩu cho tài khoản của mình. Đây là mã OTP của bạn:</p>
-            <div class="otp-box">
-              <div class="otp-code">${otp}</div>
+        <div class="wrapper">
+          <div class="container">
+            <div class="header">
+              <div class="logo-container">
+                <span class="logo-icon">🌻</span>
+              </div>
+              <h1 class="brand-name">The Sun Garden</h1>
+              <p class="brand-tagline">Mang thiên nhiên vào ngôi nhà của bạn</p>
             </div>
-            <p>Mã OTP này có hiệu lực trong <strong>10 phút</strong>.</p>
-            <p class="warning">⚠️ Nếu bạn không yêu cầu đặt lại mật khẩu, vui lòng bỏ qua email này.</p>
+            <div class="content">
+              <p class="greeting">Xin chào <strong>${userName}</strong> 👋</p>
+              <p class="message">
+                Chúng tôi nhận được yêu cầu đặt lại mật khẩu cho tài khoản của bạn tại The Sun Garden. 
+                Vui lòng sử dụng mã OTP bên dưới để tiếp tục:
+              </p>
+              
+              <div class="otp-section">
+                <p class="otp-label">Mã xác thực của bạn</p>
+                <div class="otp-code">${otp}</div>
+                <p class="otp-expire">Mã có hiệu lực trong <strong>10 phút</strong></p>
+              </div>
+              
+              <div class="info-box">
+                <p>💡 <strong>Mẹo:</strong> Bạn có thể sao chép và dán mã OTP trực tiếp vào ô nhập liệu.</p>
+              </div>
+              
+              <div class="warning">
+                <p>⚠️ <strong>Lưu ý bảo mật:</strong> Nếu bạn không yêu cầu đặt lại mật khẩu, vui lòng bỏ qua email này và tài khoản của bạn sẽ an toàn.</p>
+              </div>
+              
+              <div class="divider"></div>
+              
+              <p style="color: #888; font-size: 13px; text-align: center;">
+                Email này được gửi tự động. Vui lòng không trả lời email này.
+              </p>
+            </div>
             <div class="footer">
-              <p>© 2024 Hoa Kiểng - Mang thiên nhiên vào ngôi nhà của bạn</p>
+              <div class="footer-logo">🌻🌿🌸</div>
+              <p class="footer-text"><strong>The Sun Garden</strong></p>
+              <p class="footer-text">Chuyên cung cấp hoa tươi, cây cảnh và phụ kiện trang trí</p>
+              <div class="contact-info">
+                <p>📍 123 Đường ABC, Quận XYZ, TP. Trà Vinh</p>
+                <p>📞 0123 456 789 | ✉️ support@thesungarden.vn</p>
+              </div>
+              <p class="footer-text" style="margin-top: 15px;">© 2024 The Sun Garden. All rights reserved.</p>
             </div>
           </div>
         </div>
@@ -72,6 +253,163 @@ const sendOTPEmail = async (email, otp, userName) => {
     return { success: false, error: error.message };
   }
 };
+
+// Send Verification Email for Registration
+const sendVerificationEmail = async (email, otp, userName) => {
+  const mailOptions = {
+    from: `"The Sun Garden" <${process.env.EMAIL_USER || 'your-email@gmail.com'}>`,
+    to: email,
+    subject: '🌻 Xác minh email đăng ký - The Sun Garden',
+    html: `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <style>
+          body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            line-height: 1.6; 
+            color: #333; 
+            margin: 0;
+            padding: 0;
+            background: #f4f4f4;
+          }
+          .wrapper {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+          }
+          .container { 
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+          }
+          .header { 
+            background: linear-gradient(135deg, #2d5a27 0%, #4a7c43 50%, #6b9d64 100%);
+            color: white; 
+            padding: 40px 30px; 
+            text-align: center; 
+          }
+          .logo-container {
+            background: white;
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+          }
+          .logo-icon { font-size: 40px; }
+          .brand-name { font-size: 28px; font-weight: 700; margin: 0 0 5px; }
+          .brand-tagline { font-size: 14px; opacity: 0.9; margin: 0; }
+          .content { padding: 40px 30px; }
+          .greeting { font-size: 18px; color: #2d5a27; margin-bottom: 15px; }
+          .message { color: #666; margin-bottom: 30px; font-size: 15px; }
+          .otp-section {
+            background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+            border: 2px solid #4a7c43;
+            border-radius: 12px;
+            padding: 30px;
+            text-align: center;
+            margin: 25px 0;
+          }
+          .otp-label { font-size: 14px; color: #666; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 1px; }
+          .otp-code { font-size: 42px; font-weight: 700; color: #2d5a27; letter-spacing: 8px; font-family: 'Courier New', monospace; margin: 10px 0; }
+          .otp-expire { font-size: 13px; color: #888; margin-top: 15px; }
+          .otp-expire strong { color: #e74c3c; }
+          .welcome-box {
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+            border-left: 4px solid #2196f3;
+            padding: 20px;
+            margin: 25px 0;
+            border-radius: 0 12px 12px 0;
+          }
+          .welcome-box h3 { margin: 0 0 10px; color: #1565c0; font-size: 16px; }
+          .welcome-box ul { margin: 0; padding-left: 20px; color: #1976d2; }
+          .welcome-box li { margin: 5px 0; font-size: 14px; }
+          .warning { 
+            background: #fff3e0;
+            border-left: 4px solid #ff9800;
+            padding: 15px 20px;
+            margin: 25px 0;
+            border-radius: 0 8px 8px 0;
+          }
+          .warning p { margin: 0; color: #e65100; font-size: 14px; }
+          .footer { 
+            background: #f9f9f9;
+            text-align: center; 
+            padding: 25px 30px; 
+            border-top: 1px solid #eee;
+          }
+          .footer-logo { font-size: 24px; margin-bottom: 10px; }
+          .footer-text { color: #999; font-size: 12px; margin: 5px 0; }
+        </style>
+      </head>
+      <body>
+        <div class="wrapper">
+          <div class="container">
+            <div class="header">
+              <div class="logo-container">
+                <span class="logo-icon">🌻</span>
+              </div>
+              <h1 class="brand-name">The Sun Garden</h1>
+              <p class="brand-tagline">Chào mừng bạn đến với gia đình chúng tôi!</p>
+            </div>
+            <div class="content">
+              <p class="greeting">Xin chào <strong>${userName}</strong> 👋</p>
+              <p class="message">
+                Cảm ơn bạn đã đăng ký tài khoản tại The Sun Garden! 
+                Để hoàn tất quá trình đăng ký, vui lòng nhập mã xác minh bên dưới:
+              </p>
+              
+              <div class="otp-section">
+                <p class="otp-label">Mã xác minh email</p>
+                <div class="otp-code">${otp}</div>
+                <p class="otp-expire">Mã có hiệu lực trong <strong>10 phút</strong></p>
+              </div>
+              
+              <div class="welcome-box">
+                <h3>🎉 Khi trở thành thành viên, bạn sẽ nhận được:</h3>
+                <ul>
+                  <li>Ưu đãi độc quyền dành riêng cho thành viên</li>
+                  <li>Tích điểm đổi quà hấp dẫn</li>
+                  <li>Cập nhật sản phẩm mới & khuyến mãi</li>
+                  <li>Hỗ trợ tư vấn chăm sóc cây 24/7</li>
+                </ul>
+              </div>
+              
+              <div class="warning">
+                <p>⚠️ Nếu bạn không đăng ký tài khoản này, vui lòng bỏ qua email và không chia sẻ mã xác minh với bất kỳ ai.</p>
+              </div>
+            </div>
+            <div class="footer">
+              <div class="footer-logo">🌻🌿🌸</div>
+              <p class="footer-text"><strong>The Sun Garden</strong></p>
+              <p class="footer-text">Chuyên cung cấp hoa tươi, cây cảnh và phụ kiện trang trí</p>
+              <p class="footer-text" style="margin-top: 15px;">© 2024 The Sun Garden. All rights reserved.</p>
+            </div>
+          </div>
+        </div>
+      </body>
+      </html>
+    `
+  };
+
+  try {
+    await transporter.sendMail(mailOptions);
+    return { success: true };
+  } catch (error) {
+    console.error('Email send error:', error);
+    return { success: false, error: error.message };
+  }
+};
+
+// Temporary storage for pending registrations (in production, use Redis or database)
+const pendingRegistrations = new Map();
 
 // Note: SMS functionality requires a service like Twilio, currently simulated
 const sendOTPSMS = async (phoneNumber, otp) => {
@@ -92,10 +430,10 @@ const validatePassword = (password) => {
   return errors;
 };
 
-// Register
+// Register - Simple registration without OTP
 router.post('/register', async (req, res) => {
   try {
-    const { name, email, password } = req.body;
+    const { name, email, password, phone } = req.body;
     if (!name || !email || !password) return res.status(400).json({ message: 'Vui lòng điền đầy đủ thông tin' });
     
     // Validate password strength
@@ -106,11 +444,21 @@ router.post('/register', async (req, res) => {
     
     const existing = await User.findOne({ email });
     if (existing) return res.status(400).json({ message: 'Email đã được sử dụng' });
+    
+    // Hash password
     const salt = await bcrypt.genSalt(10);
     const hash = await bcrypt.hash(password, salt);
-    const user = new User({ name, email, password: hash });
+    
+    // Create user directly
+    const user = new User({
+      name,
+      email,
+      password: hash,
+      phoneNumber: phone || ''
+    });
     await user.save();
-    res.json({ message: 'Registered' });
+    
+    res.status(201).json({ message: 'Đăng ký thành công!' });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -141,6 +489,81 @@ router.post('/login', async (req, res) => {
     });
   } catch (err) {
     res.status(500).json({ message: err.message });
+  }
+});
+
+// Google Login/Register
+router.post('/google', async (req, res) => {
+  try {
+    const { credential } = req.body;
+    
+    if (!credential) {
+      return res.status(400).json({ message: 'Missing Google credential' });
+    }
+
+    // Verify Google token
+    const ticket = await googleClient.verifyIdToken({
+      idToken: credential,
+      audience: process.env.GOOGLE_CLIENT_ID
+    });
+    
+    const payload = ticket.getPayload();
+    const { email, name, picture, sub: googleId } = payload;
+
+    // Check if user exists
+    let user = await User.findOne({ email });
+
+    if (user) {
+      // User exists - check if locked
+      if (user.isLocked) {
+        return res.status(403).json({ message: 'Tài khoản của bạn đã bị khóa. Vui lòng liên hệ admin.' });
+      }
+
+      // Update Google info if not set
+      if (!user.googleId) {
+        user.googleId = googleId;
+        if (!user.avatar && picture) {
+          user.avatar = picture;
+        }
+        await user.save();
+      }
+    } else {
+      // Create new user with Google
+      user = new User({
+        name,
+        email,
+        googleId,
+        avatar: picture || '',
+        password: await bcrypt.hash(crypto.randomBytes(32).toString('hex'), 10), // Random password for Google users
+        phoneNumber: ''
+      });
+      await user.save();
+    }
+
+    // Generate JWT token
+    const token = jwt.sign(
+      { id: user._id, role: user.role },
+      process.env.JWT_SECRET || 'secret',
+      { expiresIn: '7d' }
+    );
+
+    res.json({
+      token,
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        phone: user.phoneNumber,
+        address: user.address,
+        avatar: user.avatar,
+        role: user.role,
+        createdAt: user.createdAt,
+        isLocked: user.isLocked
+      }
+    });
+  } catch (err) {
+    console.error('Google auth error:', err);
+    res.status(500).json({ message: 'Xác thực Google thất bại. Vui lòng thử lại.' });
   }
 });
 

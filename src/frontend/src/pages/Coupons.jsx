@@ -121,51 +121,23 @@ const Coupons = () => {
               <div className="coupons-grid">
                 {coupons.map(coupon => (
                   <div key={coupon._id} className="coupon-card">
-                    <div className="coupon-left">
-                      <div className="coupon-discount-badge">
-                        <span className="discount-percent">{coupon.discount}%</span>
-                        <span className="discount-label">Giảm</span>
-                      </div>
-                    </div>
-                    <div className="coupon-right">
-                      <div className="coupon-code-box">
-                        <span className="code-label">Mã:</span>
-                        <span className="code-value">{coupon.code}</span>
-                        <button 
-                          className="btn-copy-code"
-                          onClick={() => {
-                            navigator.clipboard.writeText(coupon.code);
-                            alert('✅ Đã sao chép mã: ' + coupon.code);
-                          }}
-                        >
-                          📋
-                        </button>
-                      </div>
-                      <p className="coupon-description">{coupon.description}</p>
-                      <div className="coupon-conditions">
-                        {coupon.minOrder > 0 && (
-                          <span className="condition-item">
-                            📦 Đơn tối thiểu {formatPrice(coupon.minOrder)}₫
-                          </span>
-                        )}
-                        {coupon.maxDiscount > 0 && (
-                          <span className="condition-item">
-                            💰 Giảm tối đa {formatPrice(coupon.maxDiscount)}₫
-                          </span>
-                        )}
-                        {coupon.validTo && (
-                          <span className="condition-item expiry">
-                            ⏰ HSD: {formatDate(coupon.validTo)}
-                          </span>
-                        )}
+                    <div className="coupon-percent">{coupon.discount}%</div>
+                    <div className="coupon-content">
+                      <div className="coupon-code">{coupon.code}</div>
+                      <p className="coupon-desc">{coupon.description}</p>
+                      <div className="coupon-info">
+                        {coupon.minOrder > 0 && <span>Đơn tối thiểu: {formatPrice(coupon.minOrder)}₫</span>}
+                        {coupon.validTo && <span>HSD: {formatDate(coupon.validTo)}</span>}
+                        {coupon.quantity !== undefined && <span>Còn lại: {coupon.quantity}</span>}
                       </div>
                       <button 
-                        className={`btn-save-coupon ${savedCoupons.find(c => c.code === coupon.code) ? 'saved' : ''}`}
+                        className={`btn-save ${savedCoupons.find(c => c.code === coupon.code) ? 'saved' : ''}`}
                         onClick={() => saveCoupon(coupon)}
-                        disabled={savingCoupon === coupon._id || savedCoupons.find(c => c.code === coupon.code)}
+                        disabled={savingCoupon === coupon._id || savedCoupons.find(c => c.code === coupon.code) || coupon.quantity === 0}
                       >
-                        {savingCoupon === coupon._id ? '⏳ Đang lưu...' : 
-                         savedCoupons.find(c => c.code === coupon.code) ? '✅ Đã lưu' : '💾 Lưu mã'}
+                        {savingCoupon === coupon._id ? 'Đang lưu...' : 
+                         savedCoupons.find(c => c.code === coupon.code) ? 'Đã lưu' : 
+                         coupon.quantity === 0 ? 'Hết mã' : 'Lưu mã'}
                       </button>
                     </div>
                   </div>
@@ -175,50 +147,34 @@ const Coupons = () => {
           </section>
 
           {/* Saved Coupons */}
-          {user && savedCoupons.length > 0 && (
+          {user && savedCoupons.filter(c => !c.used).length > 0 && (
             <section className="coupons-section saved-section">
               <div className="section-header">
-                <h2>⭐ Mã đã lưu của bạn</h2>
-                <p>Sử dụng khi thanh toán để được giảm giá (Mỗi mã chỉ dùng được 1 lần)</p>
+                <h2>Mã đã lưu</h2>
+                <p>Dùng ngay khi thanh toán</p>
               </div>
               <div className="saved-coupons-list">
-                {savedCoupons.map(coupon => (
-                  <div key={coupon.id} className={`saved-coupon-item ${coupon.used ? 'used' : ''}`}>
-                    <div className="saved-left">
-                      {coupon.used && <span className="used-badge">Đã dùng</span>}
-                      <div className="saved-discount">{coupon.discountValue}</div>
-                      <div className="saved-code">{coupon.code}</div>
-                    </div>
-                    <div className="saved-middle">
-                      <p className="saved-desc">{coupon.title}</p>
-                      {coupon.minOrder > 0 && (
-                        <span className="saved-condition">Đơn tối thiểu {formatPrice(coupon.minOrder)}₫</span>
-                      )}
-                      {coupon.expiryDate && (
-                        <span className="saved-expiry">HSD: {formatDate(coupon.expiryDate)}</span>
-                      )}
+                {savedCoupons.filter(coupon => !coupon.used).map(coupon => (
+                  <div key={coupon.id} className="saved-item">
+                    <div className="saved-percent">{coupon.discountValue}%</div>
+                    <div className="saved-content">
+                      <div className="saved-code-text">{coupon.code}</div>
+                      <p className="saved-desc-text">{coupon.title}</p>
+                      {coupon.expiryDate && <span className="saved-expiry-text">HSD: {formatDate(coupon.expiryDate)}</span>}
                     </div>
                     <div className="saved-actions">
-                      {!coupon.used ? (
-                        <>
-                          <button 
-                            className="btn-use-coupon"
-                            onClick={() => useCoupon(coupon.code)}
-                            title="Dùng ngay"
-                          >
-                            🛒 Dùng ngay
-                          </button>
-                          <button 
-                            className="btn-remove-saved"
-                            onClick={() => removeSavedCoupon(coupon.id)}
-                            title="Xóa mã này"
-                          >
-                            🗑️ Xóa
-                          </button>
-                        </>
-                      ) : (
-                        <span className="used-info">Đã dùng {coupon.usedAt ? formatDate(coupon.usedAt) : ''}</span>
-                      )}
+                      <button 
+                        className="btn-use"
+                        onClick={() => useCoupon(coupon.code)}
+                      >
+                        Dùng ngay
+                      </button>
+                      <button 
+                        className="btn-remove"
+                        onClick={() => removeSavedCoupon(coupon.id)}
+                      >
+                        Xóa
+                      </button>
                     </div>
                   </div>
                 ))}
