@@ -150,34 +150,34 @@ const Coupons = () => {
           {user && savedCoupons.filter(c => !c.used).length > 0 && (
             <section className="coupons-section saved-section">
               <div className="section-header">
-                <h2>Mã đã lưu</h2>
+                <h2>Mã khuyến mãi của tôi</h2>
                 <p>Dùng ngay khi thanh toán</p>
               </div>
-              <div className="saved-coupons-list">
-                {savedCoupons.filter(coupon => !coupon.used).map(coupon => (
-                  <div key={coupon.id} className="saved-item">
-                    <div className="saved-percent">{coupon.discountValue}%</div>
-                    <div className="saved-content">
-                      <div className="saved-code-text">{coupon.code}</div>
-                      <p className="saved-desc-text">{coupon.title}</p>
-                      {coupon.expiryDate && <span className="saved-expiry-text">HSD: {formatDate(coupon.expiryDate)}</span>}
+              <div className="saved-coupons-wrapper">
+                <div className="saved-coupons-list">
+                  {savedCoupons.filter(coupon => !coupon.used).map(coupon => (
+                    <div key={coupon.id} className="saved-item">
+                      <div className="saved-percent">{coupon.discountValue}%</div>
+                      <div className="saved-content">
+                        <div className="saved-title">{coupon.title}</div>
+                        <span className="saved-discount">Giảm {coupon.discountValue}%</span>
+                        <div className="saved-code-row">
+                          <span className="saved-code">{coupon.code}</span>
+                          <button 
+                            className="btn-copy"
+                            onClick={() => {
+                              navigator.clipboard.writeText(coupon.code);
+                              alert('Đã copy mã: ' + coupon.code);
+                            }}
+                          >
+                            Copy
+                          </button>
+                        </div>
+                        {coupon.expiryDate && <span className="saved-expiry">HSD: {formatDate(coupon.expiryDate)}</span>}
+                      </div>
                     </div>
-                    <div className="saved-actions">
-                      <button 
-                        className="btn-use"
-                        onClick={() => useCoupon(coupon.code)}
-                      >
-                        Dùng ngay
-                      </button>
-                      <button 
-                        className="btn-remove"
-                        onClick={() => removeSavedCoupon(coupon.id)}
-                      >
-                        Xóa
-                      </button>
-                    </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
             </section>
           )}

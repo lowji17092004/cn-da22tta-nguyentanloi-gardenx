@@ -1,0 +1,882 @@
+/* ==========================================
+   DARK THEME - COMPREHENSIVE OVERRIDES
+   Nền tối - Chữ sáng
+   ========================================== */
+
+/* Dark theme variables - already defined in variables.css */
+/* This file contains specific dark theme overrides */
+
+/* ========================================== 
+   GLOBAL TEXT & BACKGROUND OVERRIDES
+   ========================================== */
+
+.dark-theme {
+  /* Base colors */
+  color: #fafaf9;
+}
+
+.dark-theme body,
+.dark-theme .app-layout,
+.dark-theme .main-content {
+  background-color: #1c1917;
+  color: #fafaf9;
+}
+
+/* All text elements */
+.dark-theme h1,
+.dark-theme h2,
+.dark-theme h3,
+.dark-theme h4,
+.dark-theme h5,
+.dark-theme h6,
+.dark-theme p,
+.dark-theme span,
+.dark-theme label,
+.dark-theme a:not(.btn-primary):not(.btn-outline),
+.dark-theme li,
+.dark-theme td,
+.dark-theme th,
+.dark-theme div {
+  color: inherit;
+}
+
+/* Specific text overrides */
+.dark-theme .product-name,
+.dark-theme .product-title,
+.dark-theme .item-name,
+.dark-theme .cart-item-name,
+.dark-theme .order-title,
+.dark-theme .section-title,
+.dark-theme .page-title {
+  color: #fafaf9 !important;
+}
+
+/* ========================================== 
+   HEADER & NAVIGATION
+   ========================================== */
+
+.dark-theme .site-header,
+.dark-theme .header,
+.dark-theme .header-main {
+  background: #1c1917 !important;
+  border-bottom-color: #44403c !important;
+}
+
+/* Nav menu items */
+.dark-theme .nav-item,
+.dark-theme .nav-dropdown-btn,
+.dark-theme .nav-link {
+  color: #fafaf9 !important;
+}
+
+.dark-theme .nav-item:hover,
+.dark-theme .nav-dropdown-btn:hover,
+.dark-theme .nav-dropdown:hover .nav-dropdown-btn {
+  background: rgba(229, 193, 143, 0.15) !important;
+  color: #e5c18f !important;
+}
+
+/* Header info items */
+.dark-theme .header-info,
+.dark-theme .header a {
+  color: #fafaf9 !important;
+}
+
+.dark-theme .header-info:hover {
+  color: #e5c18f !important;
+}
+
+/* Logo */
+.dark-theme .logo-text,
+.dark-theme .logo-title {
+  color: #fafaf9 !important;
+}
+
+.dark-theme .logo-tagline {
+  color: #a8a29e !important;
+}
+
+/* Search input */
+.dark-theme .search-input,
+.dark-theme .search-input-modern,
+.dark-theme .search-box-modern input {
+  background: #292524 !important;
+  color: #fafaf9 !important;
+  border-color: #44403c !important;
+}
+
+.dark-theme .search-input::placeholder,
+.dark-theme .search-input-modern::placeholder {
+  color: #a8a29e !important;
+}
+
+.dark-theme .search-box-modern {
+  background: #292524 !important;
+  border-color: #44403c !important;
+}
+
+/* Search history dropdown */
+.dark-theme .search-history {
+  background: #292524 !important;
+  border-color: #44403c !important;
+}
+
+.dark-theme .search-history-item {
+  color: #fafaf9 !important;
+}
+
+.dark-theme .search-history-item:hover {
+  background: #3d3835 !important;
+}
+
+/* Dropdown menu - mega menu */
+.dark-theme .nav-dropdown-menu,
+.dark-theme .mega-menu-container {
+  background: #292524 !important;
+  border-color: #44403c !important;
+}
+
+.dark-theme .mega-menu-categories,
+.dark-theme .mega-menu-item,
+.dark-theme .mega-menu-link {
+  color: #fafaf9 !important;
+}
+
+.dark-theme .mega-menu-item:hover,
+.dark-theme .mega-menu-link:hover {
+  background: #3d3835 !important;
+  color: #e5c18f !important;
+}
+
+.dark-theme .mega-menu-title {
+  color: #e5c18f !important;
+}
+
+/* User dropdown */
+.dark-theme .user-dropdown,
+.dark-theme .dropdown-menu,
+.dark-theme .user-menu {
+  background: #292524 !important;
+  border-color: #44403c !important;
+}
+
+.dark-theme .dropdown-item,
+.dark-theme .user-menu-item {
+  color: #fafaf9 !important;
+}
+
+.dark-theme .dropdown-item:hover,
+.dark-theme .user-menu-item:hover {
+  background: #3d3835 !important;
+}
+
+/* Header icons */
+.dark-theme .header-action-btn,
+.dark-theme .header-icon-btn {
+  color: #fafaf9 !important;
+}
+
+.dark-theme .header-action-btn:hover,
+.dark-theme .header-icon-btn:hover {
+  background: rgba(229, 193, 143, 0.15) !important;
+  color: #e5c18f !important;
+}
+
+/* ========================================== 
+   CARDS & CONTAINERS
+   ========================================== */
+
+.dark-theme .card,
+.dark-theme .product-card,
+.dark-theme .cart-item,
+.dark-theme .order-card,
+.dark-theme .review-card,
+.dark-theme .article-card,
+.dark-theme .category-card,
+.dark-theme .coupon-card,
+.dark-theme .profile-card,
+.dark-theme .checkout-card {
+  background: #292524 !important;
+  border-color: #44403c !important;
+  color: #fafaf9 !important;
+}
+
+.dark-theme .card-title,
+.dark-theme .card-text,
+.dark-theme .card-body {
+  color: #fafaf9 !important;
+}
+
+/* ========================================== 
+   FORMS & INPUTS
+   ========================================== */
+
+.dark-theme input,
+.dark-theme textarea,
+.dark-theme select,
+.dark-theme .form-control,
+.dark-theme .form-input {
+  background: #292524 !important;
+  color: #fafaf9 !important;
+  border-color: #44403c !important;
+}
+
+.dark-theme input::placeholder,
+.dark-theme textarea::placeholder {
+  color: #a8a29e !important;
+}
+
+.dark-theme input:focus,
+.dark-theme textarea:focus,
+.dark-theme select:focus {
+  border-color: #e5c18f !important;
+  box-shadow: 0 0 0 3px rgba(229, 193, 143, 0.2) !important;
+}
+
+.dark-theme label {
+  color: #fafaf9 !important;
+}
+
+.dark-theme .form-group label,
+.dark-theme .input-label {
+  color: #fafaf9 !important;
+}
+
+/* ========================================== 
+   TABLES
+   ========================================== */
+
+.dark-theme table,
+.dark-theme .table {
+  background: #292524 !important;
+  color: #fafaf9 !important;
+}
+
+.dark-theme th {
+  background: #1c1917 !important;
+  color: #fafaf9 !important;
+  border-color: #44403c !important;
+}
+
+.dark-theme td {
+  color: #fafaf9 !important;
+  border-color: #44403c !important;
+}
+
+.dark-theme tr:hover {
+  background: #3d3835 !important;
+}
+
+.dark-theme .table-striped tbody tr:nth-child(odd) {
+  background: #252220 !important;
+}
+
+/* ========================================== 
+   MODALS & DIALOGS
+   ========================================== */
+
+.dark-theme .modal-content,
+.dark-theme .dialog,
+.dark-theme .popup {
+  background: #292524 !important;
+  color: #fafaf9 !important;
+  border-color: #44403c !important;
+}
+
+.dark-theme .modal-header,
+.dark-theme .modal-footer {
+  border-color: #44403c !important;
+}
+
+.dark-theme .modal-title {
+  color: #fafaf9 !important;
+}
+
+.dark-theme .modal-body {
+  color: #fafaf9 !important;
+}
+
+/* ========================================== 
+   FOOTER
+   ========================================== */
+
+.dark-theme .footer,
+.dark-theme footer {
+  background: #1c1917 !important;
+  color: #fafaf9 !important;
+  border-top-color: #44403c !important;
+}
+
+.dark-theme .footer a,
+.dark-theme .footer-link {
+  color: #a8a29e !important;
+}
+
+.dark-theme .footer a:hover,
+.dark-theme .footer-link:hover {
+  color: #e5c18f !important;
+}
+
+.dark-theme .footer-title,
+.dark-theme .footer h4,
+.dark-theme .footer h5 {
+  color: #fafaf9 !important;
+}
+
+/* ========================================== 
+   SHOP PAGE
+   ========================================== */
+
+.dark-theme .shop-container,
+.dark-theme .products-grid,
+.dark-theme .filter-sidebar {
+  background: transparent !important;
+}
+
+.dark-theme .filter-section {
+  background: #292524 !important;
+  border-color: #44403c !important;
+}
+
+.dark-theme .filter-title,
+.dark-theme .filter-label {
+  color: #fafaf9 !important;
+}
+
+.dark-theme .price-range input {
+  background: #292524 !important;
+  color: #fafaf9 !important;
+}
+
+/* Product cards in shop */
+.dark-theme .product-card .product-info {
+  background: #292524 !important;
+}
+
+.dark-theme .product-price,
+.dark-theme .product-original-price {
+  color: #e5c18f !important;
+}
+
+.dark-theme .product-description {
+  color: #a8a29e !important;
+}
+
+/* ========================================== 
+   CART PAGE
+   ========================================== */
+
+.dark-theme .cart-container,
+.dark-theme .cart-page {
+  background: transparent !important;
+}
+
+.dark-theme .cart-item {
+  background: #292524 !important;
+}
+
+.dark-theme .cart-item-name {
+  color: #fafaf9 !important;
+}
+
+.dark-theme .cart-item-price {
+  color: #e5c18f !important;
+}
+
+.dark-theme .cart-summary {
+  background: #292524 !important;
+  border-color: #44403c !important;
+}
+
+.dark-theme .cart-total-label,
+.dark-theme .cart-total-value {
+  color: #fafaf9 !important;
+}
+
+/* Quantity controls */
+.dark-theme .quantity-btn,
+.dark-theme .qty-btn {
+  background: #3d3835 !important;
+  color: #fafaf9 !important;
+  border-color: #44403c !important;
+}
+
+.dark-theme .quantity-input,
+.dark-theme .qty-input {
+  background: #292524 !important;
+  color: #fafaf9 !important;
+}
+
+/* ========================================== 
+   CHECKOUT PAGE
+   ========================================== */
+
+.dark-theme .checkout-container {
+  background: transparent !important;
+}
+
+.dark-theme .checkout-section {
+  background: #292524 !important;
+  border-color: #44403c !important;
+}
+
+.dark-theme .checkout-title {
+  color: #fafaf9 !important;
+}
+
+.dark-theme .order-summary {
+  background: #292524 !important;
+}
+
+/* ========================================== 
+   ORDER PAGES
+   ========================================== */
+
+.dark-theme .orders-container,
+.dark-theme .order-list {
+  background: transparent !important;
+}
+
+.dark-theme .order-card {
+  background: #292524 !important;
+}
+
+.dark-theme .order-id,
+.dark-theme .order-date,
+.dark-theme .order-total {
+  color: #fafaf9 !important;
+}
+
+.dark-theme .order-status {
+  color: #fafaf9 !important;
+}
+
+/* ========================================== 
+   PROFILE PAGE
+   ========================================== */
+
+.dark-theme .profile-container {
+  background: transparent !important;
+}
+
+.dark-theme .profile-card,
+.dark-theme .profile-section {
+  background: #292524 !important;
+}
+
+.dark-theme .profile-name,
+.dark-theme .profile-email {
+  color: #fafaf9 !important;
+}
+
+.dark-theme .profile-label {
+  color: #a8a29e !important;
+}
+
+/* ========================================== 
+   ARTICLES & BLOG
+   ========================================== */
+
+.dark-theme .articles-container,
+.dark-theme .article-detail {
+  background: transparent !important;
+}
+
+.dark-theme .article-card {
+  background: #292524 !important;
+}
+
+.dark-theme .article-title {
+  color: #fafaf9 !important;
+}
+
+.dark-theme .article-content {
+  color: #fafaf9 !important;
+}
+
+.dark-theme .article-excerpt,
+.dark-theme .article-meta {
+  color: #a8a29e !important;
+}
+
+/* ========================================== 
+   AUTH PAGES (LOGIN/REGISTER)
+   ========================================== */
+
+.dark-theme .auth-container,
+.dark-theme .login-container,
+.dark-theme .register-container {
+  background: transparent !important;
+}
+
+.dark-theme .auth-card,
+.dark-theme .login-card,
+.dark-theme .register-card {
+  background: #292524 !important;
+  border-color: #44403c !important;
+}
+
+.dark-theme .auth-title {
+  color: #fafaf9 !important;
+}
+
+/* ========================================== 
+   ADMIN PAGES
+   ========================================== */
+
+.dark-theme .admin-container,
+.dark-theme .admin-layout {
+  background: #1c1917 !important;
+}
+
+.dark-theme .admin-sidebar {
+  background: #292524 !important;
+  border-color: #44403c !important;
+}
+
+.dark-theme .admin-sidebar a,
+.dark-theme .sidebar-link {
+  color: #fafaf9 !important;
+}
+
+.dark-theme .admin-sidebar a:hover,
+.dark-theme .sidebar-link:hover,
+.dark-theme .sidebar-link.active {
+  background: #3d3835 !important;
+  color: #e5c18f !important;
+}
+
+.dark-theme .admin-content {
+  background: #1c1917 !important;
+}
+
+.dark-theme .admin-header {
+  background: #292524 !important;
+  border-color: #44403c !important;
+  color: #fafaf9 !important;
+}
+
+.dark-theme .admin-card,
+.dark-theme .stat-card,
+.dark-theme .dashboard-card {
+  background: #292524 !important;
+  border-color: #44403c !important;
+}
+
+.dark-theme .stat-value,
+.dark-theme .stat-label {
+  color: #fafaf9 !important;
+}
+
+/* Admin tables */
+.dark-theme .admin-table th {
+  background: #1c1917 !important;
+  color: #fafaf9 !important;
+}
+
+.dark-theme .admin-table td {
+  color: #fafaf9 !important;
+}
+
+/* ========================================== 
+   CHAT BUBBLE
+   ========================================== */
+
+.dark-theme .chat-bubble,
+.dark-theme .chat-container {
+  background: #292524 !important;
+  border-color: #44403c !important;
+}
+
+.dark-theme .chat-header {
+  background: #1c1917 !important;
+  color: #fafaf9 !important;
+}
+
+.dark-theme .chat-messages {
+  background: #292524 !important;
+}
+
+.dark-theme .chat-message {
+  color: #fafaf9 !important;
+}
+
+.dark-theme .chat-input {
+  background: #1c1917 !important;
+  color: #fafaf9 !important;
+  border-color: #44403c !important;
+}
+
+/* ========================================== 
+   NOTIFICATIONS & TOASTS
+   ========================================== */
+
+.dark-theme .notification,
+.dark-theme .toast {
+  background: #292524 !important;
+  color: #fafaf9 !important;
+  border-color: #44403c !important;
+}
+
+/* ========================================== 
+   COUPONS & PROMOTIONS
+   ========================================== */
+
+.dark-theme .coupon-card,
+.dark-theme .coupon-item {
+  background: #292524 !important;
+  border-color: #44403c !important;
+}
+
+.dark-theme .coupon-code {
+  color: #e5c18f !important;
+}
+
+.dark-theme .coupon-description {
+  color: #a8a29e !important;
+}
+
+/* ========================================== 
+   REVIEWS
+   ========================================== */
+
+.dark-theme .review-card,
+.dark-theme .review-item {
+  background: #292524 !important;
+  border-color: #44403c !important;
+}
+
+.dark-theme .review-author,
+.dark-theme .review-content {
+  color: #fafaf9 !important;
+}
+
+.dark-theme .review-date {
+  color: #a8a29e !important;
+}
+
+/* ========================================== 
+   PAGINATION
+   ========================================== */
+
+.dark-theme .pagination {
+  background: transparent !important;
+}
+
+.dark-theme .pagination-btn,
+.dark-theme .page-link {
+  background: #292524 !important;
+  color: #fafaf9 !important;
+  border-color: #44403c !important;
+}
+
+.dark-theme .pagination-btn:hover,
+.dark-theme .page-link:hover {
+  background: #3d3835 !important;
+}
+
+.dark-theme .pagination-btn.active,
+.dark-theme .page-link.active {
+  background: #e5c18f !important;
+  color: #1c1917 !important;
+}
+
+/* ========================================== 
+   LOADING & SPINNERS
+   ========================================== */
+
+.dark-theme .loading,
+.dark-theme .spinner {
+  color: #e5c18f !important;
+}
+
+.dark-theme .skeleton {
+  background: linear-gradient(90deg, #292524 25%, #3d3835 50%, #292524 75%) !important;
+}
+
+/* ========================================== 
+   EMPTY STATES
+   ========================================== */
+
+.dark-theme .empty-state,
+.dark-theme .no-results {
+  color: #a8a29e !important;
+}
+
+.dark-theme .empty-state-title {
+  color: #fafaf9 !important;
+}
+
+/* ========================================== 
+   BREADCRUMBS
+   ========================================== */
+
+.dark-theme .breadcrumb {
+  color: #a8a29e !important;
+}
+
+.dark-theme .breadcrumb a {
+  color: #a8a29e !important;
+}
+
+.dark-theme .breadcrumb a:hover {
+  color: #e5c18f !important;
+}
+
+.dark-theme .breadcrumb-current {
+  color: #fafaf9 !important;
+}
+
+/* ========================================== 
+   BADGES & TAGS
+   ========================================== */
+
+.dark-theme .badge,
+.dark-theme .tag {
+  background: #3d3835 !important;
+  color: #fafaf9 !important;
+}
+
+/* ========================================== 
+   SCROLLBAR
+   ========================================== */
+
+.dark-theme ::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.dark-theme ::-webkit-scrollbar-track {
+  background: #1c1917;
+}
+
+.dark-theme ::-webkit-scrollbar-thumb {
+  background: #44403c;
+  border-radius: 4px;
+}
+
+.dark-theme ::-webkit-scrollbar-thumb:hover {
+  background: #57534e;
+}
+
+/* ========================================== 
+   PRODUCT DETAIL PAGE
+   ========================================== */
+
+.dark-theme .product-detail-container {
+  background: transparent !important;
+}
+
+.dark-theme .product-detail-card {
+  background: #292524 !important;
+}
+
+.dark-theme .product-detail-name {
+  color: #fafaf9 !important;
+}
+
+.dark-theme .product-detail-price {
+  color: #e5c18f !important;
+}
+
+.dark-theme .product-detail-description {
+  color: #a8a29e !important;
+}
+
+/* Tabs */
+.dark-theme .tab-list {
+  border-color: #44403c !important;
+}
+
+.dark-theme .tab-btn {
+  color: #a8a29e !important;
+}
+
+.dark-theme .tab-btn:hover,
+.dark-theme .tab-btn.active {
+  color: #e5c18f !important;
+  border-color: #e5c18f !important;
+}
+
+.dark-theme .tab-content {
+  color: #fafaf9 !important;
+}
+
+/* ========================================== 
+   MISC OVERRIDES
+   ========================================== */
+
+.dark-theme hr {
+  border-color: #44403c !important;
+}
+
+.dark-theme .divider {
+  background: #44403c !important;
+}
+
+.dark-theme .muted,
+.dark-theme .text-muted {
+  color: #a8a29e !important;
+}
+
+.dark-theme .text-secondary {
+  color: #a8a29e !important;
+}
+
+/* Selection */
+.dark-theme ::selection {
+  background: rgba(229, 193, 143, 0.3);
+  color: #fafaf9;
+}
+
+/* Links */
+.dark-theme a {
+  color: #e5c18f;
+}
+
+.dark-theme a:hover {
+  color: #d4a574;
+}
+
+/* Cancel Order Modal */
+.dark-theme .cancel-modal-content {
+  background: #292524 !important;
+  color: #fafaf9 !important;
+}
+
+.dark-theme .cancel-modal-header {
+  border-color: #44403c !important;
+}
+
+.dark-theme .cancel-reason-item {
+  background: #1c1917 !important;
+  border-color: #44403c !important;
+  color: #fafaf9 !important;
+}
+
+.dark-theme .cancel-reason-item:hover {
+  background: #3d3835 !important;
+}
+
+/* Payment QR */
+.dark-theme .payment-qr-container {
+  background: #292524 !important;
+}
+
+.dark-theme .payment-info {
+  color: #fafaf9 !important;
+}
+
+/* Ensure all hardcoded dark colors become light */
+.dark-theme [style*="color: #1f2937"],
+.dark-theme [style*="color: #333"],
+.dark-theme [style*="color: #000"],
+.dark-theme [style*="color: black"] {
+  color: #fafaf9 !important;
+}
+
+.dark-theme [style*="color: #64748b"],
+.dark-theme [style*="color: #666"],
+.dark-theme [style*="color: #555"] {
+  color: #a8a29e !important;
+}

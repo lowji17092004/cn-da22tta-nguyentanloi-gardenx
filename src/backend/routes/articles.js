@@ -20,15 +20,25 @@ router.get('/slug/:slug', async (req, res) => {
 
 // admin create
 router.post('/', requireAuth, requireAdmin, async (req, res) => {
-  const a = new Article(req.body);
-  await a.save();
-  res.json(a);
+  try {
+    const a = new Article(req.body);
+    await a.save();
+    res.json(a);
+  } catch (err) {
+    console.error('Create article error:', err);
+    res.status(400).json({ message: err.message || 'Không thể tạo bài viết' });
+  }
 });
 
 // admin update
 router.put('/:id', requireAuth, requireAdmin, async (req, res) => {
-  const a = await Article.findByIdAndUpdate(req.params.id, req.body, { new: true });
-  res.json(a);
+  try {
+    const a = await Article.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    res.json(a);
+  } catch (err) {
+    console.error('Update article error:', err);
+    res.status(400).json({ message: err.message || 'Không thể cập nhật bài viết' });
+  }
 });
 
 // delete

@@ -1,47 +1,22 @@
 import React, { useEffect, useState } from 'react'
-import { useNavigate, Link } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import api from '../api'
 import PageBanner from '../components/PageBanner'
-import CouponDisplay from '../components/CouponDisplay'
 import './Articles.css'
 
 export default function Articles(){
-  const navigate = useNavigate()
   const [categories, setCategories] = useState([])
   const [articles, setArticles] = useState([])
   const [loading, setLoading] = useState(true)
-  const [selectedCategory, setSelectedCategory] = useState('')
   
-  // Default static categories as fallback
+  // Danh mục mặc định
   const defaultCategories = [
-    {
-      slug: 'about',
-      name: 'Về The Sun Garden',
-      description: 'Giới thiệu về The Sun Garden - Cửa hàng hoa và cây cảnh uy tín hàng đầu.',
-      image: '/images/hoakieng.jpg',
-      icon: '🏪'
-    },
-    {
-      slug: 'info',
-      name: 'Thông tin cây cảnh',
-      description: 'Toàn bộ hồ sơ thông tin về các loại cây cảnh gồm có hình ảnh, đặc điểm, tên khoa học...',
-      image: '/images/caycanh.jpg',
-      icon: '🌿'
-    },
-    {
-      slug: 'care',
-      name: 'Hướng dẫn chăm sóc',
-      description: 'Các bài viết hướng dẫn chăm sóc & những thông tin hữu ích về cây cảnh.',
-      image: '/images/caythuycanh.jpg',
-      icon: '💧'
-    },
-    {
-      slug: 'inspiration',
-      name: 'Cảm hứng & Ý tưởng',
-      description: 'Tổng hợp những mẹo và ý tưởng về cây giúp bạn có không gian sống lý tưởng.',
-      image: '/images/senda.jpg',
-      icon: '✨'
-    }
+    { slug: 'huong-dan-chon-cay', name: 'Hướng dẫn chọn cây', icon: '🌱', description: 'Cách chọn cây phù hợp với không gian sống' },
+    { slug: 'cham-soc-cay', name: 'Chăm sóc cây', icon: '💧', description: 'Bí quyết chăm sóc cây khỏe mạnh' },
+    { slug: 'y-nghia-cay', name: 'Ý nghĩa các loại cây', icon: '🍀', description: 'Khám phá ý nghĩa phong thủy của cây' },
+    { slug: 'khuyen-mai', name: 'Khuyến mãi', icon: '🎁', description: 'Tin tức khuyến mãi và sự kiện' },
+    { slug: 'meo-hay', name: 'Mẹo hay', icon: '💡', description: 'Mẹo vặt hữu ích cho người yêu cây' },
+    { slug: 'tin-tuc', name: 'Tin tức', icon: '📰', description: 'Cập nhật tin tức mới nhất' }
   ]
 
   useEffect(() => {
@@ -52,13 +27,12 @@ export default function Articles(){
           api.get('/articles')
         ])
         
-        // Use API categories if available, otherwise use defaults
-        const blogCategories = categoriesRes.data.length > 0 
+        const blogCategories = categoriesRes.data?.length > 0 
           ? categoriesRes.data 
           : defaultCategories
         
         setCategories(blogCategories)
-        setArticles(articlesRes.data || [])
+        setArticles(Array.isArray(articlesRes.data) ? articlesRes.data : [])
       } catch(err) {
         console.error('Error fetching data:', err)
         setCategories(defaultCategories)
@@ -69,20 +43,31 @@ export default function Articles(){
     fetchData()
   }, [])
 
-  // Filter articles by selected category
-  const filteredArticles = selectedCategory
-    ? articles.filter(a => a.category === selectedCategory)
-    : articles
-
-  // Get article count for each category
-  const getArticleCount = (categorySlug) => {
-    return articles.filter(a => a.category === categorySlug).length
+  // Lấy bài viết theo danh mục
+  const getArticlesByCategory = (categorySlug) => {
+    return articles.filter(a => a.category === categorySlug)
   }
 
-  // Get latest articles
-  const latestArticles = [...articles]
-    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-    .slice(0, 6)
+  // Lấy tất cả danh mục có bài viết
+  const getActiveCategories = () => {
+    const categorySlugs = new Set(articles.map(a => a.category))
+    const result = []
+    
+    categorySlugs.forEach(slug => {
+      const existingCat = categories.find(c => c.slug === slug)
+      if (existingCat) {
+        result.push(existingCat)
+      } else {
+        result.push({
+          slug,
+          name: slug.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' '),
+          icon: '📄'
+        })
+      }
+    })
+    
+    return result
+  }
 
   const formatDate = (date) => {
     return new Date(date).toLocaleDateString('vi-VN', {
@@ -92,223 +77,156 @@ export default function Articles(){
     })
   }
 
-  const getCategoryIcon = (slug) => {
-    const icons = {
-      'about': '🏪',
-      'info': '🌿',
-      'care': '💧',
-      'inspiration': '✨'
-    }
-    return icons[slug] || '📖'
-  }
-
   if (loading) {
     return (
       <>
         <PageBanner page="articles" />
-        <div className="container">
+        <div className="articles-container">
           <div className="articles-loading">
             <div className="spinner"></div>
-            <p>Đang tải...</p>
+            <p>Đang tải bài viết...</p>
           </div>
         </div>
       </>
     )
   }
+
+  const activeCategories = getActiveCategories()
   
   return (
     <>
       <PageBanner page="articles" />
-      <div className="container">
-        <div className="articles-page-new">
-          
-          {/* Hero Section */}
-          <div className="guides-hero">
-            <div className="guides-hero-content">
-              <span className="guides-hero-badge">📚 Trung tâm hướng dẫn</span>
-              <h1>Kiến thức & Hướng dẫn</h1>
-              <p>Khám phá bí quyết chăm sóc cây cảnh, ý nghĩa các loài hoa và nhiều thông tin hữu ích khác</p>
-            </div>
-          </div>
-
-          {/* Categories Grid */}
-          <section className="guides-categories-section">
-            <div className="section-header-new">
-              <h2>🗂️ Danh mục hướng dẫn</h2>
-              <p>Chọn chủ đề bạn quan tâm</p>
-            </div>
-            
-            <div className="guides-categories-grid">
-              {categories.map((cat, index) => (
-                <div 
-                  key={cat._id || cat.slug} 
-                  className="guide-category-card"
-                  onClick={() => setSelectedCategory(cat.slug)}
-                  style={{ animationDelay: `${index * 0.1}s` }}
-                >
-                  <div className="guide-category-icon">
-                    {cat.icon || getCategoryIcon(cat.slug)}
-                  </div>
-                  <div className="guide-category-info">
-                    <h3>{cat.name}</h3>
-                    <p>{cat.description || `Khám phá các bài viết về ${cat.name}`}</p>
-                  </div>
-                  <div className="guide-category-meta">
-                    <span className="guide-article-count">{getArticleCount(cat.slug)} bài viết</span>
-                    <span className="guide-arrow">→</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </section>
-
-          {/* Promotions Section */}
-          <section className="promotions-section">
-            <CouponDisplay />
-          </section>
-
-          {/* Latest Articles */}
-          {latestArticles.length > 0 && !selectedCategory && (
-            <section className="latest-articles-section">
-              <div className="section-header-new">
-                <h2>📰 Bài viết mới nhất</h2>
-                <p>Cập nhật những thông tin hữu ích nhất</p>
-              </div>
-              
-              <div className="latest-articles-grid">
-                {latestArticles.map((article, index) => (
-                  <Link 
-                    key={article._id} 
-                    to={`/article/${article.slug || article._id}`}
-                    className={`latest-article-card ${index === 0 ? 'featured' : ''}`}
-                  >
-                    <div className="latest-article-image">
-                      {article.thumbnail || article.images?.[0] ? (
-                        <img 
-                          src={article.thumbnail || article.images?.[0]} 
-                          alt={article.title} 
-                        />
-                      ) : (
-                        <div className="article-placeholder">
-                          <svg width="48" height="48" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                          </svg>
-                        </div>
-                      )}
-                      <span className="latest-article-category">
-                        {categories.find(c => c.slug === article.category)?.name || article.category}
-                      </span>
-                    </div>
-                    <div className="latest-article-content">
-                      <h3>{article.title}</h3>
-                      <p>{article.summary || article.content?.replace(/<[^>]*>/g, '').substring(0, 120)}...</p>
-                      <div className="latest-article-footer">
-                        <span className="article-date-new">
-                          <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                          </svg>
-                          {formatDate(article.createdAt)}
-                        </span>
-                        <span className="read-more-new">Đọc thêm →</span>
-                      </div>
-                    </div>
-                  </Link>
-                ))}
-              </div>
-            </section>
-          )}
-
-          {/* Category Filter View */}
-          {selectedCategory && (
-            <section className="filtered-articles-section">
-              <div className="filter-header">
-                <button className="back-btn" onClick={() => setSelectedCategory('')}>
-                  <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
-                  </svg>
-                  Quay lại
-                </button>
-                <h2>
-                  {categories.find(c => c.slug === selectedCategory)?.name}
-                  <span className="filter-count">({filteredArticles.length} bài viết)</span>
-                </h2>
-              </div>
-
-              {filteredArticles.length > 0 ? (
-                <div className="filtered-articles-grid">
-                  {filteredArticles.map(article => (
-                    <Link 
-                      key={article._id} 
-                      to={`/article/${article.slug || article._id}`}
-                      className="filtered-article-card"
-                    >
-                      <div className="filtered-article-image">
-                        {article.thumbnail || article.images?.[0] ? (
-                          <img src={article.thumbnail || article.images?.[0]} alt={article.title} />
-                        ) : (
-                          <div className="article-placeholder">
-                            <svg width="40" height="40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                            </svg>
-                          </div>
-                        )}
-                      </div>
-                      <div className="filtered-article-content">
-                        <h3>{article.title}</h3>
-                        <p>{article.summary || article.content?.replace(/<[^>]*>/g, '').substring(0, 100)}...</p>
-                        <span className="article-date-new">
-                          <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                          </svg>
-                          {formatDate(article.createdAt)}
-                        </span>
-                      </div>
-                    </Link>
-                  ))}
-                </div>
-              ) : (
-                <div className="articles-empty-new">
-                  <div className="empty-icon">📝</div>
-                  <h3>Chưa có bài viết</h3>
-                  <p>Danh mục này chưa có bài viết nào</p>
-                </div>
-              )}
-            </section>
-          )}
-
-          {/* Quick Links */}
-          <section className="quick-links-section">
-            <div className="quick-links-grid">
-              <div className="quick-link-card">
-                <div className="quick-link-icon">🛒</div>
-                <h3>Mua sắm</h3>
-                <p>Khám phá bộ sưu tập cây cảnh đa dạng</p>
-                <Link to="/shop" className="quick-link-btn">Xem sản phẩm</Link>
-              </div>
-              <div className="quick-link-card">
-                <div className="quick-link-icon">💬</div>
-                <h3>Hỗ trợ</h3>
-                <p>Cần tư vấn? Liên hệ với chúng tôi</p>
-                <button 
-                  onClick={() => {
-                    const chatBubble = document.querySelector('.chat-bubble-button');
-                    if (chatBubble) chatBubble.click();
-                  }} 
-                  className="quick-link-btn"
-                >
-                  Liên hệ ngay
-                </button>
-              </div>
-              <div className="quick-link-card">
-                <div className="quick-link-icon">🎁</div>
-                <h3>Khuyến mãi</h3>
-                <p>Xem các chương trình ưu đãi mới nhất</p>
-                <a href="/coupons" className="quick-link-btn">Xem ưu đãi</a>
-              </div>
-            </div>
-          </section>
-
+      
+      <div className="articles-container">
+        {/* Intro Section */}
+        <div className="articles-intro">
+          <h1>📚 Kiến Thức & Hướng Dẫn</h1>
+          <p>Khám phá bí quyết chăm sóc cây cảnh và nhiều thông tin hữu ích</p>
         </div>
+
+        {/* Nếu không có bài viết */}
+        {articles.length === 0 ? (
+          <div className="articles-empty">
+            <div className="empty-icon">📝</div>
+            <h2>Chưa có bài viết nào</h2>
+            <p>Các bài viết hướng dẫn sẽ sớm được cập nhật!</p>
+            <Link to="/shop" className="btn-shop">Khám phá sản phẩm</Link>
+          </div>
+        ) : (
+          <>
+            {/* Hiển thị bài viết theo từng danh mục */}
+            {activeCategories.map(category => {
+              const categoryArticles = getArticlesByCategory(category.slug)
+              if (categoryArticles.length === 0) return null
+              
+              return (
+                <section key={category.slug} className="category-section">
+                  {/* Header danh mục */}
+                  <div className="category-header">
+                    <div className="category-title-row">
+                      <span className="category-icon">{category.icon || '📄'}</span>
+                      <h2>{category.name}</h2>
+                      <span className="article-count">{categoryArticles.length} bài viết</span>
+                    </div>
+                    {category.description && (
+                      <p className="category-desc">{category.description}</p>
+                    )}
+                  </div>
+                  
+                  {/* Grid bài viết */}
+                  <div className="articles-grid">
+                    {categoryArticles.map(article => (
+                      <Link 
+                        key={article._id} 
+                        to={`/huong-dan/${article.slug || article._id}`}
+                        className="article-card"
+                      >
+                        {/* Hình ảnh */}
+                        <div className="article-image">
+                          {article.thumbnail || article.featuredImage ? (
+                            <img 
+                              src={article.thumbnail || article.featuredImage} 
+                              alt={article.title} 
+                            />
+                          ) : (
+                            <div className="image-placeholder">
+                              <svg width="48" height="48" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                              </svg>
+                            </div>
+                          )}
+                        </div>
+                        
+                        {/* Nội dung */}
+                        <div className="article-content">
+                          <h3 className="article-title">{article.title}</h3>
+                          
+                          {article.summary && (
+                            <p className="article-summary">
+                              {article.summary.length > 120 
+                                ? article.summary.substring(0, 120) + '...' 
+                                : article.summary}
+                            </p>
+                          )}
+                          
+                          <div className="article-meta">
+                            <span className="article-date">
+                              📅 {formatDate(article.createdAt)}
+                            </span>
+                            <span className="read-more">Đọc tiếp →</span>
+                          </div>
+                        </div>
+                      </Link>
+                    ))}
+                  </div>
+                </section>
+              )
+            })}
+          </>
+        )}
+
+        {/* Quick Links */}
+        <section className="quick-actions">
+          <div className="quick-action-card">
+            <span className="qa-icon">🛒</span>
+            <div className="qa-content">
+              <h3>Mua sắm</h3>
+              <p>Khám phá bộ sưu tập cây cảnh</p>
+            </div>
+            <Link to="/shop" className="qa-btn">
+              <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+              </svg>
+              Mua ngay
+            </Link>
+          </div>
+          <div className="quick-action-card">
+            <span className="qa-icon">🎁</span>
+            <div className="qa-content">
+              <h3>Khuyến mãi</h3>
+              <p>Lưu mã giảm giá hấp dẫn</p>
+            </div>
+            <Link to="/coupons" className="qa-btn">
+              <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              Xem ưu đãi
+            </Link>
+          </div>
+          <div className="quick-action-card">
+            <span className="qa-icon">🏪</span>
+            <div className="qa-content">
+              <h3>Về chúng tôi</h3>
+              <p>Tìm hiểu về The Sun Garden</p>
+            </div>
+            <Link to="/policy/about" className="qa-btn">
+              <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              Xem ngay
+            </Link>
+          </div>
+        </section>
       </div>
     </>
   )

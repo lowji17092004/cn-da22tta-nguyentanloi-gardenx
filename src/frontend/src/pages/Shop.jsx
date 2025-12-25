@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react'
-import axios from 'axios'
 import api from '../api'
 import { useCart } from '../contexts/CartContext'
 import { useAuth } from '../contexts/AuthContext'
@@ -61,6 +60,13 @@ export default function Shop(){
     localStorage.removeItem(SEARCH_HISTORY_KEY)
   }
 
+  // Remove single search history item
+  const removeSearchItem = (termToRemove) => {
+    const newHistory = searchHistory.filter(term => term !== termToRemove)
+    setSearchHistory(newHistory)
+    localStorage.setItem(SEARCH_HISTORY_KEY, JSON.stringify(newHistory))
+  }
+
   // Load categories
   useEffect(() => {
     api.get('/categories?type=product').then(res => {
@@ -73,7 +79,7 @@ export default function Shop(){
     const search = searchParams.get('search')
     const subcategory = searchParams.get('subcategory')
     
-    let url = '/api/products'
+    let url = '/products'
     const params = new URLSearchParams()
     
     if (category) {
@@ -94,17 +100,8 @@ export default function Shop(){
       url += '?' + params.toString()
     }
     
-    axios.get(url).then(r => {
-      let data = r.data
-      // Filter by search if provided
-      if (search) {
-        data = data.filter(item => 
-          item.name.toLowerCase().includes(search.toLowerCase()) ||
-          item.description?.toLowerCase().includes(search.toLowerCase())
-        )
-      }
-      setItems(data)
-      setFilteredItems(data)
+    api.get(url).then(r => {
+      setItems(r.data)
     }).catch(() => {})
   }, [searchParams])
 
@@ -113,7 +110,7 @@ export default function Shop(){
     let result = items
 
     // Enhanced search - search across name, description, category, and price
-    if (searchTerm && !searchParams.get('search')) {
+    if (searchTerm) {
       const term = searchTerm.toLowerCase().trim()
       result = result.filter(item => {
         const name = (item.name || '').toLowerCase()
@@ -339,9 +336,6 @@ export default function Shop(){
         {/* Search Bar with History */}
         <div className="shop-search-section">
           <form className="search-box-modern" onSubmit={handleSearchSubmit}>
-            <svg className="search-icon" width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
             <input
               type="text"
               placeholder="Tìm kiếm theo tên hoặc mô tả sản phẩm..."
@@ -353,12 +347,12 @@ export default function Shop(){
             />
             {searchTerm && (
               <button type="button" className="search-clear-modern" onClick={() => setSearchTerm('')}>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <line x1="18" y1="6" x2="6" y2="18"/>
-                  <line x1="6" y1="6" x2="18" y2="18"/>
-                </svg>
+                ×
               </button>
             )}
+            <button type="submit" className="search-submit-btn" title="Tìm kiếm">
+              🔍
+            </button>
             {/* Search History Dropdown */}
             {showSearchHistory && searchHistory.length > 0 && !searchTerm && (
               <div className="search-history-dropdown">
@@ -370,15 +364,30 @@ export default function Shop(){
                   <div 
                     key={idx} 
                     className="search-history-item"
-                    onClick={() => {
-                      setSearchTerm(term)
-                      setShowSearchHistory(false)
-                    }}
                   >
-                    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    <span>{term}</span>
+                    <div 
+                      className="search-history-text"
+                      onClick={() => {
+                        setSearchTerm(term)
+                        setShowSearchHistory(false)
+                      }}
+                    >
+                      <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      <span>{term}</span>
+                    </div>
+                    <button
+                      type="button"
+                      className="search-history-delete"
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        removeSearchItem(term)
+                      }}
+                      title="Xóa"
+                    >
+                      ×
+                    </button>
                   </div>
                 ))}
               </div>
@@ -452,40 +461,28 @@ export default function Shop(){
             </select>
           </div>
 
-          {/* Price Range */}
-          <div className="price-filter-compact">
+          {/* Price Range - Select dropdown */}
+          <div className="price-filter-select">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <line x1="12" y1="1" x2="12" y2="23"/>
               <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
             </svg>
-            <input
-              type="number"
-              placeholder="Từ (VNĐ)"
-              value={priceRange.min}
-              onChange={e => setPriceRange(prev => ({ ...prev, min: e.target.value }))}
-              className="price-input-compact"
-              min="0"
-              step="10000"
-            />
-            <span>-</span>
-            <input
-              type="number"
-              placeholder="Đến (VNĐ)"
-              value={priceRange.max}
-              onChange={e => setPriceRange(prev => ({ ...prev, max: e.target.value }))}
-              className="price-input-compact"
-              min="0"
-              step="10000"
-            />
-            {(priceRange.min || priceRange.max) && (
-              <button 
-                className="price-clear-btn"
-                onClick={() => setPriceRange({ min: '', max: '' })}
-                title="Xóa lọc giá"
-              >
-                ×
-              </button>
-            )}
+            <select
+              value={`${priceRange.min || ''}-${priceRange.max || ''}`}
+              onChange={e => {
+                const [min, max] = e.target.value.split('-')
+                setPriceRange({ min: min || '', max: max || '' })
+              }}
+              className="price-select-modern"
+            >
+              <option value="-">Tất cả mức giá</option>
+              <option value="0-100000">Dưới 100.000₫</option>
+              <option value="100000-200000">100.000₫ - 200.000₫</option>
+              <option value="200000-500000">200.000₫ - 500.000₫</option>
+              <option value="500000-1000000">500.000₫ - 1.000.000₫</option>
+              <option value="1000000-2000000">1.000.000₫ - 2.000.000₫</option>
+              <option value="2000000-">Trên 2.000.000₫</option>
+            </select>
           </div>
 
           {/* Sort Dropdown */}

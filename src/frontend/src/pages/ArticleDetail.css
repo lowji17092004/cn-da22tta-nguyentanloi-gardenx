@@ -469,3 +469,102 @@
     font-size: 14px;
   }
 }
+
+/* ==========================================
+   PROMOTION CARD
+   ========================================== */
+
+.article-promo-section {
+  margin-top: 40px;
+  padding-top: 40px;
+  border-top: 2px solid #f3f4f6;
+}
+
+.promo-card {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  padding: 28px 32px;
+  background: linear-gradient(135deg, #fef7ed 0%, #fff9f0 100%);
+  border-radius: 20px;
+  border: 2px solid #f5e6d3;
+}
+
+.promo-icon {
+  font-size: 48px;
+  flex-shrink: 0;
+}
+
+.promo-content {
+  flex: 1;
+}
+
+.promo-content h3 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0 0 6px;
+}
+
+.promo-content p {
+  font-size: 15px;
+  color: #6b7280;
+  margin: 0;
+}
+
+.btn-view-promo {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 28px;
+  background: linear-gradient(135deg, #d4a574 0%, #c19563 100%);
+  color: white;
+  text-decoration: none;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 15px;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+}
+
+.btn-view-promo:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(212, 165, 116, 0.4);
+}
+
+/* Dark Theme - Promo Card */
+.dark-theme .article-promo-section {
+  border-top-color: #44403c;
+}
+
+.dark-theme .promo-card {
+  background: linear-gradient(135deg, #292524 0%, #1c1917 100%);
+  border-color: #44403c;
+}
+
+.dark-theme .promo-content h3 {
+  color: #fafaf9;
+}
+
+.dark-theme .promo-content p {
+  color: #a8a29e;
+}
+
+/* Responsive Promo Card */
+@media (max-width: 768px) {
+  .promo-card {
+    flex-direction: column;
+    text-align: center;
+    padding: 24px 20px;
+    gap: 16px;
+  }
+  
+  .promo-icon {
+    font-size: 40px;
+  }
+  
+  .btn-view-promo {
+    width: 100%;
+    justify-content: center;
+  }
+}

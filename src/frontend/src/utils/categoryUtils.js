@@ -80,7 +80,25 @@ export const CATEGORY_MAPPING = {
   'phu-kien-trang-tri': 'Phụ kiện trang trí',
   'phu kien trang tri': 'Phụ kiện trang trí',
   'dat-trong-cay': 'Đất trồng cây',
-  'dat trong cay': 'Đất trồng cây'
+  'dat trong cay': 'Đất trồng cây',
+  
+  // Blog/Article categories
+  'about': 'The Sun Garden',
+  'info': 'Thông tin cây hoa',
+  'care': 'Kiến thức chăm sóc',
+  'inspiration': 'Cảm hứng & Ý tưởng',
+  'khuyen-mai': 'Khuyến mãi',
+  'khuyen mai': 'Khuyến mãi',
+  'tin-tuc': 'Tin tức',
+  'tin tuc': 'Tin tức',
+  'meo-hay': 'Mẹo hay',
+  'meo hay': 'Mẹo hay',
+  'huong-dan-chon-cay': 'Hướng dẫn chọn cây',
+  'huong dan chon cay': 'Hướng dẫn chọn cây',
+  'cham-soc-cay': 'Chăm sóc cây',
+  'cham soc cay': 'Chăm sóc cây',
+  'y-nghia-cay': 'Ý nghĩa các loại cây',
+  'y nghia cay': 'Ý nghĩa các loại cây'
 }
 
 /**

@@ -7,8 +7,10 @@ const Article = require('../models/Article')
 // Get category statistics
 router.get('/stats', async (req, res) => {
   try {
-    const categories = await Category.find()
-    const products = await Product.find()
+    const { includeHidden } = req.query
+    const categoryFilter = includeHidden === 'true' ? {} : { isVisible: { $ne: false } }
+    const categories = await Category.find(categoryFilter)
+    const products = await Product.find({ isHidden: { $ne: true } })
     const articles = await Article.find()
     
     const productCategories = categories.filter(c => c.type === 'product' || !c.type)
@@ -73,8 +75,14 @@ router.get('/stats', async (req, res) => {
 // Get all categories (can filter by type)
 router.get('/', async (req, res) => {
   try {
-    const { type } = req.query
-    const filter = type ? { type } : {}
+    const { type, includeHidden } = req.query
+    let filter = type ? { type } : {}
+    
+    // Mặc định ẩn các danh mục có isVisible = false cho public
+    if (includeHidden !== 'true') {
+      filter.isVisible = { $ne: false }
+    }
+    
     const cats = await Category.find(filter).sort({ name: 1 })
     res.json(cats)
   } catch (err) {

@@ -163,34 +163,6 @@ const bannerData = {
     gradient: 'linear-gradient(135deg, rgba(245, 158, 11, 0.85) 0%, rgba(217, 119, 6, 0.9) 100%)'
   },
   
-  // Shop & Orders banners
-  shop: {
-    image: '/images/banner-products.jpg',
-    fallbackImage: 'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=1920&h=400&fit=crop&q=80',
-    title: 'Cửa Hàng Cây Cảnh',
-    slogan: 'Khám phá bộ sưu tập cây cảnh đa dạng và chất lượng cao',
-    icon: '🌿',
-    gradient: 'linear-gradient(135deg, rgba(34, 197, 94, 0.85) 0%, rgba(22, 163, 74, 0.9) 100%)'
-  },
-  
-  orders: {
-    image: '/images/banner-products.jpg',
-    fallbackImage: 'https://images.unsplash.com/photo-1513128034602-7814ccaddd4e?w=1920&h=400&fit=crop&q=80',
-    title: 'Đơn Hàng Của Bạn',
-    slogan: 'Theo dõi và quản lý đơn hàng một cách dễ dàng',
-    icon: '📦',
-    gradient: 'linear-gradient(135deg, rgba(59, 130, 246, 0.85) 0%, rgba(37, 99, 235, 0.9) 100%)'
-  },
-  
-  cart: {
-    image: '/images/banner-products.jpg',
-    fallbackImage: 'https://images.unsplash.com/photo-1490818387583-1baba5e638af?w=1920&h=400&fit=crop&q=80',
-    title: 'Giỏ Hàng',
-    slogan: 'Hoàn tất đơn hàng để nhận những sản phẩm tuyệt vời',
-    icon: '🛒',
-    gradient: 'linear-gradient(135deg, rgba(249, 115, 22, 0.85) 0%, rgba(234, 88, 12, 0.9) 100%)'
-  },
-  
   default: {
     image: '/images/banner-default.jpg',
     fallbackImage: 'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=1920',

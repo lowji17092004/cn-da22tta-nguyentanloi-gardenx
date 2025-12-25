@@ -5,7 +5,7 @@ import axios from 'axios'
 import './Cart.css'
 
 export default function Cart(){
-  const { items, remove, updateQuantity, total, refreshStock, clear } = useCart()
+  const { items, remove, removeMultiple, updateQuantity, total, refreshStock, clear } = useCart()
   const navigate = useNavigate()
   const hasRefreshed = useRef(false)
   const [selectedItems, setSelectedItems] = useState(() => {
@@ -99,14 +99,10 @@ export default function Cart(){
       return
     }
     if (window.confirm(`Xóa ${selectedItems.length} sản phẩm đã chọn?`)) {
-      const toRemove = [...selectedItems]
-      // Remove items and clear selection
-      toRemove.forEach(productId => {
-        remove(productId)
-      })
+      removeMultiple(selectedItems)
       setSelectedItems([])
     }
-  }, [selectedItems, remove])
+  }, [selectedItems, removeMultiple])
 
   // Remove all items from cart
   const removeAll = useCallback(() => {

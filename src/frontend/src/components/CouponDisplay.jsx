@@ -65,8 +65,29 @@ export default function CouponDisplay({ categorySlug }) {
 
   const isSaved = (code) => savedCoupons.some(c => c.code === code)
 
-  if (loading || coupons.length === 0) {
-    return null
+  // Show loading state or empty state with message
+  if (loading) {
+    return (
+      <div className="coupon-display-section">
+        <div className="coupon-header">
+          <div className="coupon-header-icon">🎁</div>
+          <h2>Ưu đãi dành cho bạn</h2>
+          <p>Đang tải mã giảm giá...</p>
+        </div>
+      </div>
+    )
+  }
+
+  if (coupons.length === 0) {
+    return (
+      <div className="coupon-display-section">
+        <div className="coupon-header">
+          <div className="coupon-header-icon">🎁</div>
+          <h2>Ưu đãi dành cho bạn</h2>
+          <p>Hiện chưa có mã giảm giá nào. Quay lại sau nhé!</p>
+        </div>
+      </div>
+    )
   }
 
   return (

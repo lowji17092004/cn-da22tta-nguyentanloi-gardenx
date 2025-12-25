@@ -419,7 +419,7 @@ const OrderDetail = () => {
               )}
               <div className="info-row-simple">
                 <span className="icon-simple">📍</span>
-                <span>{order.shippingAddress}</span>
+                <span>{order.address}</span>
               </div>
               {order.note && (
                 <div className="info-row-simple">

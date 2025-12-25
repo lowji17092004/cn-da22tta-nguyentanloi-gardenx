@@ -12,6 +12,9 @@
 @import './cart.css';
 @import './banner.css';
 
+/* Theme */
+@import './dark-theme.css';
+
 /* Utilities */
 @import './animations.css';
 @import './responsive.css';

@@ -888,3 +888,122 @@
     opacity: 1;
   }
 }
+
+/* ================= DARK THEME OVERRIDES ================= */
+.dark-theme .site-header,
+.dark-theme .header-main {
+  background: #1c1917 !important;
+  border-bottom-color: #44403c !important;
+}
+
+.dark-theme .nav-item {
+  color: #fafaf9 !important;
+}
+
+.dark-theme .nav-item:hover {
+  background: rgba(229, 193, 143, 0.15) !important;
+  color: #e5c18f !important;
+}
+
+.dark-theme .nav-dropdown-btn {
+  color: #fafaf9 !important;
+}
+
+.dark-theme .nav-dropdown:hover .nav-dropdown-btn {
+  background: rgba(229, 193, 143, 0.15) !important;
+  color: #e5c18f !important;
+}
+
+.dark-theme .nav-dropdown-menu {
+  background: #292524 !important;
+  border-color: #44403c !important;
+}
+
+.dark-theme .mega-menu-container {
+  background: #292524 !important;
+}
+
+.dark-theme .mega-menu-title,
+.dark-theme .mega-menu-section-title {
+  color: #e5c18f !important;
+}
+
+.dark-theme .mega-menu-item,
+.dark-theme .mega-menu-link,
+.dark-theme .mega-category-item {
+  color: #fafaf9 !important;
+}
+
+.dark-theme .mega-menu-item:hover,
+.dark-theme .mega-menu-link:hover,
+.dark-theme .mega-category-item:hover {
+  background: #3d3835 !important;
+  color: #e5c18f !important;
+}
+
+.dark-theme .logo-title {
+  color: #fafaf9 !important;
+}
+
+.dark-theme .logo-tagline {
+  color: #a8a29e !important;
+}
+
+.dark-theme .header-search,
+.dark-theme .search-box {
+  background: #292524 !important;
+  border-color: #44403c !important;
+}
+
+.dark-theme .header-search input,
+.dark-theme .search-box input {
+  background: transparent !important;
+  color: #fafaf9 !important;
+}
+
+.dark-theme .header-search input::placeholder,
+.dark-theme .search-box input::placeholder {
+  color: #a8a29e !important;
+}
+
+.dark-theme .cart-icon-btn,
+.dark-theme .theme-toggle {
+  background: #292524 !important;
+  border-color: #44403c !important;
+  color: #fafaf9 !important;
+}
+
+.dark-theme .cart-icon-btn:hover,
+.dark-theme .theme-toggle:hover {
+  background: #3d3835 !important;
+  border-color: #e5c18f !important;
+}
+
+.dark-theme .user-dropdown-menu,
+.dark-theme .user-menu-dropdown {
+  background: #292524 !important;
+  border-color: #44403c !important;
+}
+
+.dark-theme .user-dropdown-item,
+.dark-theme .user-menu-item {
+  color: #fafaf9 !important;
+}
+
+.dark-theme .user-dropdown-item:hover,
+.dark-theme .user-menu-item:hover {
+  background: #3d3835 !important;
+}
+
+.dark-theme .mega-menu-promo {
+  background: #1c1917 !important;
+  border-color: #44403c !important;
+}
+
+.dark-theme .promo-title {
+  color: #fafaf9 !important;
+}
+
+.dark-theme .promo-desc {
+  color: #a8a29e !important;
+}

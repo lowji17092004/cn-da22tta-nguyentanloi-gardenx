@@ -28,9 +28,15 @@ export default function ArticleDetail(){
       about: { name: 'The Sun Garden', link: '/articles/about' },
       info: { name: 'Thông tin cây hoa', link: '/articles/info' },
       care: { name: 'Kiến thức chăm sóc', link: '/articles/care' },
-      inspiration: { name: 'Cảm hứng & Ý tưởng', link: '/articles/inspiration' }
+      inspiration: { name: 'Cảm hứng & Ý tưởng', link: '/articles/inspiration' },
+      'khuyen-mai': { name: 'Khuyến mãi', link: '/huong-dan' },
+      'tin-tuc': { name: 'Tin tức', link: '/huong-dan' },
+      'meo-hay': { name: 'Mẹo hay', link: '/huong-dan' },
+      'huong-dan-chon-cay': { name: 'Hướng dẫn chọn cây', link: '/huong-dan' },
+      'cham-soc-cay': { name: 'Chăm sóc cây', link: '/huong-dan' },
+      'y-nghia-cay': { name: 'Ý nghĩa các loại cây', link: '/huong-dan' }
     }
-    return categories[cat] || categories.info
+    return categories[cat] || { name: cat || 'Bài viết', link: '/huong-dan' }
   }
 
   if (loading) {
@@ -108,10 +114,24 @@ export default function ArticleDetail(){
           <Link to={catInfo.link} className="btn-back-category">
             ← Xem thêm bài viết trong {catInfo.name}
           </Link>
-          <Link to="/articles" className="btn-all-articles">
+          <Link to="/huong-dan" className="btn-all-articles">
             Tất cả bài viết
           </Link>
         </footer>
+
+        {/* Promotion Card */}
+        <div className="article-promo-section">
+          <div className="promo-card">
+            <div className="promo-icon">🎁</div>
+            <div className="promo-content">
+              <h3>Khuyến mãi & Ưu đãi</h3>
+              <p>Nhận ngay mã giảm giá hấp dẫn cho đơn hàng của bạn!</p>
+            </div>
+            <Link to="/coupons" className="btn-view-promo">
+              Xem ưu đãi →
+            </Link>
+          </div>
+        </div>
       </div>
     </div>
   )

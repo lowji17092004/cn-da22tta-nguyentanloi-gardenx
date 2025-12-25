@@ -349,7 +349,11 @@ const Checkout = () => {
         notes: note,
         paymentMethod: paymentMethod,
         paymentStatus: 'pending',
-        couponCode: appliedCoupon?.code || undefined
+        coupon: appliedCoupon ? {
+          code: appliedCoupon.code,
+          discountAmount: appliedCoupon.discountAmount,
+          userCouponId: appliedCoupon.userCouponId
+        } : null
       };
 
       const res = await api.post('/orders', orderData);
@@ -370,8 +374,14 @@ const Checkout = () => {
         setBuyNow(null);
       }
       
-      // Redirect to order success page
-      navigate(`/orders/${newOrderId}?success=true`);
+      // Show success notification then redirect after 3 seconds
+      setNotification({ 
+        message: '✅ Đặt hàng thành công! Đang chuyển đến chi tiết đơn hàng...', 
+        type: 'success' 
+      });
+      setTimeout(() => {
+        navigate(`/orders/${newOrderId}?success=true`);
+      }, 3000);
     } catch (err) {
       console.error('Order error:', err);
       setNotification({ message: err.response?.data?.message || 'Có lỗi xảy ra. Vui lòng thử lại.', type: 'error' });
@@ -409,7 +419,11 @@ const Checkout = () => {
         notes: note,
         paymentMethod: paymentMethod === 'zalopay' ? 'zalopay' : 'bank',
         paymentStatus: 'paid', // Đã thanh toán
-        couponCode: appliedCoupon?.code || undefined
+        coupon: appliedCoupon ? {
+          code: appliedCoupon.code,
+          discountAmount: appliedCoupon.discountAmount,
+          userCouponId: appliedCoupon.userCouponId
+        } : null
       };
 
       const res = await api.post('/orders', orderData);
@@ -429,8 +443,14 @@ const Checkout = () => {
         sessionStorage.removeItem('checkoutItems');
       }
       
-      // Redirect to order detail with success flag
-      navigate(`/orders/${newOrderId}?success=true`);
+      // Show success notification then redirect after 3 seconds
+      setNotification({ 
+        message: '✅ Thanh toán thành công! Đang chuyển đến chi tiết đơn hàng...', 
+        type: 'success' 
+      });
+      setTimeout(() => {
+        navigate(`/orders/${newOrderId}?success=true`);
+      }, 3000);
     } catch (err) {
       console.error('Order error:', err);
       setNotification({ message: err.response?.data?.message || 'Có lỗi xảy ra. Vui lòng thử lại.', type: 'error' });

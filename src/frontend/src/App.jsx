@@ -76,6 +76,7 @@ function AppContent() {
           <Route path="/articles/inspiration" element={<BlogInspiration/>} />
           <Route path="/articles/promotion" element={<BlogPromotion/>} />
           <Route path="/article/:slug" element={<ArticleDetail/>} />
+          <Route path="/huong-dan/:slug" element={<ArticleDetail/>} />
           
           {/* Policy Routes */}
           <Route path="/policy/about" element={<PolicyAbout/>} />

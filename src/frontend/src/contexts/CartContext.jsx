@@ -108,6 +108,12 @@ export function CartProvider({ children }){
     save(items.filter(i=> i.product !== productId))
     saveSelected(selectedItems.filter(id => id !== productId))
   }
+
+  const removeMultiple = (productIds) => {
+    save(items.filter(i => !productIds.includes(i.product)))
+    saveSelected(selectedItems.filter(id => !productIds.includes(id)))
+  }
+
   const clear = () => { save([]); saveSelected([]) }
 
   const refreshStock = useCallback((products) => {
@@ -178,7 +184,8 @@ export function CartProvider({ children }){
   return <CartContext.Provider value={{ 
     items, 
     add, 
-    remove, 
+    remove,
+    removeMultiple,
     updateQuantity, 
     clear, 
     refreshStock,

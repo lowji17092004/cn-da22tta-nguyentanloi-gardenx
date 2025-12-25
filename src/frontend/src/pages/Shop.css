@@ -15,12 +15,24 @@
 
 .search-input-modern {
   width: 100%;
-  padding: 14px 48px 14px 48px;
+  padding: 14px 100px 14px 20px;
   border: 2px solid #e5e7eb;
   border-radius: 50px;
   font-size: 15px;
   transition: all 0.3s ease;
   background: white;
+}
+
+/* Hide default clear button in search input */
+.search-input-modern::-webkit-search-cancel-button,
+.search-input-modern::-webkit-search-decoration,
+.search-input-modern::-ms-clear {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  display: none !important;
+  width: 0;
+  height: 0;
 }
 
 .search-input-modern:focus {
@@ -30,30 +42,27 @@
 }
 
 .search-box-modern .search-icon {
-  position: absolute;
-  left: 16px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: #9ca3af;
-  pointer-events: none;
+  display: none;
 }
 
 .search-clear-modern {
   position: absolute;
-  right: 14px;
+  right: 50px;
   top: 50%;
   transform: translateY(-50%);
   background: #f3f4f6;
   border: none;
   border-radius: 50%;
-  width: 28px;
-  height: 28px;
+  width: 24px;
+  height: 24px;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   transition: all 0.2s ease;
   color: #6b7280;
+  font-size: 18px;
+  line-height: 1;
 }
 
 .search-clear-modern:hover {
@@ -61,11 +70,26 @@
   color: #374151;
 }
 
-/* Search History Dropdown */
-.search-box-modern {
-  position: relative;
+/* Search Submit Button - Magnifying glass icon */
+.search-submit-btn {
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  padding: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 20px;
+  line-height: 1;
 }
 
+.search-submit-btn:hover {
+  transform: translateY(-50%) scale(1.15);
+}
+
+/* Search History Dropdown */
 .search-history-dropdown {
   position: absolute;
   top: 100%;
@@ -105,9 +129,9 @@
 .search-history-item {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 12px;
   padding: 12px 16px;
-  cursor: pointer;
   transition: background 0.2s;
 }
 
@@ -115,13 +139,38 @@
   background: #f9fafb;
 }
 
+.search-history-text {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+  cursor: pointer;
+}
+
 .search-history-item svg {
   color: #9ca3af;
+  flex-shrink: 0;
 }
 
 .search-history-item span {
   color: #374151;
   font-size: 14px;
+}
+
+.search-history-delete {
+  background: transparent;
+  border: none;
+  color: #9ca3af;
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 4px 8px;
+  transition: color 0.2s;
+  flex-shrink: 0;
+}
+
+.search-history-delete:hover {
+  color: #dc2626;
 }
 
 /* Toolbar */
@@ -307,6 +356,52 @@
 .price-filter-compact svg {
   color: #d4a574;
   flex-shrink: 0;
+}
+
+/* Price Filter Select - New */
+.price-filter-select {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px;
+  border: 2px solid #dee2e6;
+  border-radius: 10px;
+  background: white;
+  transition: all 0.2s ease;
+}
+
+.price-filter-select:hover {
+  border-color: #d4a574;
+}
+
+.price-filter-select svg {
+  color: #d4a574;
+  flex-shrink: 0;
+}
+
+.price-select-modern {
+  padding: 8px 32px 8px 12px;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #374151;
+  background: white url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236b8e23' d='M6 9L1 4h10z'/%3E%3C/svg%3E") no-repeat right 10px center;
+  background-size: 12px;
+  appearance: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 180px;
+}
+
+.price-select-modern:hover {
+  border-color: #d4a574;
+}
+
+.price-select-modern:focus {
+  border-color: #d4a574;
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(212, 165, 116, 0.1);
 }
 
 .price-input-compact {

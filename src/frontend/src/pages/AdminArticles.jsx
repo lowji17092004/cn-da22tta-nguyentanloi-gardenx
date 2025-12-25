@@ -189,11 +189,29 @@ export default function AdminArticles() {
     }
 
     try {
+      // Tạo slug từ title
+      const slug = formData.title
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/đ/g, 'd')
+        .replace(/Đ/g, 'd')
+        .replace(/[^a-z0-9\s-]/g, '')
+        .replace(/\s+/g, '-')
+        .replace(/-+/g, '-')
+        .trim();
+
+      const articleData = {
+        ...formData,
+        slug: editingArticle?.slug || slug + '-' + Date.now(),
+        featuredImage: formData.thumbnail
+      };
+
       if (editingArticle) {
-        await api.put(`/articles/${editingArticle._id}`, formData);
+        await api.put(`/articles/${editingArticle._id}`, articleData);
         setToast({ type: 'success', message: 'Cập nhật bài viết thành công!' });
       } else {
-        await api.post('/articles', formData);
+        await api.post('/articles', articleData);
         setToast({ type: 'success', message: 'Tạo bài viết mới thành công!' });
       }
       
@@ -428,63 +446,73 @@ export default function AdminArticles() {
           </div>
         ) : (
           <>
-            <div className="aa-table-wrapper">
-              <table className="aa-table">
+            {/* Table Layout */}
+            <div className="articles-table-wrapper">
+              <table className="articles-table">
                 <thead>
                   <tr>
+                    <th>Hình ảnh</th>
                     <th>Tiêu đề</th>
                     <th>Danh mục</th>
                     <th>Ngày tạo</th>
-                    <th>Trạng thái</th>
                     <th>Thao tác</th>
                   </tr>
                 </thead>
                 <tbody>
                   {paginatedArticles.map(article => (
                     <tr key={article._id}>
-                      <td>
-                        <div className="article-title-cell">
-                          {article.thumbnail && (
-                            <img src={article.thumbnail} alt={article.title} className="article-thumbnail" />
-                          )}
-                          <div>
-                            <strong>{article.title}</strong>
-                            {article.summary && (
-                              <p className="article-summary">{article.summary.substring(0, 80)}...</p>
-                            )}
+                      <td className="table-image-cell">
+                        {article.thumbnail || article.featuredImage ? (
+                          <img src={article.thumbnail || article.featuredImage} alt={article.title} />
+                        ) : (
+                          <div className="table-image-placeholder">
+                            <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
                           </div>
-                        </div>
+                        )}
+                      </td>
+                      <td className="table-title-cell">
+                        <div className="table-title">{article.title}</div>
+                        {article.summary && (
+                          <div className="table-summary">
+                            {article.summary.length > 80 ? article.summary.substring(0, 80) + '...' : article.summary}
+                          </div>
+                        )}
                       </td>
                       <td>
-                        <span className="category-badge">{getCategoryDisplayName(article.category)}</span>
+                        <span className="table-category-badge">{getCategoryDisplayName(article.category)}</span>
                       </td>
-                      <td>{formatDate(article.createdAt)}</td>
-                      <td>
-                        <span className={`status-badge ${article.published ? 'published' : 'draft'}`}>
-                          {article.published ? 'Đã xuất bản' : 'Nháp'}
-                        </span>
-                      </td>
-                      <td>
-                        <div className="action-buttons">
-                          <button
-                            className="btn-icon btn-edit"
-                            onClick={() => handleEdit(article)}
-                            title="Sửa"
-                          >
-                            <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                            </svg>
-                          </button>
-                          <button
-                            className="btn-icon btn-delete"
-                            onClick={() => handleDelete(article._id)}
-                            title="Xóa"
-                          >
-                            <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                            </svg>
-                          </button>
-                        </div>
+                      <td className="table-date">{formatDate(article.createdAt)}</td>
+                      <td className="table-actions">
+                        <button
+                          className="table-action-btn edit"
+                          onClick={() => handleEdit(article)}
+                          title="Chỉnh sửa"
+                        >
+                          <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                          </svg>
+                        </button>
+                        <button
+                          className="table-action-btn view"
+                          onClick={() => window.open(`/huong-dan/${article.slug}`, '_blank')}
+                          title="Xem bài viết"
+                        >
+                          <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                          </svg>
+                        </button>
+                        <button
+                          className="table-action-btn delete"
+                          onClick={() => handleDelete(article._id)}
+                          title="Xóa bài viết"
+                        >
+                          <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                          </svg>
+                        </button>
                       </td>
                     </tr>
                   ))}
@@ -502,8 +530,16 @@ export default function AdminArticles() {
                 >
                   ← Trước
                 </button>
-                <div className="pagination-info">
-                  Trang {currentPage} / {totalPages}
+                <div className="pagination-pages">
+                  {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
+                    <button
+                      key={page}
+                      className={`pagination-num ${currentPage === page ? 'active' : ''}`}
+                      onClick={() => setCurrentPage(page)}
+                    >
+                      {page}
+                    </button>
+                  ))}
                 </div>
                 <button
                   className="pagination-btn"

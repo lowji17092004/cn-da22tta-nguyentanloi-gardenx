@@ -81,7 +81,7 @@ export default function Header(){
       setSearchHistory(newHistory)
       localStorage.setItem(SEARCH_HISTORY_KEY, JSON.stringify(newHistory))
       
-      navigate(`/products?search=${encodeURIComponent(searchQuery.trim())}`)
+      navigate(`/shop?search=${encodeURIComponent(searchQuery.trim())}`)
       setSearchQuery('')
       setShowSearchHistory(false)
     }

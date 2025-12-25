@@ -76,20 +76,18 @@ router.post('/', requireAuth, async (req, res) => {
       };
       discountAmount = coupon.discountAmount;
       
-      // Mark user coupon as used
+      // Xóa mã giảm giá khỏi tài khoản người dùng sau khi sử dụng
       if (coupon.userCouponId) {
         const UserCoupon = require('../models/UserCoupon');
         const userCoupon = await UserCoupon.findById(coupon.userCouponId);
-        if (userCoupon && !userCoupon.used) {
-          userCoupon.used = true;
-          userCoupon.usedAt = new Date();
-          await userCoupon.save();
-          
-          // Increment coupon used count
-          const Coupon = require('../models/Coupon');
+        if (userCoupon) {
+          // Increment coupon used count trước khi xóa
           await Coupon.findByIdAndUpdate(userCoupon.couponId, {
             $inc: { usedCount: 1 }
           });
+          
+          // Xóa hoàn toàn UserCoupon khỏi database
+          await UserCoupon.findByIdAndDelete(coupon.userCouponId);
         }
       }
     }

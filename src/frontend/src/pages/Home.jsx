@@ -3,7 +3,7 @@ import BannerCarousel from '../components/BannerCarousel'
 import { Link, useNavigate } from 'react-router-dom'
 import { useCart } from '../contexts/CartContext'
 import { useAuth } from '../contexts/AuthContext'
-import axios from 'axios'
+import api from '../api'
 import { getCategoryDisplayName } from '../utils/categoryUtils'
 
 const CATEGORIES = [
@@ -36,12 +36,12 @@ export default function Home(){
 
   useEffect(() => {
     // Fetch bestsellers (sold >= 10)
-    axios.get('/api/products?bestseller=true').then(r => {
+    api.get('/products?bestseller=true').then(r => {
       setFeaturedProducts(r.data.slice(0, 8))
     }).catch(() => {})
     
     // Fetch new products
-    axios.get('/api/products').then(r => {
+    api.get('/products').then(r => {
       setNewProducts(r.data.slice(0, 8))
     }).catch(() => {})
   }, [])
