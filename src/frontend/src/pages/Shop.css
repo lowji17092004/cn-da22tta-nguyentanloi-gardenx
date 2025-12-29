@@ -36,8 +36,8 @@
 }
 
 .search-input-modern:focus {
-  border-color: #d4a574;
-  box-shadow: 0 0 0 4px rgba(212, 165, 116, 0.1);
+  border-color: #1a472a;
+  box-shadow: 0 0 0 4px rgba(26, 71, 42, 0.1);
   outline: none;
 }
 
@@ -117,7 +117,7 @@
 .search-history-header button {
   background: none;
   border: none;
-  color: #d4a574;
+  color: #1a472a;
   cursor: pointer;
   font-size: 13px;
 }
@@ -221,13 +221,13 @@
 }
 
 .pill-btn:hover {
-  border-color: #d4a574;
-  color: #d4a574;
+  border-color: #1a472a;
+  color: #1a472a;
 }
 
 .pill-btn.active {
-  background: linear-gradient(135deg, #d4a574 0%, #c9965f 100%);
-  border-color: #d4a574;
+  background: linear-gradient(135deg, #1a472a 0%, #2d5f3f 100%);
+  border-color: #1a472a;
   color: white;
 }
 
@@ -277,13 +277,13 @@
 }
 
 .sub-pill-btn:hover {
-  border-color: #d4a574;
-  color: #d4a574;
+  border-color: #1a472a;
+  color: #1a472a;
 }
 
 .sub-pill-btn.active {
-  background: #d4a574;
-  border-color: #d4a574;
+  background: #1a472a;
+  border-color: #1a472a;
   color: white;
 }
 
@@ -328,13 +328,13 @@
 }
 
 .filter-select:hover {
-  border-color: #d4a574;
+  border-color: #1a472a;
 }
 
 .filter-select:focus {
-  border-color: #d4a574;
+  border-color: #1a472a;
   outline: none;
-  box-shadow: 0 0 0 3px rgba(212, 165, 116, 0.1);
+  box-shadow: 0 0 0 3px rgba(26, 71, 42, 0.1);
 }
 
 /* Price Filter Compact */
@@ -350,11 +350,11 @@
 }
 
 .price-filter-compact:hover {
-  border-color: #d4a574;
+  border-color: #1a472a;
 }
 
 .price-filter-compact svg {
-  color: #d4a574;
+  color: #1a472a;
   flex-shrink: 0;
 }
 
@@ -371,11 +371,11 @@
 }
 
 .price-filter-select:hover {
-  border-color: #d4a574;
+  border-color: #1a472a;
 }
 
 .price-filter-select svg {
-  color: #d4a574;
+  color: #1a472a;
   flex-shrink: 0;
 }
 
@@ -395,13 +395,13 @@
 }
 
 .price-select-modern:hover {
-  border-color: #d4a574;
+  border-color: #1a472a;
 }
 
 .price-select-modern:focus {
-  border-color: #d4a574;
+  border-color: #1a472a;
   outline: none;
-  box-shadow: 0 0 0 2px rgba(212, 165, 116, 0.1);
+  box-shadow: 0 0 0 2px rgba(26, 71, 42, 0.1);
 }
 
 .price-input-compact {
@@ -415,9 +415,9 @@
 }
 
 .price-input-compact:focus {
-  border-color: #d4a574;
+  border-color: #1a472a;
   outline: none;
-  box-shadow: 0 0 0 2px rgba(212, 165, 116, 0.1);
+  box-shadow: 0 0 0 2px rgba(26, 71, 42, 0.1);
 }
 
 .price-clear-btn {
@@ -458,13 +458,13 @@
 }
 
 .sort-select-modern:hover {
-  border-color: #d4a574;
-  box-shadow: 0 2px 8px rgba(212, 165, 116, 0.1);
+  border-color: #1a472a;
+  box-shadow: 0 2px 8px rgba(26, 71, 42, 0.1);
 }
 
 .sort-select-modern:focus {
-  border-color: #d4a574;
-  box-shadow: 0 0 0 3px rgba(212, 165, 116, 0.1);
+  border-color: #1a472a;
+  box-shadow: 0 0 0 3px rgba(26, 71, 42, 0.1);
   outline: none;
 }
 
@@ -496,7 +496,7 @@
 
 .view-btn.active {
   background: white;
-  color: #d4a574;
+  color: #1a472a;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
@@ -511,7 +511,7 @@
 }
 
 .results-count strong {
-  color: #d4a574;
+  color: #1a472a;
   font-weight: 700;
 }
 
@@ -692,19 +692,19 @@
   height: 44px;
   border-radius: 50%;
   border: none;
-  background: linear-gradient(135deg, #d4a574 0%, #c9965f 100%);
+  background: linear-gradient(135deg, #1a472a 0%, #2d5f3f 100%);
   color: white;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 12px rgba(212, 165, 116, 0.4);
+  box-shadow: 0 4px 12px rgba(26, 71, 42, 0.4);
   transition: all 0.3s ease;
 }
 
 .btn-quick-add:hover {
   transform: scale(1.1) rotate(5deg);
-  box-shadow: 0 6px 16px rgba(212, 165, 116, 0.5);
+  box-shadow: 0 6px 16px rgba(26, 71, 42, 0.5);
 }
 
 .btn-quick-add:disabled {
@@ -766,7 +766,7 @@
 }
 
 .product-name-link-modern:hover .product-name-modern {
-  color: #d4a574;
+  color: #1a472a;
 }
 
 .product-desc-modern {
@@ -794,7 +794,7 @@
 .price-modern {
   font-size: 16px;
   font-weight: 700;
-  color: #d4a574;
+  color: #1a472a;
   border: none;
   outline: none;
   text-decoration: none;
@@ -840,13 +840,13 @@
 }
 
 .btn-buy-modern {
-  background: linear-gradient(135deg, #d4a574 0%, #c9965f 100%);
+  background: linear-gradient(135deg, #1a472a 0%, #2d5f3f 100%);
   color: white;
 }
 
 .btn-buy-modern:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(212, 165, 116, 0.3);
+  box-shadow: 0 4px 12px rgba(26, 71, 42, 0.3);
 }
 
 .btn-add-modern:disabled,
@@ -883,7 +883,7 @@
 
 .btn-clear-filters {
   padding: 12px 32px;
-  background: linear-gradient(135deg, #d4a574 0%, #c9965f 100%);
+  background: linear-gradient(135deg, #1a472a 0%, #2d5f3f 100%);
   color: white;
   border: none;
   border-radius: 50px;
@@ -895,7 +895,7 @@
 
 .btn-clear-filters:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(212, 165, 116, 0.4);
+  box-shadow: 0 6px 20px rgba(26, 71, 42, 0.4);
 }
 
 /* Pagination */
@@ -921,17 +921,17 @@
 }
 
 .pagination-btn:hover:not(:disabled) {
-  border-color: #d4a574;
-  color: #d4a574;
+  border-color: #1a472a;
+  color: #1a472a;
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(212, 165, 116, 0.2);
+  box-shadow: 0 4px 12px rgba(26, 71, 42, 0.2);
 }
 
 .pagination-btn.active {
-  background: linear-gradient(135deg, #d4a574 0%, #c9965f 100%);
+  background: linear-gradient(135deg, #1a472a 0%, #2d5f3f 100%);
   color: #fff;
   border-color: transparent;
-  box-shadow: 0 6px 16px rgba(212, 165, 116, 0.35);
+  box-shadow: 0 6px 16px rgba(26, 71, 42, 0.35);
 }
 
 .pagination-btn:disabled {

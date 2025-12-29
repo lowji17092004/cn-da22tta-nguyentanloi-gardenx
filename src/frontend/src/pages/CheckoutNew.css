@@ -15,7 +15,7 @@
   gap: 15px;
   margin-bottom: 30px;
   padding-bottom: 20px;
-  border-bottom: 3px solid #d4a574;
+  border-bottom: 3px solid #1a472a;
 }
 
 .checkout-header-new h1 {
@@ -26,7 +26,7 @@
 }
 
 .checkout-count {
-  background: linear-gradient(135deg, #d4a574, #c19563);
+  background: linear-gradient(135deg, #1a472a, #2d5f3f);
   color: #fff;
   padding: 6px 18px;
   border-radius: 20px;
@@ -63,7 +63,7 @@
 .btn-shop {
   display: inline-block;
   padding: 12px 30px;
-  background: linear-gradient(135deg, #d4a574, #c49464);
+  background: linear-gradient(135deg, #1a472a, #2d5f3f);
   color: #fff;
   border-radius: 25px;
   text-decoration: none;
@@ -73,7 +73,7 @@
 
 .btn-shop:hover {
   transform: translateY(-2px);
-  box-shadow: 0 5px 15px rgba(212, 165, 116, 0.4);
+  box-shadow: 0 5px 15px rgba(26, 71, 42, 0.4);
 }
 
 /* Grid Layout */
@@ -118,8 +118,8 @@
 
 .btn-add {
   background: none;
-  border: 1px solid #d4a574;
-  color: #d4a574;
+  border: 1px solid #1a472a;
+  color: #1a472a;
   padding: 6px 14px;
   border-radius: 20px;
   font-size: 13px;
@@ -128,7 +128,7 @@
 }
 
 .btn-add:hover {
-  background: #d4a574;
+  background: #1a472a;
   color: #fff;
 }
 
@@ -166,8 +166,8 @@
 .form-group input:focus,
 .form-section textarea:focus {
   outline: none;
-  border-color: #d4a574;
-  box-shadow: 0 0 0 3px rgba(212, 165, 116, 0.15);
+  border-color: #1a472a;
+  box-shadow: 0 0 0 3px rgba(26, 71, 42, 0.15);
 }
 
 .form-section textarea {
@@ -222,7 +222,7 @@
 
 .address-select:focus {
   outline: none;
-  border-color: #d4a574;
+  border-color: #1a472a;
 }
 
 .detail-address-input {
@@ -281,13 +281,13 @@
 }
 
 .checkbox-inline input {
-  accent-color: #d4a574;
+  accent-color: #1a472a;
   width: 16px;
   height: 16px;
 }
 
 .btn-save {
-  background: #d4a574;
+  background: #1a472a;
   color: #fff;
   border: none;
   padding: 8px 20px;
@@ -299,7 +299,7 @@
 }
 
 .btn-save:hover {
-  background: #c49464;
+  background: #2d5f3f;
 }
 
 /* Address List */
@@ -331,14 +331,14 @@
 }
 
 .address-card:hover {
-  border-color: #d4a574;
+  border-color: #1a472a;
   background: #fff;
 }
 
 .address-card.active {
-  border-color: #d4a574;
+  border-color: #1a472a;
   background: #fff9f0;
-  box-shadow: 0 2px 10px rgba(212, 165, 116, 0.15);
+  box-shadow: 0 2px 10px rgba(26, 71, 42, 0.15);
 }
 
 .address-radio {
@@ -349,7 +349,7 @@
   display: block;
   width: 18px;
   height: 18px;
-  border: 2px solid #d4a574;
+  border: 2px solid #1a472a;
   border-radius: 50%;
   position: relative;
   transition: all 0.3s ease;
@@ -362,7 +362,7 @@
   left: 3px;
   width: 8px;
   height: 8px;
-  background: #d4a574;
+  background: #1a472a;
   border-radius: 50%;
 }
 
@@ -438,16 +438,16 @@
 }
 
 .payment-card:hover {
-  border-color: #d4a574;
+  border-color: #1a472a;
   transform: translateY(-3px);
-  box-shadow: 0 8px 20px rgba(212, 165, 116, 0.15);
+  box-shadow: 0 8px 20px rgba(26, 71, 42, 0.15);
 }
 
 .payment-card.active {
-  border-color: #d4a574;
+  border-color: #1a472a;
   border-width: 3px;
   background: linear-gradient(135deg, #f0f8e8, #f8fdf3);
-  box-shadow: 0 8px 24px rgba(212, 165, 116, 0.25);
+  box-shadow: 0 8px 24px rgba(26, 71, 42, 0.25);
 }
 
 .payment-icon-box {
@@ -508,8 +508,8 @@
 }
 
 .payment-card.active .radio-check {
-  border-color: #d4a574;
-  background: #d4a574;
+  border-color: #1a472a;
+  background: #1a472a;
 }
 
 .radio-check.checked::after {
@@ -619,9 +619,9 @@
 
 .bank-transfer-provider.selected,
 .zalopay-provider.selected {
-  border-color: #d4a574;
+  border-color: #1a472a;
   background: #f0f8e8;
-  box-shadow: 0 2px 8px rgba(212, 165, 116, 0.15);
+  box-shadow: 0 2px 8px rgba(26, 71, 42, 0.15);
 }
 
 /* Banks Advertising - Display Only */
@@ -704,7 +704,7 @@
 }
 
 .summary-items::-webkit-scrollbar-thumb {
-  background: #d4a574;
+  background: #1a472a;
   border-radius: 4px;
 }
 
@@ -754,7 +754,7 @@
 
 .item-price {
   font-size: 14px;
-  color: #d4a574;
+  color: #1a472a;
   font-weight: 600;
 }
 
@@ -807,7 +807,7 @@
 
 .btn-apply-coupon {
   padding: 10px 20px;
-  background: linear-gradient(135deg, #d4a574, #c19563);
+  background: linear-gradient(135deg, #1a472a, #2d5f3f);
   color: white;
   border: none;
   border-radius: 8px;
@@ -820,7 +820,7 @@
 
 .btn-apply-coupon:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(212, 165, 116, 0.4);
+  box-shadow: 0 4px 12px rgba(26, 71, 42, 0.4);
 }
 
 .btn-apply-coupon:disabled {
@@ -901,7 +901,7 @@
 }
 
 .total-row.final span:last-child {
-  color: #d4a574;
+  color: #1a472a;
 }
 
 .shipping-hint {
@@ -918,7 +918,7 @@
 .btn-order {
   width: 100%;
   padding: 16px;
-  background: linear-gradient(135deg, #d4a574, #c49464);
+  background: linear-gradient(135deg, #1a472a, #2d5f3f);
   color: #fff;
   border: none;
   border-radius: 10px;
@@ -930,7 +930,7 @@
 
 .btn-order:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(212, 165, 116, 0.4);
+  box-shadow: 0 6px 20px rgba(26, 71, 42, 0.4);
 }
 
 .btn-order:disabled {
@@ -943,8 +943,8 @@
   margin-top: 12px;
   padding: 12px;
   background: #fff;
-  color: #d4a574;
-  border: 2px solid #d4a574;
+  color: #1a472a;
+  border: 2px solid #1a472a;
   border-radius: 10px;
   font-size: 14px;
   font-weight: 600;
@@ -1051,7 +1051,7 @@
 
 .qr-header-compact {
   padding: 20px 24px;
-  background: linear-gradient(135deg, #d4a574, #c19563);
+  background: linear-gradient(135deg, #1a472a, #2d5f3f);
   color: white;
 }
 
@@ -1120,7 +1120,7 @@
 
 .detail-row.highlight {
   background: #f0f8e8;
-  border: 1px solid #d4a574;
+  border: 1px solid #1a472a;
 }
 
 .detail-row .label {
@@ -1135,12 +1135,12 @@
 
 .detail-row strong.amount {
   font-size: 18px;
-  color: #d4a574;
+  color: #1a472a;
   font-weight: 800;
 }
 
 .detail-row strong.code {
-  color: #d4a574;
+  color: #1a472a;
   font-weight: 700;
   letter-spacing: 0.5px;
 }
@@ -1161,7 +1161,7 @@
 .qr-footer-compact .btn-confirm-payment {
   width: 100%;
   padding: 14px;
-  background: linear-gradient(135deg, #d4a574, #c19563);
+  background: linear-gradient(135deg, #1a472a, #2d5f3f);
   color: white;
   border: none;
   border-radius: 10px;
@@ -1173,7 +1173,7 @@
 
 .qr-footer-compact .btn-confirm-payment:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(212, 165, 116, 0.3);
+  box-shadow: 0 4px 12px rgba(26, 71, 42, 0.3);
 }
 
 .qr-image {
@@ -1209,7 +1209,7 @@
 }
 
 .qr-order-code strong {
-  color: #d4a574;
+  color: #1a472a;
   font-size: 18px;
 }
 
@@ -1246,7 +1246,7 @@
 }
 
 .bank-row.highlight strong {
-  color: #d4a574;
+  color: #1a472a;
 }
 
 .qr-notice {

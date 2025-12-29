@@ -584,18 +584,18 @@
   font-weight: 700;
   cursor: pointer;
   transition: all 0.3s ease;
-  border: 2px solid #d4a574;
+  border: 2px solid #1a472a;
   flex: 1;
-  background: linear-gradient(135deg, #d4a574 0%, #c19563 100%);
+  background: linear-gradient(135deg, #1a472a 0%, #2d5f3f 100%);
   color: white;
-  box-shadow: 0 4px 16px rgba(212, 165, 116, 0.3);
+  box-shadow: 0 4px 16px rgba(26, 71, 42, 0.3);
 }
 
 .pd-btn-buy-now:hover:not(:disabled) {
-  background: linear-gradient(135deg, #c19563 0%, #b08552 100%);
-  border-color: #c19563;
+  background: linear-gradient(135deg, #2d5f3f 0%, #b08552 100%);
+  border-color: #2d5f3f;
   transform: translateY(-3px);
-  box-shadow: 0 8px 24px rgba(212, 165, 116, 0.4);
+  box-shadow: 0 8px 24px rgba(26, 71, 42, 0.4);
 }
 
 .pd-btn-buy-now:disabled {

@@ -19,11 +19,32 @@ export function AuthProvider({ children }){
     if (user) localStorage.setItem('user', JSON.stringify(user)); else localStorage.removeItem('user')
   }, [user])
 
-  const login = async (email, password) => {
-    const res = await api.post('/auth/login', { email, password })
-    setToken(res.data.token)
-    setUser(res.data.user)
-    return res.data
+  const login = async (a, b) => {
+    // Supports two usages:
+    // 1) login(email, password) -> will call API
+    // 2) login(user, token) -> set state directly (used by pages that call API themselves)
+    if (typeof a === 'string' && typeof b === 'string') {
+      const res = await api.post('/auth/login', { email: a, password: b })
+      setToken(res.data.token)
+      setUser(res.data.user)
+      return res.data
+    }
+
+    // If caller provided user object and token
+    if (typeof a === 'object' && typeof b === 'string') {
+      setUser(a)
+      setToken(b)
+      return { user: a, token: b }
+    }
+
+    // If caller passed a single response-like object
+    if (typeof a === 'object' && a !== null && a.token && a.user) {
+      setUser(a.user)
+      setToken(a.token)
+      return a
+    }
+
+    throw new Error('Invalid arguments to login()')
   }
 
   const loginWithGoogle = async (credential) => {

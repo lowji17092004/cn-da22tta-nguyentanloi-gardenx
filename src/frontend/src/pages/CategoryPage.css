@@ -130,7 +130,7 @@
 
 /* Hero Banner */
 .cp-hero {
-  background: linear-gradient(135deg, #d4a574 0%, #c9965f 100%);
+  background: linear-gradient(135deg, #1a472a 0%, #2d5f3f 100%);
   padding: 60px 0;
   color: white;
   position: relative;
@@ -202,13 +202,13 @@
 
 .cp-stat-card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 8px 24px rgba(212, 165, 116, 0.2);
+  box-shadow: 0 8px 24px rgba(26, 71, 42, 0.2);
 }
 
 .cp-stat-number {
   font-size: 32px;
   font-weight: 700;
-  color: #d4a574;
+  color: #1a472a;
   line-height: 1;
 }
 
@@ -283,15 +283,15 @@
 }
 
 .cp-subcat-btn:hover {
-  border-color: #d4a574;
-  color: #d4a574;
+  border-color: #1a472a;
+  color: #1a472a;
 }
 
 .cp-subcat-btn.active {
-  background: linear-gradient(135deg, #d4a574 0%, #c9965f 100%);
+  background: linear-gradient(135deg, #1a472a 0%, #2d5f3f 100%);
   border-color: transparent;
   color: white;
-  box-shadow: 0 4px 12px rgba(212, 165, 116, 0.3);
+  box-shadow: 0 4px 12px rgba(26, 71, 42, 0.3);
 }
 
 /* Search Section */
@@ -324,8 +324,8 @@
 }
 
 .cp-search-input:focus {
-  border-color: #d4a574;
-  box-shadow: 0 0 0 4px rgba(212, 165, 116, 0.1);
+  border-color: #1a472a;
+  box-shadow: 0 0 0 4px rgba(26, 71, 42, 0.1);
   outline: none;
 }
 
@@ -380,7 +380,7 @@
 .cp-search-history-header button {
   background: none;
   border: none;
-  color: #d4a574;
+  color: #1a472a;
   cursor: pointer;
   font-size: 13px;
 }
@@ -452,7 +452,7 @@
 
 .cp-filter-select:focus {
   outline: none;
-  border-color: #d4a574;
+  border-color: #1a472a;
 }
 
 .cp-price-input {
@@ -467,7 +467,7 @@
 
 .cp-price-input:focus {
   outline: none;
-  border-color: #d4a574;
+  border-color: #1a472a;
 }
 
 .cp-price-clear {
@@ -511,7 +511,7 @@
 
 .cp-sort-select:focus {
   outline: none;
-  border-color: #d4a574;
+  border-color: #1a472a;
 }
 
 /* Results Count */
@@ -526,7 +526,7 @@
 }
 
 .cp-results-count strong {
-  color: #d4a574;
+  color: #1a472a;
   font-weight: 700;
 }
 
@@ -567,14 +567,14 @@
   background: white;
   border-radius: 16px;
   overflow: hidden;
-  box-shadow: 0 4px 20px rgba(212, 165, 116, 0.08);
+  box-shadow: 0 4px 20px rgba(26, 71, 42, 0.08);
   border: 1px solid #f3e5d8;
   transition: all 0.3s ease;
 }
 
 .cp-product-card:hover {
   transform: translateY(-6px);
-  box-shadow: 0 12px 40px rgba(212, 165, 116, 0.15);
+  box-shadow: 0 12px 40px rgba(26, 71, 42, 0.15);
 }
 
 .cp-product-image-link {
@@ -675,7 +675,7 @@
   justify-content: center;
   gap: 8px;
   padding: 12px 20px;
-  background: linear-gradient(135deg, #d4a574 0%, #8fbc3b 100%);
+  background: linear-gradient(135deg, #1a472a 0%, #8fbc3b 100%);
   border: none;
   border-radius: 25px;
   color: white;
@@ -687,7 +687,7 @@
 
 .cp-btn-cart:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(212, 165, 116, 0.4);
+  box-shadow: 0 6px 16px rgba(26, 71, 42, 0.4);
 }
 
 .cp-btn-cart:disabled {
@@ -714,7 +714,7 @@
 }
 
 .cp-product-subcat:hover {
-  background: linear-gradient(135deg, #d4a574 0%, #8fbc3b 100%);
+  background: linear-gradient(135deg, #1a472a 0%, #8fbc3b 100%);
   color: white;
 }
 
@@ -737,7 +737,7 @@
 }
 
 .cp-product-name-link:hover .cp-product-name {
-  color: #d4a574;
+  color: #1a472a;
 }
 
 .cp-product-price {
@@ -750,7 +750,7 @@
 .cp-price {
   font-size: 15px;
   font-weight: 700;
-  color: #d4a574;
+  color: #1a472a;
   border: none;
   outline: none;
   text-decoration: none;
@@ -795,7 +795,7 @@
   align-items: center;
   gap: 8px;
   padding: 12px 24px;
-  background: linear-gradient(135deg, #d4a574 0%, #c9965f 100%);
+  background: linear-gradient(135deg, #1a472a 0%, #2d5f3f 100%);
   color: white;
   text-decoration: none;
   border-radius: 25px;
@@ -805,7 +805,7 @@
 
 .cp-btn-back:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(212, 165, 116, 0.4);
+  box-shadow: 0 6px 20px rgba(26, 71, 42, 0.4);
 }
 
 /* Loading */
@@ -822,7 +822,7 @@
   width: 48px;
   height: 48px;
   border: 4px solid #f3e5d8;
-  border-top-color: #d4a574;
+  border-top-color: #1a472a;
   border-radius: 50%;
   animation: cp-spin 1s linear infinite;
 }
@@ -1005,16 +1005,16 @@
 }
 
 .cp-pagination-btn:hover:not(:disabled) {
-  border-color: #d4a574;
+  border-color: #1a472a;
   background: #f0f7e6;
   color: #4a6a1a;
 }
 
 .cp-pagination-btn.active {
-  background: linear-gradient(135deg, #d4a574 0%, #8fbc3b 100%);
-  border-color: #d4a574;
+  background: linear-gradient(135deg, #1a472a 0%, #8fbc3b 100%);
+  border-color: #1a472a;
   color: white;
-  box-shadow: 0 4px 12px rgba(212, 165, 116, 0.35);
+  box-shadow: 0 4px 12px rgba(26, 71, 42, 0.35);
 }
 
 .cp-pagination-btn:disabled {

@@ -97,6 +97,17 @@ export default function AdminUsers() {
     }
   }
 
+  // Calculate today's new users
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+  const newUsersToday = users.filter(u => {
+    const createdDate = new Date(u.createdAt)
+    createdDate.setHours(0, 0, 0, 0)
+    return createdDate.getTime() === today.getTime()
+  }).length
+  
+  const lockedUsers = users.filter(u => u.isLocked).length
+
   const getRoleBadge = (role) => {
     return role === 'admin' ? (
       <span className="role-badge admin">Admin</span>
@@ -107,6 +118,38 @@ export default function AdminUsers() {
 
   return (
     <AdminLayout>
+      {/* Todo Alerts - Việc cần làm */}
+      {!loading && (newUsersToday > 0 || lockedUsers > 0) && (
+        <div className="au-todo-alerts">
+          <div className="au-todo-title">
+            <span className="au-todo-icon">📋</span>
+            <span>Thông báo</span>
+            <span className="au-todo-count">{newUsersToday + lockedUsers}</span>
+          </div>
+          <div className="au-todo-grid">
+            {newUsersToday > 0 && (
+              <div className="au-todo-item au-todo-info">
+                <span className="au-todo-item-icon">🎉</span>
+                <div className="au-todo-item-content">
+                  <strong>{newUsersToday} người dùng mới hôm nay</strong>
+                  <span>Chào đón thành viên mới của cộng đồng</span>
+                </div>
+              </div>
+            )}
+            {lockedUsers > 0 && (
+              <div className="au-todo-item au-todo-warning" onClick={() => setFilterStatus('locked')}>
+                <span className="au-todo-item-icon">🔒</span>
+                <div className="au-todo-item-content">
+                  <strong>{lockedUsers} tài khoản đang bị khóa</strong>
+                  <span>Xem xét mở khóa nếu cần thiết</span>
+                </div>
+                <span className="au-todo-arrow">→</span>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
       <div className="admin-page-header">
         <div>
           <h1 className="admin-page-title">Quản lý Người dùng</h1>

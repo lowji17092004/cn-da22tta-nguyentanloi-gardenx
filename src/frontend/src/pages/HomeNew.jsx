@@ -248,7 +248,7 @@ export default function HomeNew(){
         <div className="container">
           <div className="section-header-home center">
             <h2 className="section-title-home">🏆 Tại sao chọn chúng tôi?</h2>
-            <p className="section-subtitle-home">Những lý do khiến The Sun Garden trở thành lựa chọn hàng đầu của bạn</p>
+            <p className="section-subtitle-home">Những lý do khiến Floréa trở thành lựa chọn hàng đầu của bạn</p>
           </div>
           
           <div className="why-choose-grid">
@@ -268,7 +268,7 @@ export default function HomeNew(){
         <div className="container">
           <div className="section-header-home center">
             <h2 className="section-title-home">💬 Khách hàng nói gì về chúng tôi?</h2>
-            <p className="section-subtitle-home">Những đánh giá chân thực từ khách hàng đã mua sắm tại The Sun Garden</p>
+            <p className="section-subtitle-home">Những đánh giá chân thực từ khách hàng đã mua sắm tại Floréa</p>
           </div>
           
           <div className="testimonials-grid">

@@ -7,8 +7,8 @@
   --card: #ffffff;
   --text: #2d2a24;
   --muted: #78716c;
-  --primary: #d4a574;
-  --accent: #e5c18f;
+  --primary: #1a472a;
+  --accent: #2d7a4a;
   --border: #e7e3dc;
   --radius: 10px;
 }
@@ -28,7 +28,7 @@ html, body {
   --card: #292524;
   --text: #fafaf9;
   --muted: #a8a29e;
-  --primary: #e5c18f;
-  --accent: #d4a574;
+  --primary: #2d7a4a;
+  --accent: #1a472a;
   --border: #44403c;
 }

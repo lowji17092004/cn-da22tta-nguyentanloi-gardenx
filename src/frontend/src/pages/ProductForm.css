@@ -14,9 +14,9 @@
   align-items: flex-start;
   margin-bottom: 32px;
   padding: 32px;
-  background: linear-gradient(135deg, #d4a574 0%, #c9965f 100%);
+  background: linear-gradient(135deg, #1a472a 0%, #2d5f3f 100%);
   border-radius: 16px;
-  box-shadow: 0 4px 20px rgba(212, 165, 116, 0.2);
+  box-shadow: 0 4px 20px rgba(26, 71, 42, 0.2);
 }
 
 .form-title {
@@ -100,7 +100,7 @@
   content: '';
   width: 4px;
   height: 24px;
-  background: linear-gradient(135deg, #d4a574 0%, #c9965f 100%);
+  background: linear-gradient(135deg, #1a472a 0%, #2d5f3f 100%);
   border-radius: 2px;
 }
 
@@ -261,9 +261,9 @@
 .form-input:focus,
 .form-textarea:focus {
   outline: none;
-  border-color: #d4a574;
+  border-color: #1a472a;
   background: white;
-  box-shadow: 0 0 0 3px rgba(212, 165, 116, 0.1);
+  box-shadow: 0 0 0 3px rgba(26, 71, 42, 0.1);
 }
 
 .form-input:disabled {
@@ -299,16 +299,16 @@
 
 .checkbox-label:hover {
   background: white;
-  border-color: #d4a574;
+  border-color: #1a472a;
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(212, 165, 116, 0.15);
+  box-shadow: 0 4px 12px rgba(26, 71, 42, 0.15);
 }
 
 .checkbox-input {
   width: 20px;
   height: 20px;
   cursor: pointer;
-  accent-color: #d4a574;
+  accent-color: #1a472a;
 }
 
 .checkbox-text {
@@ -361,10 +361,10 @@
 }
 
 .file-upload-label:hover {
-  border-color: #d4a574;
+  border-color: #1a472a;
   background: white;
   transform: translateY(-2px);
-  box-shadow: 0 4px 16px rgba(212, 165, 116, 0.1);
+  box-shadow: 0 4px 16px rgba(26, 71, 42, 0.1);
 }
 
 .file-upload-icon {
@@ -434,7 +434,7 @@
 .image-gallery-item:hover {
   transform: translateY(-4px);
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
-  border-color: #d4a574;
+  border-color: #1a472a;
 }
 
 .gallery-image {
@@ -479,7 +479,7 @@
   bottom: 8px;
   left: 8px;
   padding: 6px 12px;
-  background: linear-gradient(135deg, #d4a574 0%, #c9965f 100%);
+  background: linear-gradient(135deg, #1a472a 0%, #2d5f3f 100%);
   color: white;
   font-size: 11px;
   font-weight: 700;
@@ -528,7 +528,7 @@
 
 .progress-bar-fill {
   height: 100%;
-  background: linear-gradient(90deg, #d4a574 0%, #c9965f 100%);
+  background: linear-gradient(90deg, #1a472a 0%, #2d5f3f 100%);
   transition: width 0.3s ease;
   border-radius: 4px;
 }
@@ -572,14 +572,14 @@
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, #d4a574 0%, #c9965f 100%);
+  background: linear-gradient(135deg, #1a472a 0%, #2d5f3f 100%);
   color: white;
-  box-shadow: 0 2px 8px rgba(212, 165, 116, 0.3);
+  box-shadow: 0 2px 8px rgba(26, 71, 42, 0.3);
 }
 
 .btn-primary:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 16px rgba(212, 165, 116, 0.4);
+  box-shadow: 0 4px 16px rgba(26, 71, 42, 0.4);
 }
 
 .btn-primary:active {

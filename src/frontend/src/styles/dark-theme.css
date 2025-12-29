@@ -73,7 +73,7 @@
 .dark-theme .nav-dropdown-btn:hover,
 .dark-theme .nav-dropdown:hover .nav-dropdown-btn {
   background: rgba(229, 193, 143, 0.15) !important;
-  color: #e5c18f !important;
+  color: #2d7a4a !important;
 }
 
 /* Header info items */
@@ -83,7 +83,7 @@
 }
 
 .dark-theme .header-info:hover {
-  color: #e5c18f !important;
+  color: #2d7a4a !important;
 }
 
 /* Logo */
@@ -145,11 +145,11 @@
 .dark-theme .mega-menu-item:hover,
 .dark-theme .mega-menu-link:hover {
   background: #3d3835 !important;
-  color: #e5c18f !important;
+  color: #2d7a4a !important;
 }
 
 .dark-theme .mega-menu-title {
-  color: #e5c18f !important;
+  color: #2d7a4a !important;
 }
 
 /* User dropdown */
@@ -179,7 +179,7 @@
 .dark-theme .header-action-btn:hover,
 .dark-theme .header-icon-btn:hover {
   background: rgba(229, 193, 143, 0.15) !important;
-  color: #e5c18f !important;
+  color: #2d7a4a !important;
 }
 
 /* ========================================== 
@@ -229,7 +229,7 @@
 .dark-theme input:focus,
 .dark-theme textarea:focus,
 .dark-theme select:focus {
-  border-color: #e5c18f !important;
+  border-color: #2d7a4a !important;
   box-shadow: 0 0 0 3px rgba(229, 193, 143, 0.2) !important;
 }
 
@@ -314,7 +314,7 @@
 
 .dark-theme .footer a:hover,
 .dark-theme .footer-link:hover {
-  color: #e5c18f !important;
+  color: #2d7a4a !important;
 }
 
 .dark-theme .footer-title,
@@ -355,7 +355,7 @@
 
 .dark-theme .product-price,
 .dark-theme .product-original-price {
-  color: #e5c18f !important;
+  color: #2d7a4a !important;
 }
 
 .dark-theme .product-description {
@@ -380,7 +380,7 @@
 }
 
 .dark-theme .cart-item-price {
-  color: #e5c18f !important;
+  color: #2d7a4a !important;
 }
 
 .dark-theme .cart-summary {
@@ -543,7 +543,7 @@
 .dark-theme .sidebar-link:hover,
 .dark-theme .sidebar-link.active {
   background: #3d3835 !important;
-  color: #e5c18f !important;
+  color: #2d7a4a !important;
 }
 
 .dark-theme .admin-content {
@@ -629,7 +629,7 @@
 }
 
 .dark-theme .coupon-code {
-  color: #e5c18f !important;
+  color: #2d7a4a !important;
 }
 
 .dark-theme .coupon-description {
@@ -677,7 +677,7 @@
 
 .dark-theme .pagination-btn.active,
 .dark-theme .page-link.active {
-  background: #e5c18f !important;
+  background: #2d7a4a !important;
   color: #1c1917 !important;
 }
 
@@ -687,7 +687,7 @@
 
 .dark-theme .loading,
 .dark-theme .spinner {
-  color: #e5c18f !important;
+  color: #2d7a4a !important;
 }
 
 .dark-theme .skeleton {
@@ -720,7 +720,7 @@
 }
 
 .dark-theme .breadcrumb a:hover {
-  color: #e5c18f !important;
+  color: #2d7a4a !important;
 }
 
 .dark-theme .breadcrumb-current {
@@ -776,7 +776,7 @@
 }
 
 .dark-theme .product-detail-price {
-  color: #e5c18f !important;
+  color: #2d7a4a !important;
 }
 
 .dark-theme .product-detail-description {
@@ -794,8 +794,8 @@
 
 .dark-theme .tab-btn:hover,
 .dark-theme .tab-btn.active {
-  color: #e5c18f !important;
-  border-color: #e5c18f !important;
+  color: #2d7a4a !important;
+  border-color: #2d7a4a !important;
 }
 
 .dark-theme .tab-content {
@@ -831,11 +831,11 @@
 
 /* Links */
 .dark-theme a {
-  color: #e5c18f;
+  color: #2d7a4a;
 }
 
 .dark-theme a:hover {
-  color: #d4a574;
+  color: #1a472a;
 }
 
 /* Cancel Order Modal */

@@ -141,7 +141,7 @@
 }
 
 .detail-value.order-code {
-  color: #d4a574;
+  color: #1a472a;
   font-family: 'Courier New', monospace;
   font-size: 18px;
 }
@@ -205,15 +205,15 @@
 }
 
 .btn-view-order {
-  background: linear-gradient(135deg, #d4a574 0%, #c19563 100%);
+  background: linear-gradient(135deg, #1a472a 0%, #2d5f3f 100%);
   color: white;
   border: none;
-  box-shadow: 0 4px 12px rgba(212, 165, 116, 0.3);
+  box-shadow: 0 4px 12px rgba(26, 71, 42, 0.3);
 }
 
 .btn-view-order:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(212, 165, 116, 0.4);
+  box-shadow: 0 6px 20px rgba(26, 71, 42, 0.4);
 }
 
 .btn-back-home {
@@ -242,7 +242,7 @@
 }
 
 .link-shop {
-  color: #d4a574;
+  color: #1a472a;
   font-weight: 600;
   text-decoration: none;
   font-size: 15px;
@@ -250,7 +250,7 @@
 }
 
 .link-shop:hover {
-  color: #c19563;
+  color: #2d5f3f;
   text-decoration: underline;
 }
 

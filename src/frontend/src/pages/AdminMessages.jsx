@@ -127,8 +127,34 @@ export default function AdminMessages() {
     return `http://localhost:5000${avatarPath}`
   }
 
+  // Calculate stats
+  const stats = {
+    totalUnread: conversations.reduce((sum, c) => sum + c.unreadCount, 0),
+    totalConversations: conversations.length
+  }
+
   return (
     <AdminLayout>
+      {/* Todo Alerts - Việc cần làm */}
+      {stats.totalUnread > 0 && (
+        <div className="am-todo-alerts">
+          <div className="am-todo-title">
+            <span className="am-todo-icon">📋</span>
+            <span>Việc cần làm</span>
+            <span className="am-todo-count">{stats.totalUnread}</span>
+          </div>
+          <div className="am-todo-grid">
+            <div className="am-todo-item am-todo-urgent">
+              <span className="am-todo-item-icon">💬</span>
+              <div className="am-todo-item-content">
+                <strong>{stats.totalUnread} tin nhắn chưa đọc</strong>
+                <span>Phản hồi khách hàng để tăng trải nghiệm</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="am-chat-container">
         {/* Conversations Sidebar */}
         <div className="am-chat-sidebar">

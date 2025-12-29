@@ -19,11 +19,11 @@
   border-radius: 12px;
   padding: 1.25rem;
   transition: all 0.3s ease;
-  box-shadow: 0 2px 8px rgba(212, 165, 116, 0.06);
+  box-shadow: 0 2px 8px rgba(26, 71, 42, 0.06);
 }
 
 .admin-review-card:hover {
-  box-shadow: 0 4px 16px rgba(212, 165, 116, 0.12);
+  box-shadow: 0 4px 16px rgba(26, 71, 42, 0.12);
   transform: translateY(-2px);
 }
 
@@ -62,7 +62,7 @@
   width: 100%;
   height: 100%;
   border-radius: 50%;
-  background: linear-gradient(135deg, #d4a574 0%, #c19563 100%);
+  background: linear-gradient(135deg, #1a472a 0%, #2d5f3f 100%);
   color: white;
   display: flex;
   align-items: center;
@@ -121,7 +121,7 @@
 
 .product-link:hover {
   background: #f1f5f9;
-  border-color: #d4a574;
+  border-color: #1a472a;
   transform: translateX(4px);
 }
 
@@ -142,7 +142,7 @@
 }
 
 .product-info-text svg {
-  color: #d4a574;
+  color: #1a472a;
   flex-shrink: 0;
 }
 
@@ -233,7 +233,7 @@
 /* Admin Reply */
 .review-admin-reply {
   background: #fef8f0;
-  border-left: 3px solid #d4a574;
+  border-left: 3px solid #1a472a;
   border-radius: 0 8px 8px 0;
   padding: 0.75rem 1rem;
   margin-top: 0.75rem;
@@ -286,8 +286,8 @@
 
 .reply-textarea:focus {
   outline: none;
-  border-color: #d4a574;
-  box-shadow: 0 0 0 3px rgba(212, 165, 116, 0.1);
+  border-color: #1a472a;
+  box-shadow: 0 0 0 3px rgba(26, 71, 42, 0.1);
 }
 
 .reply-actions {
@@ -321,8 +321,8 @@
 
 .btn-reply:hover {
   background: #fef8f0;
-  border-color: #d4a574;
-  color: #d4a574;
+  border-color: #1a472a;
+  color: #1a472a;
 }
 
 /* ===== FIX lỗi dư ===== */
@@ -362,7 +362,7 @@
 
 .progress-fill {
   height: 100%;
-  background: linear-gradient(135deg, #d4a574 0%, #c19563 100%);
+  background: linear-gradient(135deg, #1a472a 0%, #2d5f3f 100%);
   border-radius: 2px;
   transition: width 0.3s ease;
 }
@@ -395,14 +395,14 @@
 }
 
 .progress-step.completed .step-circle {
-  background: linear-gradient(135deg, #d4a574 0%, #c19563 100%);
-  border-color: #d4a574;
+  background: linear-gradient(135deg, #1a472a 0%, #2d5f3f 100%);
+  border-color: #1a472a;
   color: #fff;
 }
 
 .progress-step.current .step-circle {
-  border-color: #d4a574;
-  color: #d4a574;
+  border-color: #1a472a;
+  color: #1a472a;
 }
 
 .step-text {
@@ -415,6 +415,134 @@
 .progress-step.current .step-text {
   color: #334155;
   font-weight: 500;
+}
+
+/* Todo Alerts Section */
+.ar-todo-alerts {
+  background: linear-gradient(135deg, #fff9e6 0%, #fff5d6 100%);
+  border-radius: 16px;
+  padding: 20px;
+  margin-bottom: 24px;
+  border: 1px solid #fde68a;
+}
+
+.ar-todo-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #92400e;
+  margin-bottom: 16px;
+}
+
+.ar-todo-icon {
+  font-size: 20px;
+}
+
+.ar-todo-count {
+  background: #f59e0b;
+  color: white;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 10px;
+  margin-left: auto;
+}
+
+.ar-todo-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 12px;
+}
+
+.ar-todo-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: white;
+  border: 1px solid transparent;
+}
+
+.ar-todo-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.ar-todo-urgent {
+  border-color: #fecaca;
+}
+
+.ar-todo-urgent:hover {
+  border-color: #ef4444;
+}
+
+.ar-todo-warning {
+  border-color: #fde68a;
+}
+
+.ar-todo-warning:hover {
+  border-color: #f59e0b;
+}
+
+.ar-todo-item-icon {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.ar-todo-urgent .ar-todo-item-icon {
+  background: linear-gradient(135deg, #fecaca, #fee2e2);
+}
+
+.ar-todo-warning .ar-todo-item-icon {
+  background: linear-gradient(135deg, #fde68a, #fef3c7);
+}
+
+.ar-todo-item-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.ar-todo-item-content strong {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.ar-todo-urgent .ar-todo-item-content strong {
+  color: #dc2626;
+}
+
+.ar-todo-warning .ar-todo-item-content strong {
+  color: #d97706;
+}
+
+.ar-todo-item-content span {
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.ar-todo-arrow {
+  color: #9ca3af;
+  font-size: 18px;
+  transition: transform 0.3s ease;
+}
+
+.ar-todo-item:hover .ar-todo-arrow {
+  transform: translateX(4px);
+  color: #1a472a;
 }
 
 /* Responsive */

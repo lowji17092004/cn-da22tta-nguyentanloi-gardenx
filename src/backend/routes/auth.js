@@ -27,9 +27,9 @@ const generateOTP = () => {
 // Send OTP via Email
 const sendOTPEmail = async (email, otp, userName) => {
   const mailOptions = {
-    from: `"The Sun Garden" <${process.env.EMAIL_USER || 'your-email@gmail.com'}>`,
+    from: `"FLORÉN" <${process.env.EMAIL_USER || 'your-email@gmail.com'}>`,
     to: email,
-    subject: '🌻 Mã OTP đặt lại mật khẩu - The Sun Garden',
+    subject: '🌿 Mã OTP đặt lại mật khẩu - FLORÉN',
     html: `
       <!DOCTYPE html>
       <html>
@@ -81,6 +81,7 @@ const sendOTPEmail = async (email, otp, userName) => {
             font-weight: 700;
             margin: 0 0 5px;
             text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            letter-spacing: 1px;
           }
           .brand-tagline {
             font-size: 14px;
@@ -196,15 +197,15 @@ const sendOTPEmail = async (email, otp, userName) => {
           <div class="container">
             <div class="header">
               <div class="logo-container">
-                <span class="logo-icon">🌻</span>
+                <span class="logo-icon">�</span>
               </div>
-              <h1 class="brand-name">The Sun Garden</h1>
+              <h1 class="brand-name">FLORÉN</h1>
               <p class="brand-tagline">Mang thiên nhiên vào ngôi nhà của bạn</p>
             </div>
             <div class="content">
               <p class="greeting">Xin chào <strong>${userName}</strong> 👋</p>
               <p class="message">
-                Chúng tôi nhận được yêu cầu đặt lại mật khẩu cho tài khoản của bạn tại The Sun Garden. 
+                Chúng tôi nhận được yêu cầu đặt lại mật khẩu cho tài khoản của bạn tại FLORÉN. 
                 Vui lòng sử dụng mã OTP bên dưới để tiếp tục:
               </p>
               
@@ -229,14 +230,14 @@ const sendOTPEmail = async (email, otp, userName) => {
               </p>
             </div>
             <div class="footer">
-              <div class="footer-logo">🌻🌿🌸</div>
-              <p class="footer-text"><strong>The Sun Garden</strong></p>
-              <p class="footer-text">Chuyên cung cấp hoa tươi, cây cảnh và phụ kiện trang trí</p>
+              <div class="footer-logo">�🌱🍃</div>
+              <p class="footer-text"><strong>FLORÉN</strong></p>
+              <p class="footer-text">Mang thiên nhiên vào ngôi nhà của bạn</p>
               <div class="contact-info">
                 <p>📍 123 Đường ABC, Quận XYZ, TP. Trà Vinh</p>
-                <p>📞 0123 456 789 | ✉️ support@thesungarden.vn</p>
+                <p>📞 0123 456 789 | ✉️ support@floren.vn</p>
               </div>
-              <p class="footer-text" style="margin-top: 15px;">© 2024 The Sun Garden. All rights reserved.</p>
+              <p class="footer-text" style="margin-top: 15px;">© 2024 FLORÉN. All rights reserved.</p>
             </div>
           </div>
         </div>
@@ -257,9 +258,9 @@ const sendOTPEmail = async (email, otp, userName) => {
 // Send Verification Email for Registration
 const sendVerificationEmail = async (email, otp, userName) => {
   const mailOptions = {
-    from: `"The Sun Garden" <${process.env.EMAIL_USER || 'your-email@gmail.com'}>`,
+    from: `"FLORÉN" <${process.env.EMAIL_USER || 'your-email@gmail.com'}>`,
     to: email,
-    subject: '🌻 Xác minh email đăng ký - The Sun Garden',
+    subject: '🌿 Xác minh email đăng ký - FLORÉN',
     html: `
       <!DOCTYPE html>
       <html>
@@ -304,7 +305,7 @@ const sendVerificationEmail = async (email, otp, userName) => {
             box-shadow: 0 4px 15px rgba(0,0,0,0.2);
           }
           .logo-icon { font-size: 40px; }
-          .brand-name { font-size: 28px; font-weight: 700; margin: 0 0 5px; }
+          .brand-name { font-size: 28px; font-weight: 700; margin: 0 0 5px; letter-spacing: 1px; }
           .brand-tagline { font-size: 14px; opacity: 0.9; margin: 0; }
           .content { padding: 40px 30px; }
           .greeting { font-size: 18px; color: #2d5a27; margin-bottom: 15px; }
@@ -354,15 +355,15 @@ const sendVerificationEmail = async (email, otp, userName) => {
           <div class="container">
             <div class="header">
               <div class="logo-container">
-                <span class="logo-icon">🌻</span>
+                <span class="logo-icon">�</span>
               </div>
-              <h1 class="brand-name">The Sun Garden</h1>
+              <h1 class="brand-name">FLORÉN</h1>
               <p class="brand-tagline">Chào mừng bạn đến với gia đình chúng tôi!</p>
             </div>
             <div class="content">
               <p class="greeting">Xin chào <strong>${userName}</strong> 👋</p>
               <p class="message">
-                Cảm ơn bạn đã đăng ký tài khoản tại The Sun Garden! 
+                Cảm ơn bạn đã đăng ký tài khoản tại FLORÉN! 
                 Để hoàn tất quá trình đăng ký, vui lòng nhập mã xác minh bên dưới:
               </p>
               
@@ -387,10 +388,10 @@ const sendVerificationEmail = async (email, otp, userName) => {
               </div>
             </div>
             <div class="footer">
-              <div class="footer-logo">🌻🌿🌸</div>
-              <p class="footer-text"><strong>The Sun Garden</strong></p>
-              <p class="footer-text">Chuyên cung cấp hoa tươi, cây cảnh và phụ kiện trang trí</p>
-              <p class="footer-text" style="margin-top: 15px;">© 2024 The Sun Garden. All rights reserved.</p>
+              <div class="footer-logo">�🌱🍃</div>
+              <p class="footer-text"><strong>FLORÉN</strong></p>
+              <p class="footer-text">Mang thiên nhiên vào ngôi nhà của bạn</p>
+              <p class="footer-text" style="margin-top: 15px;">© 2024 FLORÉN. All rights reserved.</p>
             </div>
           </div>
         </div>

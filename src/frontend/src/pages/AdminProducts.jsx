@@ -16,10 +16,13 @@ export default function AdminProducts(){
   const [filterCategory, setFilterCategory] = useState('')
   const [filterStock, setFilterStock] = useState('')
   const [filterVisibility, setFilterVisibility] = useState('all') // all, visible, hidden
+  const [filterSpecial, setFilterSpecial] = useState('') // bestseller, new, featured
   const [sortBy, setSortBy] = useState('name')
   const [viewMode, setViewMode] = useState('table')
   const [deleteModal, setDeleteModal] = useState({ show: false, item: null })
   const [toast, setToast] = useState(null)
+  const [notifications, setNotifications] = useState([])
+  const [lastUpdated, setLastUpdated] = useState(null)
 
   const showToast = useCallback((message, type = 'success') => {
     setToast({ message, type })
@@ -38,8 +41,33 @@ export default function AdminProducts(){
         api.get('/products?includeHidden=true'),
         api.get('/categories?type=product')
       ])
-      setItems(Array.isArray(productsRes.data) ? productsRes.data : [])
+      const products = Array.isArray(productsRes.data) ? productsRes.data : []
+      setItems(products)
       setCategories(Array.isArray(categoriesRes.data) ? categoriesRes.data : [])
+      setLastUpdated(new Date())
+      
+      // Build notifications based on stock status
+      const newNotifications = []
+      const outOfStock = products.filter(p => Number(p.stock || 0) === 0)
+      const lowStock = products.filter(p => Number(p.stock || 0) > 0 && Number(p.stock) < 10)
+      
+      if (outOfStock.length > 0) {
+        newNotifications.push({
+          type: 'danger',
+          icon: '🚫',
+          title: `${outOfStock.length} sản phẩm hết hàng`,
+          message: outOfStock.slice(0, 3).map(p => p.name).join(', ') + (outOfStock.length > 3 ? '...' : '')
+        })
+      }
+      if (lowStock.length > 0) {
+        newNotifications.push({
+          type: 'warning',
+          icon: '⚠️',
+          title: `${lowStock.length} sản phẩm sắp hết hàng`,
+          message: lowStock.slice(0, 3).map(p => `${p.name} (còn ${p.stock})`).join(', ') + (lowStock.length > 3 ? '...' : '')
+        })
+      }
+      setNotifications(newNotifications)
     }catch(e){
       console.error('Load products failed', e)
     }finally{
@@ -82,7 +110,15 @@ export default function AdminProducts(){
         (filterVisibility === 'visible' && !item.isHidden) ||
         (filterVisibility === 'hidden' && item.isHidden)
 
-      return matchSearch && matchCategory && matchStock && matchVisibility
+      // Special filter (bestseller, new, featured)
+      const sold = Number(item.sold || 0)
+      const isNew = new Date() - new Date(item.createdAt) < 7 * 24 * 60 * 60 * 1000 // 7 days
+      const matchSpecial = !filterSpecial || 
+        (filterSpecial === 'bestseller' && sold >= 10) ||
+        (filterSpecial === 'new' && isNew) ||
+        (filterSpecial === 'featured' && item.isFeatured)
+
+      return matchSearch && matchCategory && matchStock && matchVisibility && matchSpecial
     })
 
     result.sort((a,b) => {
@@ -99,7 +135,7 @@ export default function AdminProducts(){
     })
 
     return result
-  }, [items, debouncedSearch, filterCategory, filterStock, filterVisibility, sortBy])
+  }, [items, debouncedSearch, filterCategory, filterStock, filterVisibility, filterSpecial, sortBy])
 
   // pagination helpers
   const totalPages = Math.max(1, Math.ceil(filteredItems.length / perPage))
@@ -152,7 +188,10 @@ export default function AdminProducts(){
     const out = items.filter(it => Number(it.stock || 0) === 0).length
     const visible = items.filter(it => !it.isHidden).length
     const hidden = items.filter(it => it.isHidden).length
-    return { all, ok, low, out, visible, hidden }
+    const bestseller = items.filter(it => Number(it.sold || 0) >= 10).length
+    const newProducts = items.filter(it => new Date() - new Date(it.createdAt) < 7 * 24 * 60 * 60 * 1000).length
+    const featured = items.filter(it => it.isFeatured).length
+    return { all, ok, low, out, visible, hidden, bestseller, newProducts, featured }
   }, [items])
 
   // Get category and subcategory display names
@@ -218,6 +257,52 @@ export default function AdminProducts(){
     return n.toLocaleString('vi-VN') + ' ₫'
   }, [])
 
+  // Get product image URL with proper path
+  const getImageUrl = useCallback((item) => {
+    if (item.images?.[0]) {
+      if (item.images[0].startsWith('http')) return item.images[0]
+      return `http://localhost:5000${item.images[0]}`
+    }
+    if (item.imageUrl) {
+      if (item.imageUrl.startsWith('http')) return item.imageUrl
+      return `http://localhost:5000${item.imageUrl}`
+    }
+    return null
+  }, [])
+
+  // Check if product is bestseller (sold >= 10)
+  const isBestseller = useCallback((item) => {
+    return Number(item.sold || 0) >= 10
+  }, [])
+
+  // Check if product is new (created within 7 days)
+  const isNewProduct = useCallback((item) => {
+    return new Date() - new Date(item.createdAt) < 7 * 24 * 60 * 60 * 1000
+  }, [])
+
+  // Handle stat card click to filter
+  const handleStatClick = useCallback((type) => {
+    setFilterStock('')
+    setFilterSpecial('')
+    setPage(1)
+    
+    switch(type) {
+      case 'all':
+        break
+      case 'low':
+      case 'out':
+        setFilterStock(type)
+        break
+      case 'bestseller':
+      case 'new':
+      case 'featured':
+        setFilterSpecial(type)
+        break
+      default:
+        break
+    }
+  }, [])
+
   return (
     <AdminLayout>
       <div className="ap-page">
@@ -250,10 +335,26 @@ export default function AdminProducts(){
               </Link>
             </div>
 
-            {/* Stats */}
+            {/* Notifications */}
+            {notifications.length > 0 && (
+              <div className="ap-notifications">
+                {notifications.map((notif, idx) => (
+                  <div key={idx} className={`ap-notification ap-notification-${notif.type}`}>
+                    <span className="ap-notification-icon">{notif.icon}</span>
+                    <div className="ap-notification-content">
+                      <strong>{notif.title}</strong>
+                      <span>{notif.message}</span>
+                    </div>
+                    <button className="ap-notification-close" onClick={() => setNotifications(prev => prev.filter((_, i) => i !== idx))}>×</button>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Stats - Clickable */}
             <div className="ap-stats">
-              <div className="ap-stat-card">
-                <div className="ap-stat-icon" style={{background: 'linear-gradient(135deg, #d4a574 0%, #c9965f 100%)'}}>
+              <div className={`ap-stat-card ap-stat-clickable ${!filterStock && !filterSpecial ? 'active' : ''}`} onClick={() => handleStatClick('all')}>
+                <div className="ap-stat-icon" style={{background: 'linear-gradient(135deg, #1a472a 0%, #2d7a4a 100%)'}}>
                   <svg width="24" height="24" fill="none" stroke="white" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
                   </svg>
@@ -264,7 +365,7 @@ export default function AdminProducts(){
                 </div>
               </div>
 
-              <div className="ap-stat-card">
+              <div className={`ap-stat-card ap-stat-clickable ${filterStock === 'low' || filterStock === 'out' ? 'active' : ''}`} onClick={() => handleStatClick('low')}>
                 <div className="ap-stat-icon" style={{background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)'}}>
                   <svg width="24" height="24" fill="none" stroke="white" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
@@ -274,20 +375,84 @@ export default function AdminProducts(){
                   <div className="ap-stat-value">{stockCounts.low + stockCounts.out}</div>
                   <div className="ap-stat-label">Sắp hết/Hết hàng</div>
                 </div>
+                {(stockCounts.low + stockCounts.out > 0) && <span className="ap-stat-alert">!</span>}
               </div>
 
-              <div className="ap-stat-card">
+              <div className={`ap-stat-card ap-stat-clickable ${filterSpecial === 'bestseller' ? 'active' : ''}`} onClick={() => handleStatClick('bestseller')}>
+                <div className="ap-stat-icon" style={{background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)'}}>
+                  <svg width="24" height="24" fill="none" stroke="white" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9.879 16.121A3 3 0 1012.015 11L11 14H9c0 .768.293 1.536.879 2.121z" />
+                  </svg>
+                </div>
+                <div className="ap-stat-content">
+                  <div className="ap-stat-value">{stockCounts.bestseller}</div>
+                  <div className="ap-stat-label">Bán chạy</div>
+                </div>
+              </div>
+
+              <div className={`ap-stat-card ap-stat-clickable ${filterSpecial === 'new' ? 'active' : ''}`} onClick={() => handleStatClick('new')}>
+                <div className="ap-stat-icon" style={{background: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)'}}>
+                  <svg width="24" height="24" fill="none" stroke="white" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+                <div className="ap-stat-content">
+                  <div className="ap-stat-value">{stockCounts.newProducts}</div>
+                  <div className="ap-stat-label">Mới (7 ngày)</div>
+                </div>
+              </div>
+
+              <div className={`ap-stat-card ap-stat-clickable`} onClick={() => handleStatClick('out')}>
                 <div className="ap-stat-icon" style={{background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)'}}>
                   <svg width="24" height="24" fill="none" stroke="white" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                 </div>
                 <div className="ap-stat-content">
-                  <div className="ap-stat-value">{(items.reduce((sum, it) => sum + ((Number(it.price) || 0) * (Number(it.stock) || 0)), 0) / 1000000).toFixed(1)}M</div>
+                  <div className="ap-stat-value">{items.reduce((sum, it) => sum + ((Number(it.price) || 0) * (Number(it.stock) || 0)), 0).toLocaleString('vi-VN')}đ</div>
                   <div className="ap-stat-label">Giá trị kho hàng</div>
                 </div>
               </div>
+
+              {lastUpdated && (
+                <div className="ap-last-updated">
+                  <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <span>Cập nhật: {lastUpdated.toLocaleTimeString('vi-VN')}</span>
+                  <button className="ap-refresh-btn" onClick={load} title="Làm mới dữ liệu">
+                    <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                    </svg>
+                    <span className="refresh-text">↻ Tải lại</span>
+                  </button>
+                </div>
+              )}
             </div>
+
+            {/* Active Filter Indicator */}
+            {(filterStock || filterSpecial) && (
+              <div className="ap-active-filter">
+                <span className="ap-filter-label">
+                  Đang lọc: 
+                  <strong>
+                    {filterStock === 'low' && ' Sắp hết hàng'}
+                    {filterStock === 'out' && ' Hết hàng'}
+                    {filterSpecial === 'bestseller' && ' Bán chạy'}
+                    {filterSpecial === 'new' && ' Sản phẩm mới'}
+                    {filterSpecial === 'featured' && ' Nổi bật'}
+                  </strong>
+                  ({filteredItems.length} sản phẩm)
+                </span>
+                <button className="ap-clear-filter" onClick={() => { setFilterStock(''); setFilterSpecial(''); }}>
+                  <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                  Xóa bộ lọc
+                </button>
+              </div>
+            )}
 
             {items.length === 0 ? (
               <div className="ap-empty">
@@ -404,11 +569,11 @@ export default function AdminProducts(){
                       </thead>
                       <tbody>
                         {pagedItems.map(it => (
-                          <tr key={it._id}>
+                          <tr key={it._id} className={it.isHidden ? 'ap-row-hidden' : ''}>
                             <td>
                               <div className="ap-table-image">
-                                {it.images?.[0] ? (
-                                  <img src={it.images[0]} alt={it.name} />
+                                {getImageUrl(it) ? (
+                                  <img src={getImageUrl(it)} alt={it.name} onError={(e) => e.target.style.display = 'none'} />
                                 ) : (
                                   <div className="ap-image-placeholder">
                                     <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -416,14 +581,26 @@ export default function AdminProducts(){
                                     </svg>
                                   </div>
                                 )}
+                                {/* Product Status Badges */}
+                                <div className="ap-image-badges">
+                                  {isBestseller(it) && <span className="ap-img-badge bestseller" title="Bán chạy">🔥</span>}
+                                  {isNewProduct(it) && !isBestseller(it) && <span className="ap-img-badge new" title="Mới">✨</span>}
+                                  {Number(it.stock) > 0 && Number(it.stock) < 10 && <span className="ap-img-badge low-stock" title="Sắp hết">⚠️</span>}
+                                  {Number(it.stock) === 0 && <span className="ap-img-badge out-stock" title="Hết hàng">🚫</span>}
+                                  {it.featured && <span className="ap-img-badge featured" title="Nổi bật">⭐</span>}
+                                </div>
                               </div>
                             </td>
                             <td>
                               <div className="ap-product-info">
                                 <Link to={`/product/${it._id}`} className="ap-product-name" style={{textDecoration: 'none', color: 'inherit', cursor: 'pointer'}}>
-                                  <div className="ap-product-name">{it.name}</div>
+                                  <div className="ap-product-name">
+                                    {it.name}
+                                    {isBestseller(it) && <span className="ap-bestseller-text">Bán chạy</span>}
+                                  </div>
                                 </Link>
                                 <div className="ap-product-desc">{it.description?.substring(0, 50)}{it.description?.length > 50 ? '...' : ''}</div>
+                                {it.sold > 0 && <div className="ap-product-sold">Đã bán: {it.sold}</div>}
                               </div>
                             </td>
                             <td>
@@ -444,9 +621,24 @@ export default function AdminProducts(){
                             </td>
                             <td><strong className="ap-price">{formatCurrency(it.price)}</strong></td>
                             <td>
-                              <span className={`ap-stock-badge ${Number(it.stock) === 0 ? 'out' : Number(it.stock) < 10 ? 'low' : 'ok'}`}>
-                                {Number(it.stock) || 0}
-                              </span>
+                              <div className="ap-stock-cell">
+                                <span className={`ap-stock-badge ${Number(it.stock) === 0 ? 'out' : Number(it.stock) < 10 ? 'low' : 'ok'}`}>
+                                  {Number(it.stock) === 0 ? (
+                                    <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
+                                    </svg>
+                                  ) : Number(it.stock) < 10 ? (
+                                    <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                    </svg>
+                                  ) : (
+                                    <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                                    </svg>
+                                  )}
+                                  <span>{Number(it.stock) || 0}</span>
+                                </span>
+                              </div>
                             </td>
                             <td>
                               {it.isHidden ? (
@@ -506,12 +698,10 @@ export default function AdminProducts(){
                 ) : (
                   <div className="ap-grid">
                     {pagedItems.map(it => (
-                      <div key={it._id} className="ap-product-card">
+                      <div key={it._id} className={`ap-product-card ${it.isHidden ? 'ap-card-hidden' : ''}`}>
                         <div className="ap-card-image">
-                          {it.images && it.images.length > 0 ? (
-                            <img src={it.images[0]} alt={it.name} />
-                          ) : it.imageUrl ? (
-                            <img src={it.imageUrl} alt={it.name} />
+                          {getImageUrl(it) ? (
+                            <img src={getImageUrl(it)} alt={it.name} onError={(e) => e.target.style.display = 'none'} />
                           ) : (
                             <div className="ap-card-placeholder">
                               <svg width="32" height="32" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -520,11 +710,26 @@ export default function AdminProducts(){
                             </div>
                           )}
 
-                          {Number(it.stock) <= 5 && Number(it.stock) > 0 && (
-                            <span className="ap-card-badge warning">Sắp hết</span>
-                          )}
-                          {Number(it.stock) === 0 && (
-                            <span className="ap-card-badge danger">Hết hàng</span>
+                          {/* Product Status Badges */}
+                          <div className="ap-card-badges">
+                            {isBestseller(it) && (
+                              <span className="ap-card-badge bestseller">🔥 Bán chạy</span>
+                            )}
+                            {isNewProduct(it) && !isBestseller(it) && (
+                              <span className="ap-card-badge new">✨ Mới</span>
+                            )}
+                            {!isBestseller(it) && !isNewProduct(it) && Number(it.stock) <= 5 && Number(it.stock) > 0 && (
+                              <span className="ap-card-badge warning">⚠️ Sắp hết</span>
+                            )}
+                            {Number(it.stock) === 0 && (
+                              <span className="ap-card-badge danger">🚫 Hết hàng</span>
+                            )}
+                            {it.featured && (
+                              <span className="ap-card-badge featured">⭐ Nổi bật</span>
+                            )}
+                          </div>
+                          {it.isHidden && (
+                            <span className="ap-card-badge hidden">👁️ Đang ẩn</span>
                           )}
                         </div>
 
@@ -538,8 +743,14 @@ export default function AdminProducts(){
                             </div>
                             <div className="meta-row">
                               <span className="meta-label">Kho:</span>
-                              <span className={`meta-value stock ${Number(it.stock) <= 5 ? 'low' : ''}`}>{Number(it.stock) || 0}</span>
+                              <span className={`meta-value stock ${Number(it.stock) === 0 ? 'out' : Number(it.stock) <= 5 ? 'low' : ''}`}>{Number(it.stock) || 0}</span>
                             </div>
+                            {it.sold > 0 && (
+                              <div className="meta-row">
+                                <span className="meta-label">Đã bán:</span>
+                                <span className="meta-value sold">{it.sold}</span>
+                              </div>
+                            )}
                             {it.category && (
                               <div className="meta-row">
                                 <div className="ap-card-categories">
@@ -565,6 +776,13 @@ export default function AdminProducts(){
                                 <span>Sửa</span>
                               </button>
                             </Link>
+                            <button 
+                              onClick={() => toggleVisibility(it)} 
+                              className={`ap-btn-toggle ${it.isHidden ? 'show' : 'hide'}`}
+                              title={it.isHidden ? 'Hiện sản phẩm' : 'Ẩn sản phẩm'}
+                            >
+                              {it.isHidden ? '👁️' : '🙈'}
+                            </button>
                             <button onClick={()=>remove(it)} className="ap-btn-danger">
                               <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />

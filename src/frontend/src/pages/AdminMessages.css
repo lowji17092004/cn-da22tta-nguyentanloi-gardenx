@@ -1,11 +1,95 @@
 /* Admin Messages - Chat Interface Styles */
+
+/* Todo Alerts Section */
+.am-todo-alerts {
+  background: linear-gradient(135deg, #fff9e6 0%, #fff5d6 100%);
+  border-radius: 16px;
+  padding: 20px;
+  margin-bottom: 20px;
+  border: 1px solid #fde68a;
+}
+
+.am-todo-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #92400e;
+  margin-bottom: 16px;
+}
+
+.am-todo-icon {
+  font-size: 20px;
+}
+
+.am-todo-count {
+  background: #f59e0b;
+  color: white;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 10px;
+  margin-left: auto;
+}
+
+.am-todo-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+
+.am-todo-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: white;
+  border: 1px solid transparent;
+}
+
+.am-todo-urgent {
+  border-color: #fecaca;
+}
+
+.am-todo-item-icon {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  font-size: 18px;
+  flex-shrink: 0;
+  background: linear-gradient(135deg, #fecaca, #fee2e2);
+}
+
+.am-todo-item-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.am-todo-item-content strong {
+  font-size: 14px;
+  font-weight: 600;
+  color: #dc2626;
+}
+
+.am-todo-item-content span {
+  font-size: 12px;
+  color: #6b7280;
+}
+
 .am-chat-container {
   display: flex;
   height: calc(100vh - 80px);
   background: white;
   border-radius: 16px;
   overflow: hidden;
-  box-shadow: 0 4px 20px rgba(212, 165, 116, 0.08);
+  box-shadow: 0 4px 20px rgba(26, 71, 42, 0.08);
   max-width: 100%;
 }
 
@@ -94,8 +178,8 @@
 }
 
 .am-chat-item.active {
-  background: #d4a574;
-  background: linear-gradient(135deg, #d4a574 0%, #c19563 100%);
+  background: #1a472a;
+  background: linear-gradient(135deg, #1a472a 0%, #2d5f3f 100%);
 }
 
 .am-chat-item.active * {
@@ -120,7 +204,7 @@
 }
 
 .am-avatar-placeholder {
-  background: linear-gradient(135deg, #d4a574 0%, #c19563 100%);
+  background: linear-gradient(135deg, #1a472a 0%, #2d5f3f 100%);
   color: white;
   display: flex;
   align-items: center;
@@ -131,7 +215,7 @@
 
 .am-chat-item.active .am-avatar-placeholder {
   background: white;
-  color: #d4a574;
+  color: #1a472a;
 }
 
 .am-avatar-badge {
@@ -195,7 +279,7 @@
 }
 
 .am-chat-unread {
-  background: #d4a574;
+  background: #1a472a;
   color: white;
   font-size: 11px;
   font-weight: 600;
@@ -295,7 +379,7 @@
 }
 
 .am-chat-message.admin .am-message-bubble {
-  background: linear-gradient(135deg, #d4a574 0%, #c19563 100%);
+  background: linear-gradient(135deg, #1a472a 0%, #2d5f3f 100%);
   color: white;
   border-bottom-right-radius: 4px;
 }
@@ -350,7 +434,7 @@
   height: 44px;
   border: none;
   background: transparent;
-  color: #d4a574;
+  color: #1a472a;
   border-radius: 50%;
   cursor: pointer;
   display: flex;
@@ -363,11 +447,11 @@
 .am-chat-input-container button svg {
   width: 24px;
   height: 24px;
-  fill: #d4a574;
+  fill: #1a472a;
 }
 
 .am-send-btn {
-  background: linear-gradient(135deg, #d4a574 0%, #c19563 100%);
+  background: linear-gradient(135deg, #1a472a 0%, #2d5f3f 100%);
   box-shadow: 0 8px 20px rgba(217, 119, 6, 0.25);
   color: white;
 }
@@ -382,12 +466,12 @@
 }
 
 .am-chat-input-container button:hover:not(:disabled) {
-  background: rgba(212, 165, 116, 0.1);
+  background: rgba(26, 71, 42, 0.1);
   transform: scale(1.1);
 }
 
 .am-chat-input-container button:hover:not(:disabled) svg {
-  fill: #c19563;
+  fill: #2d5f3f;
 }
 
 .am-chat-input-container button:disabled {

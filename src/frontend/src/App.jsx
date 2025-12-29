@@ -1,5 +1,5 @@
 import React from 'react'
-import { Routes, Route, useLocation } from 'react-router-dom'
+import { Routes, Route, useLocation, Navigate } from 'react-router-dom'
 import Home from './pages/HomeNew'
 import Shop from './pages/Shop'
 import CategoryPage from './pages/CategoryPage'
@@ -15,7 +15,6 @@ import PolicyPrivacy from './pages/PolicyPrivacy'
 import PolicyWarranty from './pages/PolicyWarranty'
 import PolicyPayment from './pages/PolicyPayment'
 import PolicyShipping from './pages/PolicyShipping'
-import Admin from './pages/Admin'
 import Login from './pages/Login'
 import Register from './pages/Register'
 import ForgotPassword from './pages/ForgotPassword'
@@ -118,7 +117,8 @@ function AppContent() {
           
           <Route path="/admin/messages" element={<ProtectedRoute roles={['admin', 'collaborator']}><AdminMessages/></ProtectedRoute>} />
 
-          <Route path="/admin" element={<ProtectedRoute role={'admin'}><Admin/></ProtectedRoute>} />
+          {/* Redirect /admin to /admin/products */}
+          <Route path="/admin" element={<Navigate to="/admin/products" replace />} />
           
           {/* Collaborator Routes */}
           <Route path="/collaborator" element={<ProtectedRoute role={'collaborator'}><CollaboratorDashboard/></ProtectedRoute>} />

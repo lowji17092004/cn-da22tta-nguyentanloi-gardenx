@@ -118,6 +118,37 @@ export default function AdminReviews() {
         </div>
       </div>
 
+      {/* Todo Alerts - Việc cần làm */}
+      {!loading && stats.needReply > 0 && (
+        <div className="ar-todo-alerts">
+          <div className="ar-todo-title">
+            <span className="ar-todo-icon">📋</span>
+            <span>Việc cần làm</span>
+            <span className="ar-todo-count">{stats.needReply}</span>
+          </div>
+          <div className="ar-todo-grid">
+            <div className="ar-todo-item ar-todo-warning" onClick={() => setFilterReplied('pending')}>
+              <span className="ar-todo-item-icon">💬</span>
+              <div className="ar-todo-item-content">
+                <strong>{stats.needReply} đánh giá chờ phản hồi</strong>
+                <span>Phản hồi khách hàng để tăng sự hài lòng</span>
+              </div>
+              <span className="ar-todo-arrow">→</span>
+            </div>
+            {reviews.filter(r => r.rating <= 2 && !r.reply?.content).length > 0 && (
+              <div className="ar-todo-item ar-todo-urgent" onClick={() => { setFilterRating('1'); setFilterReplied('pending'); }}>
+                <span className="ar-todo-item-icon">⚠️</span>
+                <div className="ar-todo-item-content">
+                  <strong>{reviews.filter(r => r.rating <= 2 && !r.reply?.content).length} đánh giá thấp cần xử lý</strong>
+                  <span>Đánh giá 1-2 sao cần phản hồi ngay</span>
+                </div>
+                <span className="ar-todo-arrow">→</span>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
       {!loading && reviews.length > 0 && (
         <>
           {/* Stats Row */}

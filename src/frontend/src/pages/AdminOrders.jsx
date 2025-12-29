@@ -20,6 +20,10 @@ export default function AdminOrders() {
   const [expandedProducts, setExpandedProducts] = useState({})
   const [expandedProductsInTable, setExpandedProductsInTable] = useState({})
   const [toast, setToast] = useState(null)
+  
+  // Pagination
+  const [currentPage, setCurrentPage] = useState(1)
+  const [itemsPerPage, setItemsPerPage] = useState(10)
 
   const showToast = (message, type = 'success') => {
     setToast({ message, type })
@@ -138,6 +142,17 @@ export default function AdminOrders() {
       }
     })
 
+  // Pagination logic
+  const totalPages = Math.ceil(filteredOrders.length / itemsPerPage)
+  const startIndex = (currentPage - 1) * itemsPerPage
+  const endIndex = startIndex + itemsPerPage
+  const paginatedOrders = filteredOrders.slice(startIndex, endIndex)
+
+  // Reset to page 1 when filters change
+  React.useEffect(() => {
+    setCurrentPage(1)
+  }, [searchTerm, filterStatus, sortBy])
+
   const stats = {
     total: orders.length,
     pending: orders.filter(o => o.status === 'pending').length,
@@ -240,6 +255,59 @@ export default function AdminOrders() {
           </div>
         </div>
 
+        {/* Todo Alerts - Việc cần làm */}
+        {(stats.pending > 0 || stats.processing > 0) && (
+          <div className="ao-todo-alerts">
+            <div className="ao-todo-title">
+              <span className="ao-todo-icon">📋</span>
+              <span>Việc cần làm hôm nay</span>
+              <span className="ao-todo-count">{stats.pending + stats.processing}</span>
+            </div>
+            <div className="ao-todo-grid">
+              {stats.pending > 0 && (
+                <div className="ao-todo-item ao-todo-urgent" onClick={() => setFilterStatus('pending')}>
+                  <span className="ao-todo-item-icon">⏰</span>
+                  <div className="ao-todo-item-content">
+                    <strong>{stats.pending} đơn chờ xác nhận</strong>
+                    <span>Cần xác nhận ngay để khách không chờ lâu</span>
+                  </div>
+                  <span className="ao-todo-arrow">→</span>
+                </div>
+              )}
+              {orders.filter(o => o.status === 'confirmed').length > 0 && (
+                <div className="ao-todo-item ao-todo-warning" onClick={() => setFilterStatus('confirmed')}>
+                  <span className="ao-todo-item-icon">📦</span>
+                  <div className="ao-todo-item-content">
+                    <strong>{orders.filter(o => o.status === 'confirmed').length} đơn cần chuẩn bị</strong>
+                    <span>Đã xác nhận, cần đóng gói hàng</span>
+                  </div>
+                  <span className="ao-todo-arrow">→</span>
+                </div>
+              )}
+              {orders.filter(o => o.status === 'preparing').length > 0 && (
+                <div className="ao-todo-item ao-todo-info" onClick={() => setFilterStatus('preparing')}>
+                  <span className="ao-todo-item-icon">🚚</span>
+                  <div className="ao-todo-item-content">
+                    <strong>{orders.filter(o => o.status === 'preparing').length} đơn sẵn sàng giao</strong>
+                    <span>Đã đóng gói, chờ giao cho shipper</span>
+                  </div>
+                  <span className="ao-todo-arrow">→</span>
+                </div>
+              )}
+              {orders.filter(o => o.status === 'shipping').length > 0 && (
+                <div className="ao-todo-item ao-todo-shipping" onClick={() => setFilterStatus('shipping')}>
+                  <span className="ao-todo-item-icon">📍</span>
+                  <div className="ao-todo-item-content">
+                    <strong>{orders.filter(o => o.status === 'shipping').length} đơn đang giao</strong>
+                    <span>Theo dõi và cập nhật khi giao thành công</span>
+                  </div>
+                  <span className="ao-todo-arrow">→</span>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
         {/* Filters */}
         <div className="ao-filters">
           <div className="ao-search">
@@ -296,6 +364,20 @@ export default function AdminOrders() {
             <p>Thử thay đổi bộ lọc hoặc từ khóa tìm kiếm</p>
           </div>
         ) : (
+          <>
+          <div className="ao-table-info">
+            <span>Hiển thị {startIndex + 1} - {Math.min(endIndex, filteredOrders.length)} / {filteredOrders.length} đơn hàng</span>
+            <select 
+              value={itemsPerPage} 
+              onChange={(e) => { setItemsPerPage(Number(e.target.value)); setCurrentPage(1); }}
+              className="ao-select ao-select-small"
+            >
+              <option value={5}>5 / trang</option>
+              <option value={10}>10 / trang</option>
+              <option value={20}>20 / trang</option>
+              <option value={50}>50 / trang</option>
+            </select>
+          </div>
           <div className="ao-table-wrapper">
             <table className="ao-table">
               <thead>
@@ -310,7 +392,7 @@ export default function AdminOrders() {
                 </tr>
               </thead>
               <tbody>
-                {filteredOrders.map(order => (
+                {paginatedOrders.map(order => (
                   <React.Fragment key={order._id}>
                     <tr className={expandedRow === order._id ? 'expanded' : ''}>
                       <td>
@@ -517,6 +599,44 @@ export default function AdminOrders() {
               </tbody>
             </table>
           </div>
+          
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <div className="ao-pagination">
+              <button 
+                className="ao-page-btn"
+                onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                disabled={currentPage === 1}
+              >
+                &lt;
+              </button>
+              
+              <div className="ao-page-numbers">
+                {Array.from({ length: totalPages }, (_, i) => i + 1)
+                  .filter(p => p === 1 || p === totalPages || (p >= currentPage - 2 && p <= currentPage + 2))
+                  .map((p, idx, arr) => (
+                    <React.Fragment key={p}>
+                      {idx > 0 && arr[idx - 1] !== p - 1 && <span className="ao-page-dots">...</span>}
+                      <button
+                        className={`ao-page-num ${currentPage === p ? 'active' : ''}`}
+                        onClick={() => setCurrentPage(p)}
+                      >
+                        {p}
+                      </button>
+                    </React.Fragment>
+                  ))}
+              </div>
+              
+              <button 
+                className="ao-page-btn"
+                onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                disabled={currentPage === totalPages}
+              >
+                &gt;
+              </button>
+            </div>
+          )}
+          </>
         )}
       </div>
       {toast && (
