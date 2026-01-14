@@ -44,7 +44,7 @@ const PaymentSuccess = () => {
 
         <h1 className="success-title">🎉 Đặt hàng thành công!</h1>
         <p className="success-message">
-          Cảm ơn bạn đã tin tưởng và mua hàng tại The Sun Garden
+          Cảm ơn bạn đã tin tưởng và mua hàng tại Floréa
         </p>
 
         <div className="order-details-card">

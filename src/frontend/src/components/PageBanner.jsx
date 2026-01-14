@@ -129,7 +129,7 @@ const bannerData = {
   blogFlorana: {
     image: '/images/banner-florana.jpg',
     fallbackImage: 'https://images.unsplash.com/photo-1487530811176-3780de880c2d?w=1920',
-    title: 'Về The Sun Garden',
+    title: 'Về Floréa',
     slogan: 'Câu chuyện về đam mê và tình yêu với thiên nhiên',
     icon: '🌸'
   },
@@ -166,7 +166,7 @@ const bannerData = {
   default: {
     image: '/images/banner-default.jpg',
     fallbackImage: 'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=1920',
-    title: 'The Sun Garden',
+    title: 'Floréa',
     slogan: 'Mang thiên nhiên vào không gian sống của bạn',
     icon: '🌱'
   }

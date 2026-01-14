@@ -689,11 +689,41 @@ export default function AdminProducts(){
                     </table>
 
                     {/* pagination */}
-                    <div className="ap-pagination">
-                      <button onClick={() => setPage(p => Math.max(1, p-1))} disabled={page === 1}>Prev</button>
-                      <span>Trang {page} / {totalPages}</span>
-                      <button onClick={() => setPage(p => Math.min(totalPages, p+1))} disabled={page === totalPages}>Next</button>
-                    </div>
+                    {totalPages > 1 && (
+                      <div className="ap-pagination">
+                        <button 
+                          className="ap-page-btn"
+                          onClick={() => setPage(p => Math.max(1, p - 1))}
+                          disabled={page === 1}
+                        >
+                          &lt;
+                        </button>
+                        
+                        <div className="ap-page-numbers">
+                          {Array.from({ length: totalPages }, (_, i) => i + 1)
+                            .filter(p => p === 1 || p === totalPages || (p >= page - 2 && p <= page + 2))
+                            .map((p, idx, arr) => (
+                              <React.Fragment key={p}>
+                                {idx > 0 && arr[idx - 1] !== p - 1 && <span className="ap-page-dots">...</span>}
+                                <button
+                                  className={`ap-page-num ${page === p ? 'active' : ''}`}
+                                  onClick={() => setPage(p)}
+                                >
+                                  {p}
+                                </button>
+                              </React.Fragment>
+                            ))}
+                        </div>
+                        
+                        <button 
+                          className="ap-page-btn"
+                          onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+                          disabled={page === totalPages}
+                        >
+                          &gt;
+                        </button>
+                      </div>
+                    )}
                   </div>
                 ) : (
                   <div className="ap-grid">
@@ -795,11 +825,41 @@ export default function AdminProducts(){
                     ))}
 
                     {/* pagination grid */}
-                    <div className="ap-pagination">
-                      <button onClick={() => setPage(p => Math.max(1, p-1))} disabled={page === 1}>Prev</button>
-                      <span>Trang {page} / {totalPages}</span>
-                      <button onClick={() => setPage(p => Math.min(totalPages, p+1))} disabled={page === totalPages}>Next</button>
-                    </div>
+                    {totalPages > 1 && (
+                      <div className="ap-pagination">
+                        <button 
+                          className="ap-page-btn"
+                          onClick={() => setPage(p => Math.max(1, p - 1))}
+                          disabled={page === 1}
+                        >
+                          &lt;
+                        </button>
+                        
+                        <div className="ap-page-numbers">
+                          {Array.from({ length: totalPages }, (_, i) => i + 1)
+                            .filter(p => p === 1 || p === totalPages || (p >= page - 2 && p <= page + 2))
+                            .map((p, idx, arr) => (
+                              <React.Fragment key={p}>
+                                {idx > 0 && arr[idx - 1] !== p - 1 && <span className="ap-page-dots">...</span>}
+                                <button
+                                  className={`ap-page-num ${page === p ? 'active' : ''}`}
+                                  onClick={() => setPage(p)}
+                                >
+                                  {p}
+                                </button>
+                              </React.Fragment>
+                            ))}
+                        </div>
+                        
+                        <button 
+                          className="ap-page-btn"
+                          onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+                          disabled={page === totalPages}
+                        >
+                          &gt;
+                        </button>
+                      </div>
+                    )}
                   </div>
                 )}
               </>

@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react'
 import { Link, useNavigate, useLocation } from 'react-router-dom'
 import api from '../api'
-import './AuthSimple.css'
+import './AuthHorizontal.css'
 
 export default function VerifyOtp() {
   const [otp, setOtp] = useState(['', '', '', '', '', ''])
@@ -109,14 +109,16 @@ export default function VerifyOtp() {
 
     try {
       await api.post('/auth/verify-otp', { 
-        email: identifier, 
-        otp: code 
+        identifier: identifier,
+        otp: code,
+        method: method || 'email'
       })
       navigate('/reset-password', { 
         state: { 
           identifier, 
           otp: code,
-          verified: true 
+          verified: true,
+          method: method || 'email'
         } 
       })
     } catch (err) {
@@ -136,7 +138,10 @@ export default function VerifyOtp() {
     setLoading(true)
 
     try {
-      await api.post('/auth/forgot-password', { email: identifier })
+      await api.post('/auth/forgot-password', { 
+        identifier: identifier,
+        method: method || 'email'
+      })
       setTimer(600)
       setCanResend(false)
       setOtp(['', '', '', '', '', ''])
@@ -159,90 +164,155 @@ export default function VerifyOtp() {
 
   return (
     <div className="auth-page">
-      <div className="auth-container">
+      <div className="auth-container otp-container">
         {/* Form Card */}
-        <div className="auth-card">
-          {/* Logo */}
-          <Link to="/" className="auth-logo">
-            <div className="logo-text">
-              <span className="logo-name">FLORÉA</span>
-              <span className="logo-tagline">Botanica Way of Life</span>
+        <div className="auth-card otp-card">
+          {/* Visual Side */}
+          <div className="auth-visual-side">
+            <div className="visual-content">
+              <div className="visual-icon otp-icon">
+                <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                  <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                  <polyline points="22,6 12,13 2,6"/>
+                </svg>
+              </div>
+              <h2 className="visual-title">Kiểm tra email</h2>
+              <p className="visual-desc">Mã xác nhận 6 số đã được gửi đến hộp thư của bạn. Mã sẽ hết hạn sau 10 phút.</p>
+              
+              <div className="visual-steps">
+                <div className="step-item completed">
+                  <div className="step-number">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+                      <polyline points="20 6 9 17 4 12"/>
+                    </svg>
+                  </div>
+                  <span>Nhập email</span>
+                </div>
+                <div className="step-item active">
+                  <div className="step-number">2</div>
+                  <span>Xác nhận OTP</span>
+                </div>
+                <div className="step-item">
+                  <div className="step-number">3</div>
+                  <span>Tạo mật khẩu mới</span>
+                </div>
+              </div>
             </div>
-          </Link>
-
-          <div className="auth-header">
-            <h1>Xác nhận OTP</h1>
-            <p>Nhập mã 6 số đã gửi đến<br/><strong>{maskEmail(identifier)}</strong></p>
           </div>
 
-          {error && (
-            <div className="auth-error">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <circle cx="12" cy="12" r="10"/>
-                <line x1="15" y1="9" x2="9" y2="15"/>
-                <line x1="9" y1="9" x2="15" y2="15"/>
-              </svg>
-              {error}
-            </div>
-          )}
+          {/* Form Side */}
+          <div className="auth-form-side">
+            {/* Logo */}
+            <Link to="/" className="auth-logo">
+              <div className="logo-text">
+                <span className="logo-name">FLORÉA</span>
+                <span className="logo-tagline">Botanica Way of Life</span>
+              </div>
+            </Link>
 
-          <form onSubmit={handleSubmit} className="auth-form">
-            <div className="otp-inputs" onPaste={handlePaste}>
-              {otp.map((digit, index) => (
-                <input
-                  key={index}
-                  ref={el => inputRefs.current[index] = el}
-                  type="text"
-                  inputMode="numeric"
-                  maxLength={1}
-                  value={digit}
-                  onChange={(e) => handleChange(index, e.target.value)}
-                  onKeyDown={(e) => handleKeyDown(index, e)}
-                  className={`otp-input ${digit ? 'filled' : ''}`}
-                  disabled={loading}
-                  autoComplete="one-time-code"
-                />
-              ))}
+            <div className="auth-header">
+              <h1>Xác nhận OTP</h1>
+              <p>Nhập mã 6 số đã gửi đến<br/><strong className="email-highlight">{maskEmail(identifier)}</strong></p>
             </div>
 
-            <div className="otp-timer">
-              {timer > 0 ? (
-                <span>Mã hết hạn sau <strong>{formatTime(timer)}</strong></span>
-              ) : (
-                <span className="expired">Mã đã hết hạn</span>
-              )}
+            {error && (
+              <div className="auth-error">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <circle cx="12" cy="12" r="10"/>
+                  <line x1="15" y1="9" x2="9" y2="15"/>
+                  <line x1="9" y1="9" x2="15" y2="15"/>
+                </svg>
+                {error}
+              </div>
+            )}
+
+            <form onSubmit={handleSubmit} className="auth-form">
+              <div className="otp-inputs" onPaste={handlePaste}>
+                {otp.map((digit, index) => (
+                  <input
+                    key={index}
+                    ref={el => inputRefs.current[index] = el}
+                    type="text"
+                    inputMode="numeric"
+                    maxLength={1}
+                    value={digit}
+                    onChange={(e) => handleChange(index, e.target.value)}
+                    onKeyDown={(e) => handleKeyDown(index, e)}
+                    className={`otp-input ${digit ? 'filled' : ''}`}
+                    disabled={loading}
+                    autoComplete="one-time-code"
+                  />
+                ))}
+              </div>
+
+              <div className="otp-timer">
+                {timer > 0 ? (
+                  <div className="timer-badge">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <circle cx="12" cy="12" r="10"/>
+                      <polyline points="12 6 12 12 16 14"/>
+                    </svg>
+                    <span>Hết hạn sau <strong>{formatTime(timer)}</strong></span>
+                  </div>
+                ) : (
+                  <div className="timer-badge expired">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <circle cx="12" cy="12" r="10"/>
+                      <line x1="15" y1="9" x2="9" y2="15"/>
+                      <line x1="9" y1="9" x2="15" y2="15"/>
+                    </svg>
+                    <span>Mã đã hết hạn</span>
+                  </div>
+                )}
+              </div>
+
+              <button type="submit" className="auth-btn" disabled={loading || otp.some(d => !d)}>
+                {loading ? (
+                  <span className="btn-loading">
+                    <span className="spinner"></span>
+                    Đang xác nhận...
+                  </span>
+                ) : (
+                  <>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                      <polyline points="22 4 12 14.01 9 11.01"/>
+                    </svg>
+                    Xác nhận mã
+                  </>
+                )}
+              </button>
+
+              <button 
+                type="button" 
+                className="resend-btn"
+                onClick={handleResend}
+                disabled={!canResend || loading}
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <polyline points="23 4 23 10 17 10"/>
+                  <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
+                </svg>
+                {canResend ? 'Gửi lại mã' : `Gửi lại sau ${formatTime(timer)}`}
+              </button>
+            </form>
+
+            <div className="auth-footer">
+              <Link to="/forgot-password" className="back-link">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M19 12H5M12 19l-7-7 7-7"/>
+                </svg>
+                Đổi địa chỉ email
+              </Link>
             </div>
-
-            <button type="submit" className="auth-btn" disabled={loading || otp.some(d => !d)}>
-              {loading ? (
-                <span className="btn-loading">
-                  <span className="spinner"></span>
-                  Đang xác nhận...
-                </span>
-              ) : (
-                'Xác nhận'
-              )}
-            </button>
-
-            <button 
-              type="button" 
-              className="resend-btn"
-              onClick={handleResend}
-              disabled={!canResend || loading}
-            >
-              {canResend ? 'Gửi lại mã' : `Gửi lại sau ${formatTime(timer)}`}
-            </button>
-          </form>
-
-          <Link to="/forgot-password" className="back-link">
-            ← Đổi địa chỉ email
-          </Link>
+          </div>
         </div>
 
         {/* Back to home */}
         <Link to="/" className="back-home">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <path d="M19 12H5M12 19l-7-7 7-7"/>
+            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+            <polyline points="9 22 9 12 15 12 15 22"/>
           </svg>
           Về trang chủ
         </Link>

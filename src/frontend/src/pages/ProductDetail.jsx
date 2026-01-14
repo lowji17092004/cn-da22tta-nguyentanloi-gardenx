@@ -60,6 +60,8 @@ export default function ProductDetail() {
         const config = token ? { headers: { 'Authorization': `Bearer ${token}` } } : {}
         const res = await axios.get(`/api/reviews/product/${id}`, config)
         console.log('Reviews fetched:', res.data)
+        console.log('First review images:', res.data.reviews?.[0]?.images)
+        console.log('First review videos:', res.data.reviews?.[0]?.videos)
         setReviews(res.data.reviews || [])
         setReviewStats(res.data.stats)
       } catch (error) {
@@ -205,38 +207,33 @@ export default function ProductDetail() {
     try {
       setUploadingReview(true)
 
-      // Upload images first if any
+      // Upload images and videos together if any
       let imageUrls = []
-      let videoUrl = null
+      let videoUrls = []
 
-      if (reviewImages.length > 0) {
-        for (const img of reviewImages) {
-          const formData = new FormData()
-          formData.append('image', img)
-          
-          try {
-            const uploadRes = await axios.post('/api/upload/review', formData, {
-              headers: { 'Content-Type': 'multipart/form-data' }
-            })
-            imageUrls.push(uploadRes.data.url)
-          } catch (err) {
-            console.error('Error uploading image:', err)
-          }
-        }
-      }
-
-      // Upload video if any
-      if (reviewVideo) {
+      if (reviewImages.length > 0 || reviewVideo) {
         const formData = new FormData()
-        formData.append('video', reviewVideo)
         
+        // Add all images
+        reviewImages.forEach(img => {
+          formData.append('media', img)
+        })
+        
+        // Add video if exists
+        if (reviewVideo) {
+          formData.append('media', reviewVideo)
+        }
+
         try {
-          const uploadRes = await axios.post('/api/upload/review-video', formData, {
+          const uploadRes = await axios.post('/api/reviews/upload-media', formData, {
             headers: { 'Content-Type': 'multipart/form-data' }
           })
-          videoUrl = uploadRes.data.url
+          console.log('Upload response:', uploadRes.data)
+          imageUrls = uploadRes.data.images || []
+          videoUrls = uploadRes.data.videos || []
         } catch (err) {
-          console.error('Error uploading video:', err)
+          console.error('Error uploading media:', err)
+          alert('Đã có lỗi khi upload ảnh/video. Đánh giá sẽ được gửi không có ảnh/video.')
         }
       }
 
@@ -246,7 +243,7 @@ export default function ProductDetail() {
         rating: newReview.rating,
         comment: newReview.comment,
         images: imageUrls,
-        video: videoUrl
+        videos: videoUrls
       })
 
       alert('Đánh giá thành công!')
@@ -865,6 +862,45 @@ export default function ProductDetail() {
                             </div>
                           </div>
                           <p className="pd-review-comment">{review.comment}</p>
+                          
+                          {/* Review images and videos */}
+                          {(review.images?.length > 0 || review.videos?.length > 0) && (
+                            <div className="pd-review-media">
+                              {review.images?.map((img, idx) => (
+                                <div key={`img-${idx}`} className="pd-review-img">
+                                  <img 
+                                    src={`http://localhost:5000${img}`} 
+                                    alt={`Review ${idx + 1}`}
+                                    onClick={() => {
+                                      // Optional: Open image in modal
+                                    }}
+                                  />
+                                </div>
+                              ))}
+                              {review.videos?.map((vid, idx) => (
+                                <div key={`vid-${idx}`} className="pd-review-video">
+                                  <video controls>
+                                    <source src={`http://localhost:5000${vid}`} />
+                                    Trình duyệt không hỗ trợ video
+                                  </video>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                          
+                          {/* Shop Reply */}
+                          {review.reply?.content && (
+                            <div className="pd-review-reply">
+                              <div className="pd-reply-header">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                  <path d="M3 10h10a8 8 0 0 1 8 8v2M3 10l6 6m-6-6l6-6"/>
+                                </svg>
+                                <span className="pd-reply-label">Phản hồi của shop</span>
+                                <span className="pd-reply-date">{formatDate(review.reply.repliedAt)}</span>
+                              </div>
+                              <p className="pd-reply-content">{review.reply.content}</p>
+                            </div>
+                          )}
                           
                           {/* Like button */}
                           <div className="pd-review-actions">

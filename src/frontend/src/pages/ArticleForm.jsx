@@ -27,7 +27,7 @@ export default function ArticleForm(){
   const [editorMode, setEditorMode] = useState('smart') // 'smart' hoặc 'html'
 
   const categories = [
-    { value: 'about', label: 'The Sun Garden - Giới thiệu', icon: '🏪' },
+    { value: 'about', label: 'Floréa - Giới thiệu', icon: '🏪' },
     { value: 'info', label: 'Thông tin cây hoa', icon: '🌸' },
     { value: 'care', label: 'Kiến thức chăm sóc', icon: '💧' },
     { value: 'inspiration', label: 'Cảm hứng & Ý tưởng', icon: '💡' }

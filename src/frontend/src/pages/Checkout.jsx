@@ -47,6 +47,8 @@ const Checkout = () => {
   const [appliedCoupon, setAppliedCoupon] = useState(null);
   const [couponLoading, setCouponLoading] = useState(false);
   const [couponError, setCouponError] = useState('');
+  const [savedCoupons, setSavedCoupons] = useState([]);
+  const [showCouponList, setShowCouponList] = useState(false);
   const countdownRef = useRef(null);
   const pollingRef = useRef(null);
 
@@ -67,8 +69,25 @@ const Checkout = () => {
         phone: user.phone || '',
         email: user.email || ''
       }));
+      loadSavedCoupons();
     }
   }, [user]);
+
+  // Load saved coupons
+  const loadSavedCoupons = async () => {
+    try {
+      const res = await api.get('/coupons/my-coupons');
+      // Lọc mã còn hạn và chưa dùng
+      const validCoupons = (res.data || []).filter(coupon => {
+        if (coupon.used) return false;
+        if (!coupon.validTo) return true;
+        return new Date(coupon.validTo) >= new Date();
+      });
+      setSavedCoupons(validCoupons);
+    } catch (error) {
+      console.error('Load saved coupons error:', error);
+    }
+  };
 
   // Cleanup
   useEffect(() => {
@@ -141,8 +160,10 @@ const Checkout = () => {
   };
 
   // Apply coupon
-  const handleApplyCoupon = async () => {
-    if (!couponCode.trim()) {
+  const handleApplyCoupon = async (code = null) => {
+    const couponToApply = code || couponCode.trim();
+    
+    if (!couponToApply) {
       setCouponError('Vui lòng nhập mã giảm giá');
       return;
     }
@@ -152,11 +173,13 @@ const Checkout = () => {
     
     try {
       const res = await api.post('/coupons/validate', {
-        code: couponCode.toUpperCase(),
+        code: couponToApply.toUpperCase(),
         orderTotal: checkoutTotal
       });
       
       setAppliedCoupon(res.data);
+      setCouponCode(res.data.code);
+      setShowCouponList(false);
       setNotification({ message: `Đã áp dụng mã giảm giá: ${res.data.code}`, type: 'success' });
     } catch (err) {
       setCouponError(err.response?.data?.message || 'Mã giảm giá không hợp lệ');
@@ -171,6 +194,7 @@ const Checkout = () => {
     setAppliedCoupon(null);
     setCouponCode('');
     setCouponError('');
+    setShowCouponList(false);
   };
 
   // Calculate final total with coupon
@@ -533,23 +557,66 @@ const Checkout = () => {
                 </button>
               </div>
             ) : (
-              <div className="coupon-input-group">
-                <input
-                  type="text"
-                  placeholder="Nhập mã giảm giá"
-                  value={couponCode}
-                  onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
-                  className="coupon-input"
-                  disabled={couponLoading}
-                />
-                <button 
-                  className="apply-coupon-btn"
-                  onClick={handleApplyCoupon}
-                  disabled={couponLoading}
-                >
-                  {couponLoading ? 'Đang kiểm tra...' : 'Áp dụng'}
-                </button>
-              </div>
+              <>
+                {savedCoupons.length > 0 ? (
+                  <>
+                    <button 
+                      className="select-coupon-btn"
+                      onClick={() => setShowCouponList(!showCouponList)}
+                    >
+                      {showCouponList ? '✕ Đóng' : '🎫 Chọn mã đã lưu'}
+                    </button>
+                    
+                    {showCouponList && (
+                      <div className="saved-coupons-list">
+                        {savedCoupons.map(coupon => (
+                          <div 
+                            key={coupon._id} 
+                            className="saved-coupon-item"
+                            onClick={() => handleApplyCoupon(coupon.code)}
+                          >
+                            <div className="coupon-item-badge">{coupon.discount}%</div>
+                            <div className="coupon-item-info">
+                              <div className="coupon-item-code">{coupon.code}</div>
+                              <div className="coupon-item-desc">{coupon.description}</div>
+                              {coupon.minOrder > 0 && (
+                                <div className="coupon-item-min">Đơn tối thiểu: {formatPrice(coupon.minOrder)}</div>
+                              )}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                    
+                    <div className="or-divider">
+                      <span>hoặc nhập mã</span>
+                    </div>
+                  </>
+                ) : (
+                  <div className="no-saved-coupons">
+                    <p>Bạn chưa lưu mã giảm giá nào</p>
+                    <Link to="/coupons" className="go-to-coupons">Xem mã giảm giá</Link>
+                  </div>
+                )}
+                
+                <div className="coupon-input-group">
+                  <input
+                    type="text"
+                    placeholder="Nhập mã giảm giá"
+                    value={couponCode}
+                    onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
+                    className="coupon-input"
+                    disabled={couponLoading}
+                  />
+                  <button 
+                    className="apply-coupon-btn"
+                    onClick={() => handleApplyCoupon()}
+                    disabled={couponLoading}
+                  >
+                    {couponLoading ? 'Đang kiểm tra...' : 'Áp dụng'}
+                  </button>
+                </div>
+              </>
             )}
             {couponError && <div className="coupon-error">{couponError}</div>}
           </div>

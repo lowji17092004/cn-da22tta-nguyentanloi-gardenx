@@ -104,10 +104,18 @@ router.get('/:id', async (req, res) => {
 // Create category
 router.post('/', async (req, res) => {
   try {
-    const { name, slug, color, type, subcategories } = req.body
+    const { name, slug, color, type, subcategories, description, image } = req.body
     const exists = await Category.findOne({ slug, type: type || 'product' })
     if (exists) return res.status(400).json({ message: 'Slug danh mục đã tồn tại' })
-    const cat = new Category({ name, slug, color, type: type || 'product', subcategories: subcategories || [] })
+    const cat = new Category({ 
+      name, 
+      slug, 
+      color, 
+      type: type || 'product', 
+      subcategories: subcategories || [],
+      description: description || '',
+      image: image || ''
+    })
     await cat.save()
     res.status(201).json(cat)
   } catch (err) {
@@ -118,7 +126,7 @@ router.post('/', async (req, res) => {
 // Update category
 router.put('/:id', async (req, res) => {
   try {
-    const { name, slug, color, type, subcategories } = req.body
+    const { name, slug, color, type, subcategories, description, image } = req.body
     const cat = await Category.findById(req.params.id)
     if (!cat) return res.status(404).json({ message: 'Không tìm thấy danh mục' })
     cat.name = name || cat.name
@@ -126,6 +134,8 @@ router.put('/:id', async (req, res) => {
     cat.color = color || cat.color
     if (type) cat.type = type
     if (subcategories !== undefined) cat.subcategories = subcategories
+    if (description !== undefined) cat.description = description
+    if (image !== undefined) cat.image = image
     await cat.save()
     res.json(cat)
   } catch (err) {

@@ -327,12 +327,13 @@
   border-radius: 10px;
   cursor: pointer;
   transition: all 0.3s ease;
-  background: #fefcfa;
+  background: #ffffff;
 }
 
 .address-card:hover {
   border-color: #1a472a;
-  background: #fff;
+  background: #ffffff;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
 }
 
 .address-card.active {
@@ -871,9 +872,16 @@
 .total-row {
   display: flex;
   justify-content: space-between;
+  align-items: center;
   padding: 8px 0;
   font-size: 14px;
   color: #6b5344;
+  gap: 12px;
+}
+
+.total-row span:last-child {
+  white-space: nowrap;
+  font-weight: 600;
 }
 
 .total-row .free {
@@ -902,6 +910,7 @@
 
 .total-row.final span:last-child {
   color: #1a472a;
+  font-size: 20px;
 }
 
 .shipping-hint {
@@ -1021,6 +1030,22 @@
   color: #64748b;
   font-size: 14px;
   margin-bottom: 25px;
+}
+
+.waiting-indicator {
+  display: inline-block;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.6;
+    transform: scale(1.1);
+  }
 }
 
 .qr-content {
@@ -1351,5 +1376,298 @@
   .qr-image img {
     width: 180px;
     height: 180px;
+  }
+}
+
+/* ZaloPay Iframe Modal */
+.payment-iframe-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  padding: 20px;
+  animation: fadeIn 0.3s ease;
+}
+
+.payment-iframe-container {
+  background: #ffffff;
+  border-radius: 16px;
+  width: 100%;
+  max-width: 800px;
+  height: 90vh;
+  max-height: 900px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  animation: slideUp 0.3s ease;
+}
+
+.payment-iframe-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 24px;
+  border-bottom: 1px solid #e5e7eb;
+  background: linear-gradient(135deg, #1a472a 0%, #2d5a27 100%);
+  border-radius: 16px 16px 0 0;
+}
+
+.payment-iframe-header h2 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.close-iframe-btn {
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  color: #ffffff;
+  transition: all 0.2s ease;
+}
+
+.close-iframe-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: scale(1.1);
+}
+
+.payment-iframe-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: relative;
+}
+
+.payment-status-banner {
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  color: #ffffff;
+  padding: 14px 20px;
+  text-align: center;
+  font-size: 14px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.zalopay-iframe {
+  flex: 1;
+  width: 100%;
+  border: none;
+  background: #ffffff;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive for Iframe Modal */
+@media (max-width: 768px) {
+  .payment-iframe-overlay {
+    padding: 0;
+  }
+
+  .payment-iframe-container {
+    max-width: 100%;
+    height: 100vh;
+    max-height: 100vh;
+    border-radius: 0;
+  }
+
+  .payment-iframe-header {
+    border-radius: 0;
+    padding: 16px 20px;
+  }
+
+  .payment-iframe-header h2 {
+    font-size: 18px;
+  }
+
+  .payment-status-banner {
+    font-size: 13px;
+    padding: 12px 16px;
+  }
+}
+
+/* Success Overlay */
+.success-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10001;
+  padding: 20px;
+  animation: fadeIn 0.4s ease;
+}
+
+.success-card {
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 48px 40px;
+  max-width: 480px;
+  width: 100%;
+  text-align: center;
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+  animation: scaleIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.success-icon {
+  width: 100px;
+  height: 100px;
+  margin: 0 auto 24px;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: bounce 0.6s ease 0.2s;
+}
+
+.success-icon svg {
+  color: #ffffff;
+  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.2));
+}
+
+.success-card h2 {
+  font-size: 28px;
+  font-weight: 800;
+  color: #1a472a;
+  margin: 0 0 16px 0;
+}
+
+.success-card p {
+  font-size: 15px;
+  color: #6b7280;
+  line-height: 1.6;
+  margin: 0 0 32px 0;
+}
+
+.success-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.btn-view-orders,
+.btn-continue {
+  padding: 14px 28px;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: none;
+  flex: 1;
+  min-width: 140px;
+}
+
+.btn-view-orders {
+  background: linear-gradient(135deg, #1a472a 0%, #2d5a27 100%);
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(26, 71, 42, 0.3);
+}
+
+.btn-view-orders:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(26, 71, 42, 0.4);
+}
+
+.btn-continue {
+  background: #f3f4f6;
+  color: #374151;
+}
+
+.btn-continue:hover {
+  background: #e5e7eb;
+  transform: translateY(-2px);
+}
+
+.btn-order:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+}
+
+@media (max-width: 640px) {
+  .success-card {
+    padding: 36px 24px;
+  }
+
+  .success-card h2 {
+    font-size: 24px;
+  }
+
+  .success-card p {
+    font-size: 14px;
+  }
+
+  .success-actions {
+    flex-direction: column;
+  }
+
+  .btn-view-orders,
+  .btn-continue {
+    width: 100%;
   }
 }

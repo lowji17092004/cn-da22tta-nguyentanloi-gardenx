@@ -354,28 +354,63 @@
 }
 
 .ac-btn {
-  width: 32px;
-  height: 32px;
+  width: 40px;
+  height: 40px;
+  min-width: 40px;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 14px;
-  transition: all 0.15s;
-  background: #f3f4f6;
+  transition: all 0.2s ease;
+  background: #f1f5f9;
+  padding: 0;
+}
+
+.ac-btn svg {
+  width: 18px;
+  height: 18px;
+  min-width: 18px;
+  min-height: 18px;
+  color: #64748b;
+  display: block;
 }
 
 .ac-btn:hover {
-  transform: scale(1.1);
+  transform: scale(1.08);
 }
 
-.ac-btn-assign:hover { background: #dbeafe; }
-.ac-btn-edit:hover { background: #fef3c7; }
-.ac-btn-toggle.on { background: #dcfce7; }
-.ac-btn-toggle.off { background: #f3f4f6; }
-.ac-btn-delete:hover { background: #fee2e2; }
+.ac-btn-assign:hover {
+  background: #dbeafe;
+}
+.ac-btn-assign:hover svg { color: #3b82f6; }
+
+.ac-btn-edit:hover {
+  background: #f5ead8;
+}
+.ac-btn-edit:hover svg { color: #1a472a; }
+
+.ac-btn-toggle.on {
+  background: #f1f5f9;
+}
+.ac-btn-toggle.on:hover {
+  background: #ecfdf5;
+}
+.ac-btn-toggle.on:hover svg { color: #10b981; }
+
+.ac-btn-toggle.off {
+  background: #f1f5f9;
+}
+.ac-btn-toggle.off:hover {
+  background: #fef3c7;
+}
+.ac-btn-toggle.off:hover svg { color: #d97706; }
+
+.ac-btn-delete:hover {
+  background: #fef2f2;
+}
+.ac-btn-delete:hover svg { color: #ef4444; }
 
 /* Empty State */
 .ac-empty {
@@ -549,6 +584,7 @@
   align-items: center;
   gap: 12px;
   cursor: pointer;
+  position: relative;
 }
 
 .ac-toggle-label input {
@@ -558,10 +594,11 @@
 .ac-toggle-slider {
   width: 44px;
   height: 24px;
-  background: #e5e7eb;
+  background: #dc2626;
   border-radius: 12px;
   position: relative;
-  transition: background 0.2s;
+  transition: background 0.3s;
+  flex-shrink: 0;
 }
 
 .ac-toggle-slider::after {
@@ -573,12 +610,12 @@
   border-radius: 50%;
   top: 3px;
   left: 3px;
-  transition: transform 0.2s;
+  transition: transform 0.3s;
   box-shadow: 0 1px 3px rgba(0,0,0,0.2);
 }
 
 .ac-toggle-label input:checked + .ac-toggle-slider {
-  background: #1a472a;
+  background: #16a34a;
 }
 
 .ac-toggle-label input:checked + .ac-toggle-slider::after {
@@ -588,6 +625,8 @@
 .ac-toggle-label span:last-child {
   font-size: 14px;
   color: #374151;
+  font-weight: 600;
+  min-width: 100px;
 }
 
 /* Form Actions */

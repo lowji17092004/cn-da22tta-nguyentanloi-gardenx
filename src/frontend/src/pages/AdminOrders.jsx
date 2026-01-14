@@ -98,12 +98,88 @@ export default function AdminOrders() {
     if (!window.confirm('Bạn có chắc muốn xóa đơn hàng này?')) return
     try {
       await api.delete('/orders/' + id)
-      setExpandedRow(null)
       load()
       showToast('Xóa đơn hàng thành công', 'success')
     } catch (e) {
       showToast('Xóa đơn hàng thất bại', 'error')
     }
+  }
+
+  const exportInvoice = (order) => {
+    const invoiceData = {
+      soHoaDon: `HD${order._id.slice(-8).toUpperCase()}`,
+      ngayXuat: new Date().toLocaleString('vi-VN'),
+      ngayDatHang: new Date(order.createdAt).toLocaleString('vi-VN'),
+      thongTinKhachHang: {
+        hoTen: order.customerName || order.user?.name || 'Khách hàng',
+        soDienThoai: order.phone || 'N/A',
+        email: order.customerEmail || order.user?.email || 'N/A',
+        diaChi: order.address || 'N/A'
+      },
+      sanPham: order.items?.map(item => ({
+        tenSanPham: item.product?.name || item.name || 'Sản phẩm',
+        soLuong: item.quantity || 1,
+        donGia: item.price || 0,
+        thanhTien: (item.quantity || 1) * (item.price || 0)
+      })) || [],
+      tongTien: order.total || 0,
+      phuongThucThanhToan: paymentMethodLabels[order.paymentMethod] || 'COD',
+      trangThaiThanhToan: paymentStatusLabels[order.paymentStatus || 'pending'],
+      trangThaiDonHang: statusLabels[order.status],
+      ghiChu: order.notes || ''
+    }
+
+    const invoiceText = `
+==============================================
+           HÓA ĐƠN BÁN HÀNG
+==============================================
+
+Số hóa đơn: ${invoiceData.soHoaDon}
+Ngày xuất: ${invoiceData.ngayXuat}
+Ngày đặt hàng: ${invoiceData.ngayDatHang}
+
+----------------------------------------------
+THÔNG TIN KHÁCH HÀNG
+----------------------------------------------
+Họ tên: ${invoiceData.thongTinKhachHang.hoTen}
+Số điện thoại: ${invoiceData.thongTinKhachHang.soDienThoai}
+Email: ${invoiceData.thongTinKhachHang.email}
+Địa chỉ: ${invoiceData.thongTinKhachHang.diaChi}
+
+----------------------------------------------
+CHI TIẾT SẢN PHẨM
+----------------------------------------------
+${invoiceData.sanPham.map((sp, i) => `
+${i + 1}. ${sp.tenSanPham}
+   Số lượng: ${sp.soLuong}
+   Đơn giá: ${sp.donGia.toLocaleString('vi-VN')}đ
+   Thành tiền: ${sp.thanhTien.toLocaleString('vi-VN')}đ`).join('\n')}
+
+----------------------------------------------
+TỔNG TIỀN: ${invoiceData.tongTien.toLocaleString('vi-VN')}đ
+----------------------------------------------
+
+Phương thức thanh toán: ${invoiceData.phuongThucThanhToan}
+Trạng thái thanh toán: ${invoiceData.trangThaiThanhToan}
+Trạng thái đơn hàng: ${invoiceData.trangThaiDonHang}
+
+${invoiceData.ghiChu ? `Ghi chú: ${invoiceData.ghiChu}\n` : ''}
+==============================================
+Cảm ơn quý khách đã mua hàng!
+==============================================
+    `.trim()
+
+    const blob = new Blob([invoiceText], { type: 'text/plain;charset=utf-8' })
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = `hoa-don-${invoiceData.soHoaDon}-${new Date().toISOString().split('T')[0]}.txt`
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+    URL.revokeObjectURL(url)
+    
+    showToast('Xuất hóa đơn thành công', 'success')
   }
 
   const getProductImage = (item) => {
@@ -364,7 +440,7 @@ export default function AdminOrders() {
             <p>Thử thay đổi bộ lọc hoặc từ khóa tìm kiếm</p>
           </div>
         ) : (
-          <>
+          <div>
           <div className="ao-table-info">
             <span>Hiển thị {startIndex + 1} - {Math.min(endIndex, filteredOrders.length)} / {filteredOrders.length} đơn hàng</span>
             <select 
@@ -455,6 +531,15 @@ export default function AdminOrders() {
                             <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                            </svg>
+                          </button>
+                          <button
+                            className="action-btn export"
+                            onClick={() => exportInvoice(order)}
+                            title="Xuất hóa đơn"
+                          >
+                            <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                             </svg>
                           </button>
                           <button
@@ -636,9 +721,9 @@ export default function AdminOrders() {
               </button>
             </div>
           )}
-          </>
+          </div>
         )}
-      </div>
+        </div>
       {toast && (
         <Toast 
           message={toast.message} 

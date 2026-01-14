@@ -10,17 +10,18 @@
 .search-box-modern {
   position: relative;
   width: 100%;
-  max-width: 600px;
+  max-width: 500px;
 }
 
 .search-input-modern {
   width: 100%;
-  padding: 14px 100px 14px 20px;
+  padding: 10px 44px 10px 16px;
+  border-radius: 25px;
   border: 2px solid #e5e7eb;
-  border-radius: 50px;
-  font-size: 15px;
-  transition: all 0.3s ease;
-  background: white;
+  font-size: 14px;
+  background: #f9fafb;
+  margin: 0;
+  transition: all 0.2s;
 }
 
 /* Hide default clear button in search input */
@@ -36,9 +37,10 @@
 }
 
 .search-input-modern:focus {
-  border-color: #1a472a;
-  box-shadow: 0 0 0 4px rgba(26, 71, 42, 0.1);
+  border-color: #2d5a3d;
+  background: #fff;
   outline: none;
+  box-shadow: 0 0 0 3px rgba(45, 90, 61, 0.1);
 }
 
 .search-box-modern .search-icon {
@@ -47,21 +49,21 @@
 
 .search-clear-modern {
   position: absolute;
-  right: 50px;
+  right: 44px;
   top: 50%;
   transform: translateY(-50%);
   background: #f3f4f6;
   border: none;
   border-radius: 50%;
-  width: 24px;
-  height: 24px;
+  width: 20px;
+  height: 20px;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   transition: all 0.2s ease;
   color: #6b7280;
-  font-size: 18px;
+  font-size: 14px;
   line-height: 1;
 }
 
@@ -70,23 +72,37 @@
   color: #374151;
 }
 
-/* Search Submit Button - Magnifying glass icon */
+/* Search Submit Button - Same as Header */
 .search-submit-btn {
   position: absolute;
-  right: 16px;
+  right: 4px;
   top: 50%;
   transform: translateY(-50%);
-  background: transparent;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
   border: none;
-  padding: 4px;
+  background: linear-gradient(135deg, #2d5a3d 0%, #1a472a 100%);
+  color: #fff;
   cursor: pointer;
-  transition: all 0.2s ease;
-  font-size: 20px;
-  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  transition: transform 0.2s;
+  box-shadow: none;
+}
+
+.search-submit-btn svg {
+  width: 18px;
+  height: 18px;
+  stroke: #fff;
+  stroke-width: 2;
 }
 
 .search-submit-btn:hover {
-  transform: translateY(-50%) scale(1.15);
+  transform: translateY(-50%) scale(1.05);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
 /* Search History Dropdown */

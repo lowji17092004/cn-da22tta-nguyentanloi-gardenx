@@ -509,7 +509,7 @@
 .ao-table th:nth-child(6),
 .ao-table td:nth-child(6) { width: 16%; min-width: 140px; } /* TT Thanh toán */
 .ao-table th:nth-child(7),
-.ao-table td:nth-child(7) { width: 14%; min-width: 100px; } /* Thao tác */
+.ao-table td:nth-child(7) { width: 180px; min-width: 180px; max-width: 180px; } /* Thao tác */
 
 .ao-table thead {
   background: linear-gradient(135deg, #1a472a 0%, #2d5f3f 100%);
@@ -917,56 +917,93 @@
   background-color: #fef2f2;
 }
 
-/* Action Buttons - Clean & Modern */
+/* Action Buttons - Clean & Modern - FIXED */
 .table-actions {
-  display: flex;
+  display: flex !important;
   gap: 8px;
-  justify-content: center;
+  justify-content: flex-start;
   align-items: center;
+  flex-wrap: nowrap;
+  min-width: 140px;
+  padding: 4px 8px;
+  visibility: visible !important;
+  opacity: 1 !important;
 }
 
 .action-btn {
-  background: none;
-  border: none;
-  padding: 8px;
-  cursor: pointer;
+  width: 36px !important;
+  height: 36px !important;
+  min-width: 36px !important;
+  max-width: 36px !important;
+  min-height: 36px !important;
+  max-height: 36px !important;
+  flex-shrink: 0 !important;
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 8px !important;
+  cursor: pointer !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
   transition: all 0.2s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 6px;
+  background: #ffffff !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1) !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  position: relative !important;
+  z-index: 1 !important;
 }
 
 .action-btn svg {
-  width: 20px;
-  height: 20px;
+  width: 18px !important;
+  height: 18px !important;
+  min-width: 18px !important;
+  min-height: 18px !important;
+  max-width: 18px !important;
+  max-height: 18px !important;
+  color: #64748b !important;
+  display: block !important;
+  flex-shrink: 0 !important;
+  stroke-width: 2 !important;
+  visibility: visible !important;
+  opacity: 1 !important;
 }
 
-.action-btn.view {
-  color: #64748b;
+.action-btn:hover {
+  transform: scale(1.08);
 }
 
 .action-btn.view:hover {
-  color: #1a472a;
-  background: #fef3e7;
+  background: #dbeafe;
 }
 
-.action-btn.edit {
-  color: #64748b;
+.action-btn.view:hover svg {
+  color: #3b82f6;
+}
+
+.action-btn.export:hover {
+  background: #f0fdf4;
+}
+
+.action-btn.export:hover svg {
+  color: #10b981;
 }
 
 .action-btn.edit:hover {
-  color: #2563eb;
-  background: #eff6ff;
+  background: #f5ead8;
 }
 
-.action-btn.delete {
-  color: #64748b;
+.action-btn.edit:hover svg {
+  color: #1a472a;
 }
 
 .action-btn.delete:hover {
-  color: #dc2626;
   background: #fef2f2;
+}
+
+.action-btn.delete:hover svg {
+  color: #ef4444;
 }
 
 /* Expanded Row - Beautiful Design */

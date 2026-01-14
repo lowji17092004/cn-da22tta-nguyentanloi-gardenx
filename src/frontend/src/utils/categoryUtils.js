@@ -83,7 +83,7 @@ export const CATEGORY_MAPPING = {
   'dat trong cay': 'Đất trồng cây',
   
   // Blog/Article categories
-  'about': 'The Sun Garden',
+  'about': 'Floréa',
   'info': 'Thông tin cây hoa',
   'care': 'Kiến thức chăm sóc',
   'inspiration': 'Cảm hứng & Ý tưởng',

@@ -6,13 +6,13 @@ import './Policy.css'
 export default function PolicyAbout() {
   return (
     <>
-      <PageBanner page="policy" title="Giới thiệu" subtitle="Về The Sun Garden" />
+      <PageBanner page="policy" title="Giới thiệu" subtitle="Về Floréa" />
       <div className="policy-container">
         <div className="policy-content">
           <div className="policy-section">
             <h2>🌿 Về Chúng Tôi</h2>
             <p>
-              <strong>The Sun Garden</strong> là điểm đến lý tưởng cho những ai yêu thích cây cảnh và mong muốn tạo nên không gian sống xanh, 
+              <strong>Floréa</strong> là điểm đến lý tưởng cho những ai yêu thích cây cảnh và mong muốn tạo nên không gian sống xanh, 
               gần gũi với thiên nhiên. Chúng tôi tự hào là một trong những cửa hàng cung cấp cây cảnh, hoa kiểng và phụ kiện làm vườn 
               chất lượng cao tại Việt Nam.
             </p>

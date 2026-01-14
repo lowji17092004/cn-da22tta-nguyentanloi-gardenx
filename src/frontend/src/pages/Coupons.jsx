@@ -23,7 +23,12 @@ const Coupons = () => {
   const loadCoupons = async () => {
     try {
       const res = await api.get('/coupons/active');
-      setCoupons(res.data || []);
+      // Lọc ra các mã còn hạn sử dụng
+      const activeCoupons = (res.data || []).filter(coupon => {
+        if (!coupon.validTo) return true;
+        return new Date(coupon.validTo) >= new Date();
+      });
+      setCoupons(activeCoupons);
     } catch (error) {
       console.error('Load coupons error:', error);
     } finally {
@@ -34,7 +39,12 @@ const Coupons = () => {
   const loadSavedCoupons = async () => {
     try {
       const res = await api.get('/coupons/my-coupons');
-      setSavedCoupons(res.data || []);
+      // Lọc ra các mã còn hạn sử dụng
+      const activeSavedCoupons = (res.data || []).filter(coupon => {
+        if (!coupon.validTo) return true;
+        return new Date(coupon.validTo) >= new Date();
+      });
+      setSavedCoupons(activeSavedCoupons);
     } catch (error) {
       console.error('Load saved coupons error:', error);
     }

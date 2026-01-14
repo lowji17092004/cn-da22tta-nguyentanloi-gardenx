@@ -85,11 +85,15 @@ export default function ProductForm(){
   const handleFiles = async e => {
     const files = Array.from(e.target.files || [])
     if (!files.length) return
+    console.log('Starting upload for', files.length, 'files')
     setUploading(true)
     setError('')
     try{
       for (const file of files){
-        const form = new FormData(); form.append('file', file)
+        console.log('Uploading file:', file.name, 'Size:', file.size)
+        const form = new FormData(); 
+        form.append('file', file)
+        console.log('FormData created, posting to /upload')
         const res = await api.post('/upload', form, {
           headers: {'Content-Type':'multipart/form-data'},
           onUploadProgress: (e) => {
@@ -97,10 +101,16 @@ export default function ProductForm(){
             setProgressMap(prev => ({...prev, [file.name]: pct}))
           }
         })
+        console.log('Upload response:', res.data)
         setData(prev => ({...prev, images: [...(prev.images||[]), res.data.path]}))
-        setProgressMap(prev => ({...prev, [file.name]: 100}))
       }
-    }catch(err){ setError('Upload lỗi. Vui lòng thử lại.') }
+      // Clear progress after all uploads complete
+      setTimeout(() => setProgressMap({}), 1000)
+    }catch(err){ 
+      console.error('Upload error:', err)
+      console.error('Error response:', err.response?.data)
+      setError(err.response?.data?.message || 'Upload lỗi. Vui lòng thử lại.') 
+    }
     setUploading(false)
   }
 
@@ -341,20 +351,25 @@ export default function ProductForm(){
 
             {data.images && data.images.length > 0 && (
               <div className="image-gallery">
-                {data.images.map((img, i) => (
-                  <div key={i} className="image-gallery-item">
-                    <img src={img} alt={`Product ${i+1}`} className="gallery-image" />
-                    <button 
-                      type="button" 
-                      onClick={() => removeImage(img, i)}
-                      className="image-remove-btn"
-                      title="Xóa ảnh"
-                    >
-                      ✕
-                    </button>
-                    {i === 0 && <span className="image-badge">Ảnh chính</span>}
-                  </div>
-                ))}
+                {console.log('Rendering images:', data.images)}
+                {data.images.map((img, i) => {
+                  const imgSrc = img.startsWith('http') ? img : `http://localhost:5000${img}`
+                  console.log('Image src:', imgSrc)
+                  return (
+                    <div key={i} className="image-gallery-item">
+                      <img src={imgSrc} alt={`Product ${i+1}`} className="gallery-image" />
+                      <button 
+                        type="button" 
+                        onClick={() => removeImage(img, i)}
+                        className="image-remove-btn"
+                        title="Xóa ảnh"
+                      >
+                        ✕
+                      </button>
+                      {i === 0 && <span className="image-badge">Ảnh chính</span>}
+                    </div>
+                  )
+                })}
               </div>
             )}
 

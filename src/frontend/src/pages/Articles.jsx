@@ -1,12 +1,16 @@
 import React, { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
 import api from '../api'
 import PageBanner from '../components/PageBanner'
 import './Articles.css'
 
 export default function Articles(){
+  const [searchParams] = useSearchParams()
+  const categoryFilter = searchParams.get('category')
+  
   const [categories, setCategories] = useState([])
   const [articles, setArticles] = useState([])
+  const [coupons, setCoupons] = useState([])
   const [loading, setLoading] = useState(true)
   
   // Danh mục mặc định
@@ -22,10 +26,18 @@ export default function Articles(){
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [categoriesRes, articlesRes] = await Promise.all([
+        const requests = [
           api.get('/categories?type=blog'),
           api.get('/articles')
-        ])
+        ]
+        
+        // Nếu đang xem danh mục khuyến mãi, load coupons
+        if (categoryFilter && (categoryFilter === 'khuyen-mai' || categoryFilter.includes('khuyen'))) {
+          requests.push(api.get('/coupons'))
+        }
+        
+        const responses = await Promise.all(requests)
+        const [categoriesRes, articlesRes, couponsRes] = responses
         
         const blogCategories = categoriesRes.data?.length > 0 
           ? categoriesRes.data 
@@ -33,6 +45,10 @@ export default function Articles(){
         
         setCategories(blogCategories)
         setArticles(Array.isArray(articlesRes.data) ? articlesRes.data : [])
+        
+        if (couponsRes) {
+          setCoupons(Array.isArray(couponsRes.data) ? couponsRes.data : [])
+        }
       } catch(err) {
         console.error('Error fetching data:', err)
         setCategories(defaultCategories)
@@ -41,7 +57,7 @@ export default function Articles(){
       }
     }
     fetchData()
-  }, [])
+  }, [categoryFilter])
 
   // Lấy bài viết theo danh mục
   const getArticlesByCategory = (categorySlug) => {
@@ -50,14 +66,34 @@ export default function Articles(){
 
   // Lấy tất cả danh mục có bài viết
   const getActiveCategories = () => {
+    // Nếu có filter category, chỉ trả về category đó
+    if (categoryFilter) {
+      // Tìm category theo slug hoặc name
+      const filteredCat = categories.find(c => 
+        c.slug === categoryFilter || 
+        c.name.toLowerCase().replace(/\s+/g, '-') === categoryFilter ||
+        c.name.toLowerCase() === categoryFilter.toLowerCase()
+      )
+      if (filteredCat) {
+        const categoryArticles = articles.filter(a => a.category === categoryFilter)
+        if (categoryArticles.length > 0) {
+          return [filteredCat]
+        }
+      }
+      return []
+    }
+    
+    // Nếu không có filter, trả về tất cả categories có bài viết
     const categorySlugs = new Set(articles.map(a => a.category))
     const result = []
     
     categorySlugs.forEach(slug => {
-      const existingCat = categories.find(c => c.slug === slug)
+      // Tìm category theo slug hoặc name
+      const existingCat = categories.find(c => c.slug === slug || c.name.toLowerCase() === slug.toLowerCase())
       if (existingCat) {
         result.push(existingCat)
       } else {
+        // Nếu không tìm thấy, tạo category mới với tên từ slug
         result.push({
           slug,
           name: slug.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' '),
@@ -93,6 +129,11 @@ export default function Articles(){
 
   const activeCategories = getActiveCategories()
   
+  // Tìm thông tin danh mục hiện tại nếu có filter
+  const currentCategory = categoryFilter 
+    ? categories.find(c => c.slug === categoryFilter) 
+    : null
+  
   return (
     <>
       <PageBanner page="articles" />
@@ -100,8 +141,20 @@ export default function Articles(){
       <div className="articles-container">
         {/* Intro Section */}
         <div className="articles-intro">
-          <h1>📚 Kiến Thức & Hướng Dẫn</h1>
-          <p>Khám phá bí quyết chăm sóc cây cảnh và nhiều thông tin hữu ích</p>
+          {currentCategory ? (
+            <>
+              <h1>{currentCategory.icon || '📚'} {currentCategory.name}</h1>
+              <p>{currentCategory.description || 'Khám phá các bài viết trong danh mục này'}</p>
+              <Link to="/articles" className="back-link">
+                ← Xem tất cả danh mục
+              </Link>
+            </>
+          ) : (
+            <>
+              <h1>📚 Kiến Thức & Hướng Dẫn</h1>
+              <p>Khám phá bí quyết chăm sóc cây cảnh và nhiều thông tin hữu ích</p>
+            </>
+          )}
         </div>
 
         {/* Nếu không có bài viết */}
@@ -114,6 +167,53 @@ export default function Articles(){
           </div>
         ) : (
           <>
+            {/* Hiển thị mã giảm giá nếu đang xem danh mục khuyến mãi */}
+            {categoryFilter && (categoryFilter === 'khuyen-mai' || categoryFilter.includes('khuyen')) && coupons.length > 0 && (
+              <section className="coupons-section">
+                <div className="coupons-header">
+                  <h2>🎁 Mã giảm giá khả dụng</h2>
+                  <p>Sử dụng các mã giảm giá hấp dẫn khi mua hàng</p>
+                </div>
+                <div className="coupons-grid">
+                  {coupons.filter(c => c.isActive && new Date(c.expiryDate) > new Date()).map(coupon => (
+                    <div key={coupon._id} className="coupon-card">
+                      <div className="coupon-badge">
+                        <span className="coupon-discount">
+                          {coupon.discountType === 'percentage' 
+                            ? `${coupon.discountValue}%` 
+                            : `${coupon.discountValue.toLocaleString('vi-VN')}đ`}
+                        </span>
+                        <span className="coupon-type">GIẢM</span>
+                      </div>
+                      <div className="coupon-content">
+                        <h3 className="coupon-title">{coupon.description || coupon.code}</h3>
+                        <div className="coupon-code">
+                          <span className="code-label">Mã:</span>
+                          <span className="code-value">{coupon.code}</span>
+                        </div>
+                        {coupon.minOrderValue > 0 && (
+                          <p className="coupon-condition">
+                            Đơn tối thiểu: {coupon.minOrderValue.toLocaleString('vi-VN')}đ
+                          </p>
+                        )}
+                        {coupon.maxDiscountAmount && (
+                          <p className="coupon-condition">
+                            Giảm tối đa: {coupon.maxDiscountAmount.toLocaleString('vi-VN')}đ
+                          </p>
+                        )}
+                        <p className="coupon-expiry">
+                          HSD: {new Date(coupon.expiryDate).toLocaleDateString('vi-VN')}
+                        </p>
+                      </div>
+                      <Link to="/shop" className="coupon-use-btn">
+                        Dùng ngay
+                      </Link>
+                    </div>
+                  ))}
+                </div>
+              </section>
+            )}
+            
             {/* Hiển thị bài viết theo từng danh mục */}
             {activeCategories.map(category => {
               const categoryArticles = getArticlesByCategory(category.slug)
@@ -217,7 +317,7 @@ export default function Articles(){
             <span className="qa-icon">🏪</span>
             <div className="qa-content">
               <h3>Về chúng tôi</h3>
-              <p>Tìm hiểu về The Sun Garden</p>
+              <p>Tìm hiểu về Floréa</p>
             </div>
             <Link to="/policy/about" className="qa-btn">
               <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">

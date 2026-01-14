@@ -10,7 +10,7 @@ export default function PolicyPayment() {
         <div className="policy-content">
           <div className="policy-intro">
             <p>
-              <strong>The Sun Garden</strong> hỗ trợ nhiều phương thức thanh toán linh hoạt, 
+              <strong>Floréa</strong> hỗ trợ nhiều phương thức thanh toán linh hoạt, 
               giúp khách hàng dễ dàng và an toàn khi mua sắm.
             </p>
           </div>

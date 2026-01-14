@@ -135,31 +135,33 @@ const OrderDetail = () => {
     try {
       setUploadingMedia(true);
       
-      // Upload images if any
+      // Upload images and videos together if any
       let uploadedImages = [];
-      if (reviewImages.length > 0) {
-        for (const img of reviewImages) {
-          const formData = new FormData();
-          formData.append('image', img);
-          const uploadRes = await api.post('/upload', formData, {
+      let uploadedVideos = [];
+      
+      if (reviewImages.length > 0 || reviewVideo) {
+        const formData = new FormData();
+        
+        // Add all images
+        reviewImages.forEach(img => {
+          formData.append('media', img);
+        });
+        
+        // Add video if exists
+        if (reviewVideo) {
+          formData.append('media', reviewVideo);
+        }
+
+        try {
+          const uploadRes = await api.post('/reviews/upload-media', formData, {
             headers: { 'Content-Type': 'multipart/form-data' }
           });
-          if (uploadRes.data.imageUrl) {
-            uploadedImages.push(uploadRes.data.imageUrl);
-          }
-        }
-      }
-
-      // Upload video if any
-      let uploadedVideo = null;
-      if (reviewVideo) {
-        const formData = new FormData();
-        formData.append('video', reviewVideo);
-        const uploadRes = await api.post('/upload/video', formData, {
-          headers: { 'Content-Type': 'multipart/form-data' }
-        });
-        if (uploadRes.data.videoUrl) {
-          uploadedVideo = uploadRes.data.videoUrl;
+          console.log('Upload response:', uploadRes.data);
+          uploadedImages = uploadRes.data.images || [];
+          uploadedVideos = uploadRes.data.videos || [];
+        } catch (err) {
+          console.error('Error uploading media:', err);
+          alert('Đã có lỗi khi upload ảnh/video. Đánh giá sẽ được gửi không có ảnh/video.');
         }
       }
 
@@ -169,7 +171,7 @@ const OrderDetail = () => {
           rating: reviewData.rating,
           comment: reviewData.comment,
           images: uploadedImages,
-          video: uploadedVideo
+          videos: uploadedVideos
         });
         alert('Cập nhật đánh giá thành công!');
       } else {
@@ -181,7 +183,7 @@ const OrderDetail = () => {
           rating: reviewData.rating,
           comment: reviewData.comment,
           images: uploadedImages,
-          video: uploadedVideo
+          videos: uploadedVideos
         });
         alert('Đánh giá thành công!');
       }
@@ -455,7 +457,7 @@ const OrderDetail = () => {
             <div className="payment-rows">
               <div className="payment-row">
                 <span>Phương thức:</span>
-                <span>ZaloPay</span>
+                <span>{order.paymentMethod === 'cod' ? 'Tiền mặt (COD)' : order.paymentMethod === 'zalopay' ? 'ZaloPay' : order.paymentMethod === 'vnpay' ? 'VNPay' : 'Khác'}</span>
               </div>
               <div className="payment-row">
                 <span>Tạm tính:</span>

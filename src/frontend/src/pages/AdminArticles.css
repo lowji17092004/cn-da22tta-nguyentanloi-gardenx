@@ -1473,6 +1473,8 @@
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.2s ease;
+  background: #e5e7eb;
+  color: #6b7280;
 }
 
 .table-action-btn svg {
@@ -1481,29 +1483,14 @@
   flex-shrink: 0;
 }
 
-.table-action-btn.edit {
-  background: #dbeafe;
-  color: #2563eb;
-}
-
 .table-action-btn.edit:hover {
   background: #2563eb;
   color: white;
 }
 
-.table-action-btn.view {
-  background: #dcfce7;
-  color: #16a34a;
-}
-
 .table-action-btn.view:hover {
   background: #16a34a;
   color: white;
-}
-
-.table-action-btn.delete {
-  background: #fee2e2;
-  color: #dc2626;
 }
 
 .table-action-btn.delete:hover {
@@ -1786,6 +1773,26 @@
   background: linear-gradient(135deg, #2d7a4a 0%, #1a472a 100%);
   color: #1c1917;
   border-color: #2d7a4a;
+}
+
+.dark-theme .table-action-btn {
+  background: #44403c;
+  color: #a8a29e;
+}
+
+.dark-theme .table-action-btn.edit:hover {
+  background: #2563eb;
+  color: white;
+}
+
+.dark-theme .table-action-btn.view:hover {
+  background: #2d7a4a;
+  color: white;
+}
+
+.dark-theme .table-action-btn.delete:hover {
+  background: #dc2626;
+  color: white;
 }
 
 /* Responsive */

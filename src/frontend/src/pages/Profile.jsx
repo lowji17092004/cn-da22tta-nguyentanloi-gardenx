@@ -192,7 +192,7 @@ const Profile = () => {
     }
 
     if (passwordData.newPassword.length < 6) {
-      setMessage({ type: 'error', text: 'Mật khẩu phải có ít nhất 6 ký tự!' });
+      setMessage({ type: 'error', text: 'Mật khẩu phải có ít nhất 8 ký tự!' });
       return;
     }
 

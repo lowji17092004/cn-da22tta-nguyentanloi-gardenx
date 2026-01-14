@@ -50,6 +50,13 @@ const Checkout = () => {
   const [showOnlinePayment, setShowOnlinePayment] = useState(false);
   const [selectedBank, setSelectedBank] = useState('');
   const [savedCoupons, setSavedCoupons] = useState([]);
+  const [pollingInterval, setPollingInterval] = useState(null);
+  const [paymentStartTime, setPaymentStartTime] = useState(null);
+  const [isWaitingPayment, setIsWaitingPayment] = useState(false);
+  const [zaloPayUrl, setZaloPayUrl] = useState('');
+  const [showZaloPayIframe, setShowZaloPayIframe] = useState(false);
+  const [zaloPayTransId, setZaloPayTransId] = useState('');
+  const [zaloPayOrderData, setZaloPayOrderData] = useState(null);
 
   // Vietnam address states
   const [provinces, setProvinces] = useState([]);
@@ -125,6 +132,112 @@ const Checkout = () => {
     // Load provinces
     getProvinces().then(setProvinces);
   }, [user]);
+
+  // Cleanup polling on unmount
+  useEffect(() => {
+    return () => {
+      if (pollingInterval) {
+        clearInterval(pollingInterval);
+      }
+    };
+  }, [pollingInterval]);
+
+  // Poll for ZaloPay payment completion - Query trực tiếp trạng thái từ ZaloPay
+  const startPaymentPolling = (appTransId, orderData) => {
+    const startTime = Date.now();
+    setPaymentStartTime(startTime);
+    setIsWaitingPayment(true);
+    
+    console.log('[ZaloPay Polling] Started at:', new Date(startTime).toISOString());
+    console.log('[ZaloPay Polling] Tracking app_trans_id:', appTransId);
+    
+    const interval = setInterval(async () => {
+      try {
+        console.log('[ZaloPay Polling] Querying payment status...');
+        
+        // Query trạng thái thanh toán từ ZaloPay
+        const queryRes = await api.post('/payments/zalopay/query', {
+          app_trans_id: appTransId
+        });
+        
+        console.log('[ZaloPay Polling] Query result:', queryRes.data);
+        
+        // ZaloPay return codes:
+        // return_code = 1: Thanh toán thành công
+        // return_code = 2: Giao dịch thất bại/không tồn tại
+        // return_code = 3: Đang xử lý hoặc chưa thanh toán
+        if (queryRes.data.return_code === 1) {
+          console.log('[ZaloPay Polling] ✅ Payment successful! Creating order...');
+          
+          // Gọi API tạo order
+          const createOrderRes = await api.post('/payments/zalopay/create-order', {
+            app_trans_id: appTransId,
+            orderData: orderData
+          });
+          
+          if (createOrderRes.data.success) {
+            console.log('[ZaloPay Polling] ✅ Order created:', createOrderRes.data.order._id);
+            
+            clearInterval(interval);
+            setPollingInterval(null);
+            setIsWaitingPayment(false);
+            setShowQR(false);
+            setShowZaloPayIframe(false);
+            
+            // Clear cart
+            if (buyNowItem) {
+              setBuyNow(null);
+            }
+            const selectedIds = JSON.parse(sessionStorage.getItem('checkoutItems') || '[]');
+            if (selectedIds.length > 0) {
+              selectedIds.forEach(id => remove(id));
+              sessionStorage.removeItem('checkoutItems');
+            }
+            
+            // Show success message
+            setNotification({ 
+              message: `🎉 Đặt hàng thành công! Mã đơn hàng: #${createOrderRes.data.order._id.slice(-8).toUpperCase()}`, 
+              type: 'success' 
+            });
+            
+            // Reset form
+            setCheckoutItems([]);
+            setOrderCreated(true);
+          }
+        } else if (queryRes.data.return_code === 2) {
+          // Giao dịch thất bại hoặc không tồn tại
+          console.log('[ZaloPay Polling] ❌ Transaction failed or not found');
+          clearInterval(interval);
+          setPollingInterval(null);
+          setIsWaitingPayment(false);
+          setShowZaloPayIframe(false);
+          setNotification({
+            message: 'Giao dịch không thành công hoặc đã hết hạn. Vui lòng thử lại.',
+            type: 'error'
+          });
+        }
+        // return_code = 3: Đang xử lý, tiếp tục polling
+        
+        // Stop polling after 10 minutes
+        const elapsed = Date.now() - startTime;
+        if (elapsed > 600000) {
+          console.log('[ZaloPay Polling] ⏱️ Timeout after 10 minutes');
+          clearInterval(interval);
+          setPollingInterval(null);
+          setIsWaitingPayment(false);
+          setShowZaloPayIframe(false);
+          setNotification({
+            message: 'Hết thời gian chờ thanh toán. Vui lòng kiểm tra lại đơn hàng của bạn.',
+            type: 'warning'
+          });
+        }
+      } catch (error) {
+        console.error('[ZaloPay Polling] Error:', error);
+      }
+    }, 3000); // Check every 3 seconds
+    
+    setPollingInterval(interval);
+  };
 
   // Load districts when province changes
   useEffect(() => {
@@ -240,9 +353,32 @@ const Checkout = () => {
 
   const generateZaloPayQR = async (amount, code) => {
     try {
+      // Chuẩn bị orderData để gửi cho callback
+      const orderData = {
+        customerName: formData.fullName,
+        customerEmail: formData.email,
+        phone: formData.phone,
+        address: selectedAddress.fullAddress,
+        items: checkoutItems.map(item => ({
+          product: item.product || item._id,
+          name: item.name,
+          price: item.salePrice || item.price,
+          quantity: item.quantity,
+          image: item.imageUrl || item.images?.[0] || item.image
+        })),
+        total: finalTotal,
+        notes: note,
+        coupon: appliedCoupon ? {
+          code: appliedCoupon.code,
+          discountAmount: appliedCoupon.discountAmount,
+          userCouponId: appliedCoupon.userCouponId
+        } : null
+      };
+
       const res = await api.post('/payments/zalopay/create', {
         amount: amount,
         orderId: code,
+        orderData: JSON.stringify(orderData), // Gửi orderData để callback tạo order
         items: checkoutItems.map(item => ({
           name: item.name,
           quantity: item.quantity,
@@ -299,19 +435,47 @@ const Checkout = () => {
       if (paymentMethod === 'zalopay') {
         // Gọi API ZaloPay để lấy QR thực
         setLoading(true);
+        console.log('[ZaloPay] Generating payment QR code...');
         const zaloPayResult = await generateZaloPayQR(finalTotal, tempOrderCode);
         setLoading(false);
         
         if (zaloPayResult && zaloPayResult.orderUrl) {
-          // Redirect đến trang thanh toán ZaloPay
+          console.log('[ZaloPay] Payment QR generated successfully:', zaloPayResult.appTransId);
+          console.log('[ZaloPay] Starting payment polling...');
+          
+          // Lưu app_trans_id và orderData để polling
+          const orderDataForPolling = {
+            customerName: formData.fullName,
+            customerEmail: formData.email,
+            phone: formData.phone,
+            address: selectedAddress.fullAddress,
+            items: checkoutItems.map(item => ({
+              product: item.product || item._id,
+              name: item.name,
+              price: item.salePrice || item.price,
+              quantity: item.quantity,
+              image: item.imageUrl || item.images?.[0] || item.image
+            })),
+            total: finalTotal,
+            notes: note,
+            coupon: appliedCoupon ? {
+              code: appliedCoupon.code,
+              discountAmount: appliedCoupon.discountAmount,
+              userCouponId: appliedCoupon.userCouponId
+            } : null
+          };
+          
+          // Start polling with app_trans_id and orderData
+          startPaymentPolling(zaloPayResult.appTransId, orderDataForPolling);
+          
+          // Mở trang thanh toán ZaloPay trong tab mới
           window.open(zaloPayResult.orderUrl, '_blank');
           setNotification({ 
-            message: 'Vui lòng hoàn tất thanh toán trên trang ZaloPay. Sau khi thanh toán xong, hãy nhấn "Đã thanh toán" để xác nhận.', 
+            message: 'Đang chờ thanh toán ZaloPay. Vui lòng hoàn tất thanh toán trong tab mới.', 
             type: 'info' 
           });
-          setShowQR(true);
-          setQrCodeUrl(generateQRCode(finalTotal, tempOrderCode)); // Fallback QR
         } else {
+          console.error('[ZaloPay] Failed to generate payment QR');
           // Fallback về VietQR nếu ZaloPay không khả dụng
           setNotification({ 
             message: 'ZaloPay tạm thời không khả dụng. Vui lòng dùng mã QR ngân hàng bên dưới.', 
@@ -771,15 +935,44 @@ const Checkout = () => {
                 <div className="total-row final"><span>Tổng cộng</span><span>{formatPrice(finalTotal)}</span></div>
               </div>
 
-              <button className="btn-order" onClick={handleSubmit} disabled={loading}>
-                {loading ? 'Đang xử lý...' : 'Đặt hàng'}
+              <button className="btn-order" onClick={handleSubmit} disabled={loading || orderCreated}>
+                {loading ? 'Đang xử lý...' : orderCreated ? '✅ Đã đặt hàng' : 'Đặt hàng'}
               </button>
 
-              <p className="order-note">Đơn hàng sẽ được Admin xác nhận trước khi giao</p>
+              <p className="order-note">
+                {orderCreated 
+                  ? '🎉 Đơn hàng của bạn đã được tạo thành công!' 
+                  : 'Đơn hàng sẽ được Admin xác nhận trước khi giao'
+                }
+              </p>
             </div>
           </div>
         </div>
       </div>
+
+      {/* Success Overlay */}
+      {orderCreated && (
+        <div className="success-overlay">
+          <div className="success-card">
+            <div className="success-icon">
+              <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                <polyline points="22 4 12 14.01 9 11.01"/>
+              </svg>
+            </div>
+            <h2>Đặt hàng thành công!</h2>
+            <p>Cảm ơn bạn đã mua hàng. Đơn hàng của bạn đã được ghi nhận và đang chờ xác nhận.</p>
+            <div className="success-actions">
+              <button className="btn-view-orders" onClick={() => navigate('/orders')}>
+                Xem đơn hàng
+              </button>
+              <button className="btn-continue" onClick={() => navigate('/')}>
+                Tiếp tục mua sắm
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Payment QR Modal */}
       {showQR && (
@@ -823,16 +1016,26 @@ const Checkout = () => {
                 </div>
                 
                 <div className="qr-footer-compact">
-                  <p className="note">💡 Vui lòng chuyển khoản đúng nội dung để đơn hàng được xử lý nhanh</p>
-                  <button className="btn-confirm-payment" onClick={handlePaymentConfirm}>
-                    Tôi đã thanh toán
-                  </button>
+                  <p className="note">💡 Hệ thống đang chờ xác nhận thanh toán. Vui lòng chuyển khoản đúng số tiền và nội dung.</p>
+                  <button className="btn-cancel-qr" onClick={() => setShowQR(false)}>Đóng</button>
                 </div>
               </div>
             ) : (
               <div className="qr-content-new">
                 <h2>Thanh toán đơn hàng</h2>
-                <p className="qr-subtitle">Phương thức thanh toán</p>
+                <p className="qr-subtitle">
+                  {isWaitingPayment ? (
+                    <>
+                      <span className="waiting-indicator">⏳</span> Đang chờ xác nhận thanh toán từ ZaloPay...
+                      <br />
+                      <small style={{fontSize: '0.9em', opacity: 0.8}}>
+                        Đơn hàng sẽ tự động được tạo sau khi thanh toán thành công
+                      </small>
+                    </>
+                  ) : (
+                    'Hệ thống đang chờ xác nhận thanh toán ZaloPay...'
+                  )}
+                </p>
                 <PaymentQR
                   amount={finalTotal}
                   orderId={orderId}
@@ -840,13 +1043,50 @@ const Checkout = () => {
                   onPaymentComplete={handlePaymentConfirm}
                 />
                 <div className="qr-actions">
-                  <button className="btn-confirm-payment" onClick={handlePaymentConfirm}>
-                    Tôi đã thanh toán
-                  </button>
                   <button className="btn-cancel-qr" onClick={() => setShowQR(false)}>Đóng</button>
                 </div>
               </div>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* ZaloPay Iframe Modal */}
+      {showZaloPayIframe && (
+        <div className="payment-iframe-overlay">
+          <div className="payment-iframe-container">
+            <div className="payment-iframe-header">
+              <h2>Thanh toán ZaloPay</h2>
+              <button 
+                className="close-iframe-btn" 
+                onClick={() => {
+                  setShowZaloPayIframe(false);
+                  setIsWaitingPayment(false);
+                  if (pollingInterval) {
+                    clearInterval(pollingInterval);
+                    setPollingInterval(null);
+                  }
+                }}
+                aria-label="Đóng"
+              >
+                ✕
+              </button>
+            </div>
+            <div className="payment-iframe-body">
+              {isWaitingPayment && (
+                <div className="payment-status-banner">
+                  <span className="waiting-indicator">⏳</span>
+                  Đang chờ xác nhận thanh toán... Đơn hàng sẽ tự động được tạo khi thanh toán thành công.
+                </div>
+              )}
+              <iframe
+                src={zaloPayUrl}
+                title="ZaloPay Payment"
+                className="zalopay-iframe"
+                frameBorder="0"
+                allowFullScreen
+              />
+            </div>
           </div>
         </div>
       )}

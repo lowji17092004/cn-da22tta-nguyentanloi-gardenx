@@ -6,43 +6,94 @@ import './AdminStats.css'
 // ================== CHART COMPONENTS ==================
 
 // Line Chart Component
-function LineChart({ data, height = 200, color = '#1a472a' }) {
-  if (!data || data.length === 0) return <div className="chart-empty">Không có dữ liệu</div>
+function LineChart({ data, height = 200, color = '#4A90E2', simplified = false, maxYValue = null }) {
+  if (!data || data.length === 0) return <div className="chart-empty">📉 Không có dữ liệu</div>
   const maxValue = Math.max(...data.map(d => d.value), 1)
+  const minValue = 0
+  const range = maxValue || 1
+  
+  // Calculate nice Y-axis scale
+  const getYAxisValues = () => {
+    let max = maxYValue || maxValue
+    // For simplified format (customer chart), use cleaner steps
+    if (simplified) {
+      max = Math.max(max, 500000) // Minimum 500k
+      const step = Math.ceil(max / 5 / 100000) * 100000
+      return Array.from({ length: 6 }, (_, i) => i * step)
+    }
+    const step = Math.ceil(max / 5 / 100000) * 100000
+    return Array.from({ length: 6 }, (_, i) => i * step)
+  }
+  const yAxisValues = getYAxisValues()
+  const yMax = yAxisValues[yAxisValues.length - 1]
+  
   const points = data.map((d, i) => ({
-    x: (i / (data.length - 1 || 1)) * 100,
-    y: 100 - (d.value / maxValue) * 80
+    x: 15 + (i / (data.length - 1 || 1)) * 80,
+    y: 90 - ((d.value / yMax) * 75),
+    value: d.value
   }))
   
   const pathD = points.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`).join(' ')
-  const areaD = pathD + ` L 100 100 L 0 100 Z`
+
+  const formatCurrency = (value) => {
+    return value.toLocaleString('vi-VN') + 'đ'
+  }
 
   return (
-    <div className="chart-wrapper" style={{ height }}>
-      <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="line-chart-svg">
-        <defs>
-          <linearGradient id={`lineGradient-${color.replace('#', '')}`} x1="0%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%" stopColor={color} stopOpacity="0.3" />
-            <stop offset="100%" stopColor={color} stopOpacity="0.05" />
-          </linearGradient>
-        </defs>
-        {/* Grid lines */}
-        {[0, 25, 50, 75, 100].map(y => (
-          <line key={y} x1="0" y1={y} x2="100" y2={y} stroke="#e5e7eb" strokeWidth="0.5" vectorEffect="non-scaling-stroke" />
-        ))}
-        <path d={areaD} fill={`url(#lineGradient-${color.replace('#', '')})`} />
-        <path d={pathD} fill="none" stroke={color} strokeWidth="2.5" vectorEffect="non-scaling-stroke" strokeLinecap="round" strokeLinejoin="round" />
-        {points.map((p, i) => (
-          <g key={i}>
-            <circle cx={p.x} cy={p.y} r="6" fill={color} opacity="0.2" />
-            <circle cx={p.x} cy={p.y} r="4" fill={color} stroke="#fff" strokeWidth="2" vectorEffect="non-scaling-stroke">
-              <title>{data[i].label}: {data[i].value.toLocaleString()}</title>
-            </circle>
-          </g>
-        ))}
-      </svg>
-      <div className="chart-x-labels">
-        {data.map((d, i) => <span key={i}>{d.label}</span>)}
+    <div className="professional-chart-container">
+      <div className="chart-canvas" style={{ height }}>
+        <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="line-chart-svg">
+          {/* Horizontal grid lines */}
+          {yAxisValues.map((val, i) => {
+            const y = 90 - (i / (yAxisValues.length - 1)) * 75
+            return (
+              <line 
+                key={i} 
+                x1="15" 
+                y1={y} 
+                x2="95" 
+                y2={y} 
+                stroke="#d0d0d0" 
+                strokeWidth="0.15" 
+                vectorEffect="non-scaling-stroke"
+              />
+            )
+          })}
+          {/* Main line */}
+          <path 
+            d={pathD} 
+            fill="none" 
+            stroke={color} 
+            strokeWidth="2" 
+            vectorEffect="non-scaling-stroke" 
+            strokeLinecap="round" 
+            strokeLinejoin="round" 
+            className="chart-line"
+          />
+        </svg>
+        
+        {/* Y-axis labels */}
+        <div className="y-axis-labels">
+          {yAxisValues.slice().reverse().map((val, i) => (
+            <div key={i} className="y-axis-label">{formatCurrency(val)}</div>
+          ))}
+        </div>
+        
+        {/* X-axis labels */}
+        <div className="x-axis-labels">
+          {data.map((d, i) => {
+            const xPercent = 15 + (i / (data.length - 1 || 1)) * 80
+            // Chỉ hiển thị labels có khoảng cách hợp lý để tránh chồng chéo
+            const shouldShow = data.length <= 15 || 
+                              i === 0 || 
+                              i === data.length - 1 || 
+                              (data.length <= 31 && i % 2 === 0) || 
+                              (data.length > 31 && i % 3 === 0)
+            return shouldShow ? (
+              <span key={i} className="x-axis-label" style={{ left: `${xPercent}%` }}>{d.label}</span>
+            ) : null
+          })}
+        </div>
       </div>
     </div>
   )
@@ -50,28 +101,34 @@ function LineChart({ data, height = 200, color = '#1a472a' }) {
 
 // Bar Chart Component
 function BarChart({ data, height = 220 }) {
-  if (!data || data.length === 0) return <div className="chart-empty">Không có dữ liệu</div>
+  if (!data || data.length === 0) return <div className="chart-empty">📊 Không có dữ liệu</div>
   const maxValue = Math.max(...data.map(d => d.value), 1)
   const colors = ['#1a472a', '#10b981', '#3b82f6', '#8b5cf6', '#f59e0b', '#ec4899', '#14b8a6', '#ef4444']
   
   return (
     <div className="bar-chart-wrapper" style={{ height }}>
       <div className="bar-chart-container">
-        {data.map((item, i) => (
-          <div key={i} className="bar-column">
-            <div className="bar-value">{item.value}</div>
-            <div className="bar-track">
-              <div 
-                className="bar-fill" 
-                style={{ 
-                  height: `${(item.value / maxValue) * 100}%`,
-                  background: item.color || colors[i % colors.length]
-                }}
-              />
+        {data.map((item, i) => {
+          const barColor = item.color || colors[i % colors.length]
+          const barHeight = (item.value / maxValue) * 70
+          return (
+            <div key={i} className="bar-column">
+              <div className="bar-value-top" style={{ color: barColor }}>{item.value}</div>
+              <div className="bar-track">
+                <div 
+                  className="bar-fill" 
+                  style={{ 
+                    height: `${barHeight}%`,
+                    background: `linear-gradient(180deg, ${barColor} 0%, ${barColor}dd 100%)`,
+                    boxShadow: `0 -2px 8px ${barColor}40`
+                  }}
+                  title={`${item.label}: ${item.value}`}
+                />
+              </div>
+              <div className="bar-label" title={item.fullLabel || item.label}>{item.label}</div>
             </div>
-            <div className="bar-label" title={item.fullLabel || item.label}>{item.label}</div>
-          </div>
-        ))}
+          )
+        })}
       </div>
     </div>
   )
@@ -264,12 +321,16 @@ export default function AdminStats() {
     completedOrders: 0,
     cancelledOrders: 0,
     processingOrders: 0,
-    shippingOrders: 0
+    shippingOrders: 0,
+    allUsers: []
   })
   const [loading, setLoading] = useState(true)
   const [recentOrders, setRecentOrders] = useState([])
   const [categoryData, setCategoryData] = useState([])
   const [timePeriod, setTimePeriod] = useState('month')
+  const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1)
+  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear())
+  const [selectedWeek, setSelectedWeek] = useState(1)
   const [revenueChartData, setRevenueChartData] = useState([])
   const [allOrders, setAllOrders] = useState([])
   const [topProducts, setTopProducts] = useState([])
@@ -280,12 +341,53 @@ export default function AdminStats() {
   const [performanceData, setPerformanceData] = useState([])
 
   // Calculate revenue by time period
-  const calculateRevenueByPeriod = (orders, period) => {
+  const calculateRevenueByPeriod = (orders, period, month = null, year = null, week = null) => {
     const deliveredOrders = orders.filter(o => o.status === 'delivered')
     const now = new Date()
     let data = []
 
-    if (period === 'day') {
+    if (period === 'specific-week' && week && month && year) {
+      // Hiển thị doanh thu 7 ngày trong tuần của tháng được chọn
+      const startDay = (week - 1) * 7 + 1
+      const endDay = Math.min(week * 7, new Date(year, month, 0).getDate())
+      
+      for (let day = startDay; day <= endDay; day++) {
+        const currentDay = new Date(year, month - 1, day)
+        const dayRevenue = deliveredOrders
+          .filter(o => {
+            const orderDate = new Date(o.createdAt)
+            return orderDate.getDate() === day && orderDate.getMonth() === month - 1 && orderDate.getFullYear() === year
+          })
+          .reduce((sum, o) => sum + (o.total || 0), 0)
+        const dayLabel = currentDay.toLocaleDateString('vi-VN', { weekday: 'short' })
+        data.push({ label: dayLabel, value: dayRevenue })
+      }
+    } else if (period === 'specific-month' && month && year) {
+      // Hiển thị doanh thu từng ngày trong tháng được chọn
+      const daysInMonth = new Date(year, month, 0).getDate()
+      for (let day = 1; day <= daysInMonth; day++) {
+        const dayRevenue = deliveredOrders
+          .filter(o => {
+            const orderDate = new Date(o.createdAt)
+            return orderDate.getDate() === day && 
+                   orderDate.getMonth() === month - 1 && 
+                   orderDate.getFullYear() === year
+          })
+          .reduce((sum, o) => sum + (o.total || 0), 0)
+        data.push({ label: `${day}`, value: dayRevenue })
+      }
+    } else if (period === 'specific-year' && year) {
+      // Hiển thị doanh thu 12 tháng trong năm được chọn
+      for (let m = 1; m <= 12; m++) {
+        const monthRevenue = deliveredOrders
+          .filter(o => {
+            const orderDate = new Date(o.createdAt)
+            return orderDate.getMonth() === m - 1 && orderDate.getFullYear() === year
+          })
+          .reduce((sum, o) => sum + (o.total || 0), 0)
+        data.push({ label: `T${m}`, value: monthRevenue })
+      }
+    } else if (period === 'day') {
       for (let i = 6; i >= 0; i--) {
         const date = new Date(now)
         date.setDate(date.getDate() - i)
@@ -333,6 +435,32 @@ export default function AdminStats() {
           .reduce((sum, o) => sum + (o.total || 0), 0)
         data.push({ label: year.toString(), value: yearRevenue })
       }
+    } else if (period === 'specific-month' && month && year) {
+      // Hiển thị doanh thu từng ngày trong tháng được chọn
+      const daysInMonth = new Date(year, month, 0).getDate()
+      for (let day = 1; day <= daysInMonth; day++) {
+        const date = new Date(year, month - 1, day)
+        const dayRevenue = deliveredOrders
+          .filter(o => {
+            const orderDate = new Date(o.createdAt)
+            return orderDate.getDate() === day && 
+                   orderDate.getMonth() === month - 1 && 
+                   orderDate.getFullYear() === year
+          })
+          .reduce((sum, o) => sum + (o.total || 0), 0)
+        data.push({ label: `${day}`, value: dayRevenue })
+      }
+    } else if (period === 'specific-year' && year) {
+      // Hiển thị doanh thu từng tháng trong năm được chọn
+      for (let m = 1; m <= 12; m++) {
+        const monthRevenue = deliveredOrders
+          .filter(o => {
+            const orderDate = new Date(o.createdAt)
+            return orderDate.getMonth() === m - 1 && orderDate.getFullYear() === year
+          })
+          .reduce((sum, o) => sum + (o.total || 0), 0)
+        data.push({ label: `T${m}`, value: monthRevenue })
+      }
     }
     setRevenueChartData(data)
   }
@@ -374,7 +502,8 @@ export default function AdminStats() {
           processingOrders,
           shippingOrders,
           completedOrders,
-          cancelledOrders
+          cancelledOrders,
+          allUsers: users
         })
 
         setAllOrders(orders)
@@ -442,11 +571,13 @@ export default function AdminStats() {
         })))
 
         // Weekday distribution
-        const weekdays = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7']
+        const weekdays = ['Th 2', 'Th 3', 'Th 4', 'Th 5', 'Th 6', 'Th 7', 'CN']
         const weekdayDist = Array(7).fill(0)
         orders.forEach(o => {
           const day = new Date(o.createdAt).getDay()
-          weekdayDist[day]++
+          // Map Sunday (0) to index 6, Monday (1) to index 0, etc.
+          const mappedIndex = day === 0 ? 6 : day - 1
+          weekdayDist[mappedIndex]++
         })
         setWeekdayData(weekdays.map((label, i) => ({
           label,
@@ -509,7 +640,211 @@ export default function AdminStats() {
 
   const handleTimePeriodChange = (period) => {
     setTimePeriod(period)
-    calculateRevenueByPeriod(allOrders, period)
+    if (period === 'specific-week') {
+      calculateRevenueByPeriod(allOrders, period, selectedMonth, selectedYear, selectedWeek)
+      calculateOrdersByCategory(allOrders, period, selectedMonth, selectedYear, selectedWeek)
+      calculateUserGrowthByPeriod(period, selectedMonth, selectedYear, selectedWeek)
+    } else if (period === 'specific-month') {
+      calculateRevenueByPeriod(allOrders, period, selectedMonth, selectedYear)
+      calculateOrdersByCategory(allOrders, period, selectedMonth, selectedYear)
+      calculateUserGrowthByPeriod(period, selectedMonth, selectedYear)
+    } else if (period === 'specific-year') {
+      calculateRevenueByPeriod(allOrders, period, null, selectedYear)
+      calculateOrdersByCategory(allOrders, period, null, selectedYear)
+      calculateUserGrowthByPeriod(period, null, selectedYear)
+    } else {
+      calculateRevenueByPeriod(allOrders, period)
+      calculateOrdersByCategory(allOrders, period)
+      calculateUserGrowthByPeriod(period)
+    }
+  }
+
+  const handleWeekChange = (e) => {
+    const week = parseInt(e.target.value)
+    setSelectedWeek(week)
+    if (timePeriod === 'specific-week') {
+      calculateRevenueByPeriod(allOrders, 'specific-week', selectedMonth, selectedYear, week)
+      calculateOrdersByCategory(allOrders, 'specific-week', selectedMonth, selectedYear, week)
+      calculateUserGrowthByPeriod('specific-week', selectedMonth, selectedYear, week)
+    }
+  }
+
+  const handleMonthChange = (e) => {
+    const month = parseInt(e.target.value)
+    setSelectedMonth(month)
+    if (timePeriod === 'specific-week') {
+      calculateRevenueByPeriod(allOrders, 'specific-week', month, selectedYear, selectedWeek)
+      calculateOrdersByCategory(allOrders, 'specific-week', month, selectedYear, selectedWeek)
+      calculateUserGrowthByPeriod('specific-week', month, selectedYear, selectedWeek)
+    } else if (timePeriod === 'specific-month') {
+      calculateRevenueByPeriod(allOrders, 'specific-month', month, selectedYear)
+      calculateOrdersByCategory(allOrders, 'specific-month', month, selectedYear)
+      calculateUserGrowthByPeriod('specific-month', month, selectedYear)
+    }
+  }
+
+  const handleYearChange = (e) => {
+    const year = parseInt(e.target.value)
+    setSelectedYear(year)
+    if (timePeriod === 'specific-week') {
+      calculateRevenueByPeriod(allOrders, 'specific-week', selectedMonth, year, selectedWeek)
+      calculateOrdersByCategory(allOrders, 'specific-week', selectedMonth, year, selectedWeek)
+      calculateUserGrowthByPeriod('specific-week', selectedMonth, year, selectedWeek)
+    } else if (timePeriod === 'specific-month') {
+      calculateRevenueByPeriod(allOrders, 'specific-month', selectedMonth, year)
+      calculateOrdersByCategory(allOrders, 'specific-month', selectedMonth, year)
+      calculateUserGrowthByPeriod('specific-month', selectedMonth, year)
+    } else if (timePeriod === 'specific-year') {
+      calculateRevenueByPeriod(allOrders, 'specific-year', null, year)
+      calculateOrdersByCategory(allOrders, 'specific-year', null, year)
+      calculateUserGrowthByPeriod('specific-year', null, year)
+    }
+  }
+
+  const calculateOrdersByCategory = (orders, period, month = null, year = null, week = null) => {
+    // Filter orders based on time period
+    let filteredOrders = orders
+    const now = new Date()
+    
+    if (period === 'specific-week' && week && month && year) {
+      const startDay = (week - 1) * 7 + 1
+      const endDay = Math.min(week * 7, new Date(year, month, 0).getDate())
+      filteredOrders = orders.filter(o => {
+        const orderDate = new Date(o.createdAt)
+        const day = orderDate.getDate()
+        return day >= startDay && day <= endDay && 
+               orderDate.getMonth() === month - 1 && 
+               orderDate.getFullYear() === year
+      })
+    } else if (period === 'specific-month' && month && year) {
+      filteredOrders = orders.filter(o => {
+        const orderDate = new Date(o.createdAt)
+        return orderDate.getMonth() === month - 1 && orderDate.getFullYear() === year
+      })
+    } else if (period === 'specific-year' && year) {
+      filteredOrders = orders.filter(o => {
+        const orderDate = new Date(o.createdAt)
+        return orderDate.getFullYear() === year
+      })
+    } else if (period === 'day') {
+      const sevenDaysAgo = new Date(now)
+      sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 6)
+      filteredOrders = orders.filter(o => new Date(o.createdAt) >= sevenDaysAgo)
+    } else if (period === 'week') {
+      const eightWeeksAgo = new Date(now)
+      eightWeeksAgo.setDate(eightWeeksAgo.getDate() - 56)
+      filteredOrders = orders.filter(o => new Date(o.createdAt) >= eightWeeksAgo)
+    } else if (period === 'month') {
+      const sixMonthsAgo = new Date(now)
+      sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 5)
+      filteredOrders = orders.filter(o => new Date(o.createdAt) >= sixMonthsAgo)
+    } else if (period === 'year') {
+      const fiveYearsAgo = new Date(now)
+      fiveYearsAgo.setFullYear(fiveYearsAgo.getFullYear() - 4)
+      filteredOrders = orders.filter(o => new Date(o.createdAt) >= fiveYearsAgo)
+    }
+    
+    // Group orders by category
+    const categoryMap = new Map()
+    
+    filteredOrders.forEach(order => {
+      if (order.items && Array.isArray(order.items)) {
+        order.items.forEach(item => {
+          if (item.product && item.product.category) {
+            const categoryName = item.product.category.name || 'Khác'
+            categoryMap.set(categoryName, (categoryMap.get(categoryName) || 0) + 1)
+          }
+        })
+      }
+    })
+    
+    // Convert to array and sort by count
+    const data = Array.from(categoryMap.entries())
+      .map(([label, value]) => ({ label, value }))
+      .sort((a, b) => b.value - a.value)
+      .slice(0, 8) // Top 8 categories
+    
+    setOrderTrend(data)
+  }
+
+  const calculateUserGrowthByPeriod = (period, month = null, year = null, week = null) => {
+    const users = stats.allUsers || []
+    const now = new Date()
+    let data = []
+    
+    if (period === 'specific-week' && week && month && year) {
+      const startDay = (week - 1) * 7 + 1
+      const endDay = Math.min(week * 7, new Date(year, month, 0).getDate())
+      
+      for (let day = startDay; day <= endDay; day++) {
+        const currentDay = new Date(year, month - 1, day)
+        const dayUsers = users.filter(u => {
+          const userDate = new Date(u.createdAt)
+          return userDate.getDate() === day && userDate.getMonth() === month - 1 && userDate.getFullYear() === year
+        }).length
+        const dayLabel = currentDay.toLocaleDateString('vi-VN', { weekday: 'short' })
+        data.push({ label: dayLabel, value: dayUsers })
+      }
+    } else if (period === 'specific-month' && month && year) {
+      const daysInMonth = new Date(year, month, 0).getDate()
+      for (let day = 1; day <= daysInMonth; day++) {
+        const dayUsers = users.filter(u => {
+          const userDate = new Date(u.createdAt)
+          return userDate.getDate() === day && 
+                 userDate.getMonth() === month - 1 && 
+                 userDate.getFullYear() === year
+        }).length
+        data.push({ label: `${day}`, value: dayUsers })
+      }
+    } else if (period === 'specific-year' && year) {
+      for (let m = 1; m <= 12; m++) {
+        const monthUsers = users.filter(u => {
+          const userDate = new Date(u.createdAt)
+          return userDate.getMonth() === m - 1 && userDate.getFullYear() === year
+        }).length
+        data.push({ label: `T${m}`, value: monthUsers })
+      }
+    } else if (period === 'day') {
+      for (let i = 6; i >= 0; i--) {
+        const date = new Date(now)
+        date.setDate(date.getDate() - i)
+        const shortLabel = date.toLocaleDateString('vi-VN', { weekday: 'short' })
+        const dayUsers = users.filter(u => new Date(u.createdAt).toDateString() === date.toDateString()).length
+        data.push({ label: shortLabel, value: dayUsers })
+      }
+    } else if (period === 'week') {
+      for (let i = 7; i >= 0; i--) {
+        const weekStart = new Date(now)
+        weekStart.setDate(weekStart.getDate() - (i * 7) - weekStart.getDay())
+        const weekEnd = new Date(weekStart)
+        weekEnd.setDate(weekEnd.getDate() + 6)
+        const weekLabel = `T${8-i}`
+        const weekUsers = users.filter(u => {
+          const userDate = new Date(u.createdAt)
+          return userDate >= weekStart && userDate <= weekEnd
+        }).length
+        data.push({ label: weekLabel, value: weekUsers })
+      }
+    } else if (period === 'month') {
+      for (let i = 5; i >= 0; i--) {
+        const date = new Date(now)
+        date.setMonth(date.getMonth() - i)
+        const monthIndex = date.getMonth()
+        const year = date.getFullYear()
+        const monthUsers = users.filter(u => {
+          const userDate = new Date(u.createdAt)
+          return userDate.getMonth() === monthIndex && userDate.getFullYear() === year
+        }).length
+        data.push({ label: `T${monthIndex + 1}`, value: monthUsers })
+      }
+    } else if (period === 'year') {
+      for (let i = 4; i >= 0; i--) {
+        const year = now.getFullYear() - i
+        const yearUsers = users.filter(u => new Date(u.createdAt).getFullYear() === year).length
+        data.push({ label: year.toString(), value: yearUsers })
+      }
+    }
+    setUserGrowth(data)
   }
 
   const orderStatusData = [
@@ -521,9 +856,79 @@ export default function AdminStats() {
   ]
 
   const formatCurrency = (value) => {
-    if (value >= 1000000) return (value / 1000000).toFixed(1) + 'M'
-    if (value >= 1000) return (value / 1000).toFixed(0) + 'K'
-    return value.toLocaleString()
+    return value.toLocaleString('vi-VN') + 'đ'
+  }
+
+  const handleExportReport = () => {
+    const getTimePeriodLabel = () => {
+      if (timePeriod === 'day') return '7 ngày gần nhất'
+      if (timePeriod === 'week') return '8 tuần gần nhất'
+      if (timePeriod === 'month') return '6 tháng gần nhất'
+      if (timePeriod === 'year') return '5 năm gần nhất'
+      if (timePeriod === 'specific-week') return `Tuần ${selectedWeek} - Tháng ${selectedMonth}/${selectedYear}`
+      if (timePeriod === 'specific-month') return `Tháng ${selectedMonth}/${selectedYear}`
+      return `Năm ${selectedYear}`
+    }
+
+    const formatCurrencyReport = (value) => {
+      return (value || 0).toLocaleString('vi-VN') + 'đ'
+    }
+
+    const reportText = `
+==============================================
+           BÁO CÁO THỐNG KÊ
+           GARDENX - CỬA HÀNG CÂY CẢNH
+==============================================
+
+Ngày xuất báo cáo: ${new Date().toLocaleString('vi-VN')}
+Khoảng thời gian: ${getTimePeriodLabel()}
+
+----------------------------------------------
+TỔNG QUAN
+----------------------------------------------
+Tổng đơn hàng:        ${stats.totalOrders}
+Tổng doanh thu:       ${formatCurrencyReport(stats.totalRevenue)}
+Số sản phẩm:          ${stats.totalProducts}
+Số khách hàng:        ${stats.totalUsers}
+
+----------------------------------------------
+TRẠNG THÁI ĐƠN HÀNG
+----------------------------------------------
+Hoàn thành:           ${stats.completedOrders} đơn
+Đang giao:            ${stats.shippingOrders} đơn
+Đang xử lý:           ${stats.processingOrders} đơn
+Chờ duyệt:            ${stats.pendingOrders} đơn
+Đã hủy:               ${stats.cancelledOrders} đơn
+
+----------------------------------------------
+DOANH THU THEO THỜI GIAN
+----------------------------------------------
+${revenueChartData.map(item => `${item.label.padEnd(15)} ${formatCurrencyReport(item.value)}`).join('\n')}
+
+----------------------------------------------
+ĐƠN HÀNG THEO DANH MỤC
+----------------------------------------------
+${orderTrend.map((item, i) => `${(i + 1).toString().padStart(2)}. ${item.label.padEnd(20)} ${item.value} đơn`).join('\n')}
+
+----------------------------------------------
+KHÁCH HÀNG MỚI
+----------------------------------------------
+${userGrowth.map(item => `${item.label.padEnd(15)} ${item.value} khách`).join('\n')}
+
+==============================================
+Báo cáo được tạo tự động bởi hệ thống GardenX
+==============================================
+    `.trim()
+
+    const blob = new Blob([reportText], { type: 'text/plain;charset=utf-8' })
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = `bao-cao-thong-ke-${new Date().toISOString().split('T')[0]}.txt`
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+    URL.revokeObjectURL(url)
   }
 
   return (
@@ -536,6 +941,14 @@ export default function AdminStats() {
             <p>Tổng quan hoạt động kinh doanh của cửa hàng</p>
           </div>
           <div className="stats-header-right">
+            <button className="export-btn" onClick={handleExportReport}>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                <polyline points="7 10 12 15 17 10"/>
+                <line x1="12" y1="15" x2="12" y2="3"/>
+              </svg>
+              Xuất báo cáo
+            </button>
             <span className="stats-date">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
@@ -546,6 +959,64 @@ export default function AdminStats() {
               {new Date().toLocaleDateString('vi-VN', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' })}
             </span>
           </div>
+        </div>
+
+        {/* Global Filter */}
+        <div className="global-filter">
+          <div className="filter-label">🔍 Bộ lọc thời gian:</div>
+          <div className="filter-options">
+            {['day', 'week', 'month', 'year', 'specific-week', 'specific-month', 'specific-year'].map(p => (
+              <button 
+                key={p}
+                className={`filter-option-btn ${timePeriod === p ? 'active' : ''}`}
+                onClick={() => handleTimePeriodChange(p)}
+              >
+                {p === 'day' ? 'Ngày' : p === 'week' ? 'Tuần' : p === 'month' ? 'Tháng' : p === 'year' ? 'Năm' : p === 'specific-week' ? 'Lọc tuần' : p === 'specific-month' ? 'Lọc tháng' : 'Lọc năm'}
+              </button>
+            ))}
+          </div>
+          {(timePeriod === 'specific-week' || timePeriod === 'specific-month' || timePeriod === 'specific-year') && (
+            <div className="date-range-selector">
+              {timePeriod === 'specific-week' && (
+                <>
+                  <div className="date-input-group">
+                    <label>Tháng:</label>
+                    <select value={selectedMonth} onChange={handleMonthChange} className="month-year-select">
+                      {[1,2,3,4,5,6,7,8,9,10,11,12].map(m => (
+                        <option key={m} value={m}>Tháng {m}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="date-input-group">
+                    <label>Tuần:</label>
+                    <select value={selectedWeek} onChange={handleWeekChange} className="month-year-select">
+                      {[1,2,3,4,5].map(w => (
+                        <option key={w} value={w}>Tuần {w}</option>
+                      ))}
+                    </select>
+                  </div>
+                </>
+              )}
+              {timePeriod === 'specific-month' && (
+                <div className="date-input-group">
+                  <label>Tháng:</label>
+                  <select value={selectedMonth} onChange={handleMonthChange} className="month-year-select">
+                    {[1,2,3,4,5,6,7,8,9,10,11,12].map(m => (
+                      <option key={m} value={m}>Tháng {m}</option>
+                    ))}
+                  </select>
+                </div>
+              )}
+              <div className="date-input-group">
+                <label>Năm:</label>
+                <select value={selectedYear} onChange={handleYearChange} className="month-year-select">
+                  {Array.from({length: 10}, (_, i) => new Date().getFullYear() - i).map(y => (
+                    <option key={y} value={y}>{y}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+          )}
         </div>
 
         {loading ? (
@@ -600,21 +1071,10 @@ export default function AdminStats() {
               <div className="stats-card large">
                 <div className="stats-card-header">
                   <h3>📈 Biểu đồ doanh thu</h3>
-                  <div className="time-period-tabs">
-                    {['day', 'week', 'month', 'year'].map(p => (
-                      <button 
-                        key={p}
-                        className={`period-tab ${timePeriod === p ? 'active' : ''}`}
-                        onClick={() => handleTimePeriodChange(p)}
-                      >
-                        {p === 'day' ? 'Ngày' : p === 'week' ? 'Tuần' : p === 'month' ? 'Tháng' : 'Năm'}
-                      </button>
-                    ))}
-                  </div>
                 </div>
-                <LineChart data={revenueChartData} height={220} color="#1a472a" />
+                <LineChart data={revenueChartData} height={220} color="#4A90E2" />
                 <div className="chart-summary">
-                  <span>Tổng: <strong>{formatCurrency(revenueChartData.reduce((s, d) => s + d.value, 0))}đ</strong></span>
+                  <span>Tổng: <strong>{formatCurrency(revenueChartData.reduce((s, d) => s + d.value, 0))}</strong></span>
                 </div>
               </div>
 
@@ -650,7 +1110,7 @@ export default function AdminStats() {
                 <div className="stats-card-header">
                   <h3>👤 Khách hàng mới</h3>
                 </div>
-                <LineChart data={userGrowth} height={180} color="#10b981" />
+                <BarChart data={userGrowth} height={200} />
               </div>
 
               <div className="stats-card">

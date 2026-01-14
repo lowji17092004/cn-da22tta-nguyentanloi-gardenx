@@ -10,7 +10,7 @@ export default function PolicyWarranty() {
         <div className="policy-content">
           <div className="policy-intro">
             <p>
-              <strong>The Sun Garden</strong> cam kết đảm bảo chất lượng sản phẩm và cung cấp chính sách bảo hành 
+              <strong>Floréa</strong> cam kết đảm bảo chất lượng sản phẩm và cung cấp chính sách bảo hành 
               rõ ràng, minh bạch để khách hàng yên tâm mua sắm.
             </p>
           </div>
@@ -119,7 +119,7 @@ export default function PolicyWarranty() {
               <p><strong>Hotline:</strong> <a href="tel:0368920249">0368 920 249</a> (8:00 - 22:00)</p>
               <p><strong>Email:</strong> <a href="mailto:thesungarden.tvu@gmail.com">thesungarden.tvu@gmail.com</a></p>
               <p><strong>Zalo:</strong> <a href="https://zalo.me/0368920249" target="_blank" rel="noopener noreferrer">0368 920 249</a></p>
-              <p><strong>Facebook:</strong> <a href="https://www.facebook.com/thesungarden" target="_blank" rel="noopener noreferrer">The Sun Garden</a></p>
+              <p><strong>Facebook:</strong> <a href="https://www.facebook.com/florea" target="_blank" rel="noopener noreferrer">Floréa</a></p>
             </div>
           </div>
 

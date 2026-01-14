@@ -42,6 +42,7 @@ import Profile from './pages/Profile'
 import CollaboratorDashboard from './pages/CollaboratorDashboard'
 import FeaturedPage from './pages/FeaturedPage'
 import Coupons from './pages/Coupons'
+import About from './pages/About'
 import { AuthProvider } from './contexts/AuthContext'
 import { CartProvider } from './contexts/CartContext'
 import Header from './components/Header'
@@ -63,6 +64,7 @@ function AppContent() {
         <Routes>
           <Route path="/" element={<Home/>} />
           <Route path="/shop" element={<Shop/>} />
+          <Route path="/about" element={<About/>} />
           <Route path="/featured" element={<FeaturedPage/>} />
           <Route path="/bestsellers" element={<FeaturedPage/>} />
           <Route path="/category/:categorySlug" element={<CategoryPage/>} />

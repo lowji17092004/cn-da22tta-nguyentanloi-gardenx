@@ -14,11 +14,10 @@ export default function Header(){
   const [isScrolled, setIsScrolled] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const [productCategories, setProductCategories] = useState([])
+  const [articleCategories, setArticleCategories] = useState([])
   const [searchHistory, setSearchHistory] = useState([])
   const [showSearchHistory, setShowSearchHistory] = useState(false)
-  const [showAdminMenu, setShowAdminMenu] = useState(false)
   const [showUserMenu, setShowUserMenu] = useState(false)
-  const adminMenuRef = useRef(null)
   const userMenuRef = useRef(null)
 
   const SEARCH_HISTORY_KEY = 'thesungarden_search_history'
@@ -46,19 +45,6 @@ export default function Header(){
     }
   }, [])
 
-  // Close admin menu when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (adminMenuRef.current && !adminMenuRef.current.contains(event.target)) {
-        setShowAdminMenu(false)
-      }
-    }
-    if (showAdminMenu) {
-      document.addEventListener('mousedown', handleClickOutside)
-    }
-    return () => document.removeEventListener('mousedown', handleClickOutside)
-  }, [showAdminMenu])
-
   // Close user menu when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -83,6 +69,7 @@ export default function Header(){
     try {
       const res = await api.get('/categories/stats')
       setProductCategories(res.data.productCategories || [])
+      setArticleCategories(res.data.blogCategories || [])
     } catch (err) {
       console.error('Error loading categories:', err)
     }
@@ -127,7 +114,7 @@ export default function Header(){
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
                 </svg>
-                <span>Hotline: 0123 456 789</span>
+                <span>Hotline: 0368 920 249</span>
               </a>
               <span className="topbar-divider">|</span>
               <span className="topbar-promo">🎁 Miễn phí giao hàng cho đơn từ 500k</span>
@@ -137,99 +124,7 @@ export default function Header(){
                 <span>{dark ? '🌙' : '☀️'}</span>
               </button>
               
-              {/* Admin Dropdown Menu */}
-              {(isAdmin || isCollaborator) && (
-                <div className="admin-dropdown-wrapper" ref={adminMenuRef}>
-                  <button 
-                    className="topbar-admin-btn"
-                    onClick={() => setShowAdminMenu(!showAdminMenu)}
-                  >
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <path d="M12 15a3 3 0 100-6 3 3 0 000 6z"/>
-                      <path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/>
-                    </svg>
-                    <span>Admin</span>
-                    <svg className={`admin-chevron ${showAdminMenu ? 'open' : ''}`} width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <path d="M6 9l6 6 6-6"/>
-                    </svg>
-                  </button>
-                  
-                  {showAdminMenu && (
-                    <div className="admin-dropdown-menu">
-                      <div className="admin-dropdown-header">
-                        <span className="admin-role-badge">{isAdmin ? '👑 Admin' : '👤 Nhân viên'}</span>
-                      </div>
-                      
-                      <Link to={isCollaborator ? "/collaborator" : "/admin"} className="admin-menu-item" onClick={() => setShowAdminMenu(false)}>
-                        <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                          <rect x="3" y="3" width="7" height="7" rx="1"/>
-                          <rect x="14" y="3" width="7" height="7" rx="1"/>
-                          <rect x="3" y="14" width="7" height="7" rx="1"/>
-                          <rect x="14" y="14" width="7" height="7" rx="1"/>
-                        </svg>
-                        <span>Dashboard</span>
-                      </Link>
-                      
-                      {isAdmin && (
-                        <>
-                          <Link to="/admin/products" className="admin-menu-item" onClick={() => setShowAdminMenu(false)}>
-                            <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                              <path d="M12 3c-1.2 0-2.4.6-3 1.7L3 14c-.6 1.1-.6 2.5 0 3.6.6 1.2 1.8 2.4 3 2.4h12c1.2 0 2.4-1.2 3-2.4.6-1.1.6-2.5 0-3.6l-6-9.3C14.4 3.6 13.2 3 12 3z"/>
-                              <circle cx="12" cy="14" r="3"/>
-                            </svg>
-                            <span>Sản phẩm</span>
-                          </Link>
-                          
-                          <Link to="/admin/categories" className="admin-menu-item" onClick={() => setShowAdminMenu(false)}>
-                            <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                              <rect x="3" y="3" width="7" height="7" rx="1.5"/>
-                              <rect x="14" y="3" width="7" height="7" rx="1.5"/>
-                              <rect x="3" y="14" width="7" height="7" rx="1.5"/>
-                              <rect x="14" y="14" width="7" height="7" rx="1.5"/>
-                            </svg>
-                            <span>Danh mục</span>
-                          </Link>
-                          
-                          <Link to="/admin/users" className="admin-menu-item" onClick={() => setShowAdminMenu(false)}>
-                            <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                              <circle cx="9" cy="7" r="4"/>
-                              <path d="M3 21v-2a4 4 0 014-4h4a4 4 0 014 4v2"/>
-                              <circle cx="17" cy="7" r="3"/>
-                              <path d="M21 21v-2a4 4 0 00-3-3.87"/>
-                            </svg>
-                            <span>Người dùng</span>
-                          </Link>
-                        </>
-                      )}
-                      
-                      <Link to="/admin/orders" className="admin-menu-item" onClick={() => setShowAdminMenu(false)}>
-                        <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                          <path d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
-                        </svg>
-                        <span>Đơn hàng</span>
-                      </Link>
-                      
-                      <Link to="/admin/messages" className="admin-menu-item" onClick={() => setShowAdminMenu(false)}>
-                        <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                          <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>
-                        </svg>
-                        <span>Tin nhắn</span>
-                      </Link>
-                      
-                      <div className="admin-menu-divider"></div>
-                      
-                      <Link to="/admin/stats" className="admin-menu-item" onClick={() => setShowAdminMenu(false)}>
-                        <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                          <path d="M18 20V10M12 20V4M6 20v-6"/>
-                        </svg>
-                        <span>Thống kê</span>
-                      </Link>
-                    </div>
-                  )}
-                </div>
-              )}
-              
-              {user ? (
+{user ? (
                 <div className="admin-dropdown-wrapper" ref={userMenuRef}>
                   <button 
                     className="topbar-user-btn"
@@ -247,6 +142,19 @@ export default function Header(){
                   
                   {showUserMenu && (
                     <div className="admin-dropdown-menu">
+                      {(isAdmin || isCollaborator) && (
+                        <>
+                          <Link to={isCollaborator ? "/collaborator" : "/admin"} className="admin-menu-item admin-link" onClick={() => setShowUserMenu(false)}>
+                            <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                              <path d="M12 15a3 3 0 100-6 3 3 0 000 6z"/>
+                              <path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/>
+                            </svg>
+                            <span>Quản trị</span>
+                          </Link>
+                          <div className="admin-menu-divider"></div>
+                        </>
+                      )}
+                      
                       <Link to="/profile" className="admin-menu-item" onClick={() => setShowUserMenu(false)}>
                         <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                           <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
@@ -298,7 +206,7 @@ export default function Header(){
                 <span>Trang chủ</span>
               </Link>
 
-              <div className="nav-item nav-dropdown">
+              <div className="nav-dropdown">
                 <Link to="/shop" className="nav-dropdown-btn">
                   <span>Sản phẩm</span>
                   <svg className="dropdown-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -381,6 +289,17 @@ export default function Header(){
                         alt="Cây cảnh đa dạng" 
                         onError={(e) => { e.target.src = '/images/hoakieng.jpg'; }}
                       />
+                      <div className="mega-image-overlay">
+                        <div className="mega-image-badge">🌿 Floréa</div>
+                        <h3 className="mega-image-title">Khám phá<br/>Thế giới xanh</h3>
+                        <p className="mega-image-desc">100+ cây cảnh, hoa kiểng và phụ kiện</p>
+                        <Link to="/shop" className="mega-image-btn">
+                          Xem tất cả
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                            <path d="M5 12h14M12 5l7 7-7 7"/>
+                          </svg>
+                        </Link>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -397,8 +316,91 @@ export default function Header(){
 
             {/* Right Navigation */}
             <nav className="nav-menu nav-right">
-              <Link to="/articles" className="nav-item">
-                <span>Hướng dẫn</span>
+              <div className="nav-dropdown">
+                <Link to="/articles" className="nav-dropdown-btn">
+                  <span>Hướng dẫn</span>
+                  <svg className="dropdown-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M6 9l6 6 6-6"/>
+                  </svg>
+                </Link>
+
+                <div className="nav-dropdown-menu guide-mega-menu">
+                  <div className="guide-mega-container">
+                    {articleCategories.length > 0 ? (
+                      articleCategories.map((cat, index) => {
+                        const fallbackImages = ['/images/kuyenmai.jpg', '/images/caycanh.jpg', '/images/kienthucchamsoc.jpg', '/images/huongdanluachon.jpg']
+                        const defaultImg = fallbackImages[index % fallbackImages.length]
+                        
+                        // Nếu là danh mục khuyến mãi, chuyển đến trang coupons
+                        const isPromotionCategory = cat.slug.includes('khuyen') || cat.slug.includes('promotion') || cat.slug === 'khuyen-mai'
+                        const linkTo = isPromotionCategory ? '/coupons' : `/articles?category=${cat.slug}`
+                        
+                        return (
+                          <Link 
+                            key={cat._id} 
+                            to={linkTo} 
+                            className="guide-mega-card"
+                          >
+                            <div className="guide-mega-image">
+                              <img 
+                                src={cat.image ? (cat.image.startsWith('http') ? cat.image : `http://localhost:5000${cat.image}`) : defaultImg} 
+                                alt={cat.name}
+                                onError={(e) => { e.target.src = defaultImg; }}
+                              />
+                            </div>
+                            <div className="guide-mega-content">
+                              <h3 className="guide-mega-title">{cat.name}</h3>
+                              <p className="guide-mega-desc">{cat.description || 'Khám phá các bài viết trong danh mục này.'}</p>
+                            </div>
+                          </Link>
+                        )
+                      })
+                    ) : (
+                      <>
+                        <Link to="/coupons" className="guide-mega-card">
+                          <div className="guide-mega-image">
+                            <img src="/images/kuyenmai.jpg" alt="Khuyến mãi" />
+                          </div>
+                          <div className="guide-mega-content">
+                            <h3 className="guide-mega-title">Khuyến mãi</h3>
+                            <p className="guide-mega-desc">Khám phá các mã giảm giá và chương trình ưu đãi hấp dẫn.</p>
+                          </div>
+                        </Link>
+                        <Link to="/articles?category=thong-tin-cay-trong" className="guide-mega-card">
+                          <div className="guide-mega-image">
+                            <img src="/images/caycanh.jpg" alt="Thông tin cây trồng" />
+                          </div>
+                          <div className="guide-mega-content">
+                            <h3 className="guide-mega-title">Thông tin cây trồng</h3>
+                            <p className="guide-mega-desc">Toàn bộ hồ sơ thông tin về các loại cây cảnh gồm hình ảnh, đặc điểm, tên khoa học...</p>
+                          </div>
+                        </Link>
+                        <Link to="/articles?category=kien-thuc-cham-soc" className="guide-mega-card">
+                          <div className="guide-mega-image">
+                            <img src="/images/kienthucchamsoc.jpg" alt="Kiến thức chăm sóc" />
+                          </div>
+                          <div className="guide-mega-content">
+                            <h3 className="guide-mega-title">Kiến thức chăm sóc</h3>
+                            <p className="guide-mega-desc">Các bài viết hướng dẫn chăm sóc & những thông tin hữu ích về cây cảnh.</p>
+                          </div>
+                        </Link>
+                        <Link to="/articles?category=huong-dan-lua-chon" className="guide-mega-card">
+                          <div className="guide-mega-image">
+                            <img src="/images/huongdanluachon.jpg" alt="Hướng dẫn lựa chọn" />
+                          </div>
+                          <div className="guide-mega-content">
+                            <h3 className="guide-mega-title">Hướng dẫn lựa chọn</h3>
+                            <p className="guide-mega-desc">Mẹo chọn cây phù hợp với không gian sống và phong thủy của bạn.</p>
+                          </div>
+                        </Link>
+                      </>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              <Link to="/about" className="nav-item">
+                <span>Giới thiệu</span>
               </Link>
             </nav>
 

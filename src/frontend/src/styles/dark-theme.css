@@ -66,14 +66,14 @@
 .dark-theme .nav-item,
 .dark-theme .nav-dropdown-btn,
 .dark-theme .nav-link {
-  color: #fafaf9 !important;
+  color: #ffffff !important;
 }
 
 .dark-theme .nav-item:hover,
 .dark-theme .nav-dropdown-btn:hover,
 .dark-theme .nav-dropdown:hover .nav-dropdown-btn {
   background: rgba(229, 193, 143, 0.15) !important;
-  color: #2d7a4a !important;
+  color: #ffffff !important;
 }
 
 /* Header info items */
@@ -712,15 +712,15 @@
    ========================================== */
 
 .dark-theme .breadcrumb {
-  color: #a8a29e !important;
+  color: #ffffff !important;
 }
 
 .dark-theme .breadcrumb a {
-  color: #a8a29e !important;
+  color: #ffffff !important;
 }
 
 .dark-theme .breadcrumb a:hover {
-  color: #2d7a4a !important;
+  color: #ffffff !important;
 }
 
 .dark-theme .breadcrumb-current {

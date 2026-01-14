@@ -3,7 +3,6 @@ import api from '../api';
 import AdminLayout from '../components/AdminLayout';
 import Toast from '../components/Toast';
 import ReactQuill from 'react-quill';
-import { getCategoryDisplayName } from '../utils/categoryUtils';
 import 'react-quill/dist/quill.snow.css';
 import './AdminArticles.css';
 
@@ -153,6 +152,13 @@ export default function AdminArticles() {
 
   const itemsPerPage = 10;
 
+  // Get category display name from loaded categories
+  const getCategoryDisplayName = (categorySlug) => {
+    if (!categorySlug) return 'Chưa phân loại';
+    const category = categories.find(c => c.slug === categorySlug);
+    return category ? category.name : categorySlug;
+  };
+
   useEffect(() => {
     loadCategories();
     loadArticles();
@@ -189,14 +195,9 @@ export default function AdminArticles() {
     }
 
     try {
-      // Tạo slug từ title
+      // Tạo slug từ title - GIỮ TIẾNG VIỆT CÓ DẤU
       const slug = formData.title
         .toLowerCase()
-        .normalize('NFD')
-        .replace(/[\u0300-\u036f]/g, '')
-        .replace(/đ/g, 'd')
-        .replace(/Đ/g, 'd')
-        .replace(/[^a-z0-9\s-]/g, '')
         .replace(/\s+/g, '-')
         .replace(/-+/g, '-')
         .trim();

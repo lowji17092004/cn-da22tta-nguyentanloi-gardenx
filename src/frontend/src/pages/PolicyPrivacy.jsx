@@ -10,7 +10,7 @@ export default function PolicyPrivacy() {
         <div className="policy-content">
           <div className="policy-intro">
             <p>
-              <strong>The Sun Garden</strong> cam kết bảo mật thông tin cá nhân của khách hàng. 
+              <strong>Floréa</strong> cam kết bảo mật thông tin cá nhân của khách hàng. 
               Chính sách này giải thích cách chúng tôi thu thập, sử dụng và bảo vệ thông tin của bạn.
             </p>
           </div>

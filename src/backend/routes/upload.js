@@ -20,23 +20,42 @@ const storage = multer.diskStorage({
   }
 })
 
-const upload = multer({ storage })
+const upload = multer({ 
+  storage,
+  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB max
+  fileFilter: (req, file, cb) => {
+    console.log('File filter - mimetype:', file.mimetype, 'originalname:', file.originalname);
+    const allowedTypes = /jpeg|jpg|png|gif|webp|avif/;
+    const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
+    const mimetype = allowedTypes.test(file.mimetype);
+    if (mimetype && extname) {
+      return cb(null, true);
+    }
+    cb(new Error('Chỉ chấp nhận file ảnh (jpg, png, gif, webp, avif)'));
+  }
+})
 
 // Upload a single file (accepts both 'file' and 'image' field names)
 router.post('/', (req, res) => {
-  const uploadSingle = upload.single('image') || upload.single('file');
-  
-  uploadSingle(req, res, (err) => {
+  console.log('Upload request received');
+  upload.any()(req, res, (err) => {
     if (err) {
-      return res.status(400).json({ message: 'Upload failed', error: err.message });
+      console.error('Multer error:', err);
+      return res.status(400).json({ message: err.message || 'Upload failed' });
     }
     
-    if (!req.file) {
+    console.log('Request files:', req.files);
+    console.log('Request body:', req.body);
+    
+    if (!req.files || req.files.length === 0) {
+      console.error('No file uploaded - req.files:', req.files);
       return res.status(400).json({ message: 'No file uploaded' });
     }
     
-    const urlPath = `/uploads/${req.file.filename}`;
-    res.json({ url: urlPath, path: urlPath, filename: req.file.filename });
+    const file = req.files[0];
+    const urlPath = `/uploads/${file.filename}`;
+    console.log('File uploaded successfully:', urlPath);
+    res.json({ url: urlPath, path: urlPath, filename: file.filename });
   });
 });
 

@@ -10,7 +10,7 @@ export default function PolicyShipping() {
         <div className="policy-content">
           <div className="policy-intro">
             <p>
-              <strong>The Sun Garden</strong> cam kết giao hàng nhanh chóng, an toàn với đội ngũ đóng gói chuyên nghiệp 
+              <strong>Floréa</strong> cam kết giao hàng nhanh chóng, an toàn với đội ngũ đóng gói chuyên nghiệp 
               và đối tác vận chuyển uy tín.
             </p>
           </div>

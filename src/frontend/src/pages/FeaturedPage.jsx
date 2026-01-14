@@ -23,7 +23,7 @@ const FeaturedPage = () => {
   const isFeatured = location.pathname.includes('featured');
   const title = isFeatured ? '⭐ Sản phẩm nổi bật' : '🔥 Sản phẩm bán chạy';
   const subtitle = isFeatured 
-    ? 'Những sản phẩm được yêu thích nhất tại The Sun Garden'
+    ? 'Những sản phẩm được yêu thích nhất tại Floréa'
     : 'Những sản phẩm đã bán trên 10 đơn hàng';
 
   useEffect(() => {

@@ -31,7 +31,7 @@ export default function BlogFlorana(){
           <div className="blog-breadcrumb">
             <Link to="/articles">Hướng dẫn</Link>
             <span>/</span>
-            <span>The Sun Garden</span>
+            <span>Floréa</span>
           </div>
 
           <div className="blog-page-content">
@@ -41,7 +41,7 @@ export default function BlogFlorana(){
             <div className="empty-state">
               <span className="empty-icon">📝</span>
               <h3>Chưa có bài viết</h3>
-              <p>Các bài viết về The Sun Garden sẽ sớm được cập nhật.</p>
+              <p>Các bài viết về Floréa sẽ sớm được cập nhật.</p>
             </div>
           ) : (
             <div className="articles-grid">
