@@ -1,51 +1,46 @@
-# Flower Shop - Cửa hàng Hoa Kiểng
+# Flower Shop E-commerce Platform
 
-Website bán và quảng bá hoa kiểng chuyên nghiệp, xây dựng với React, Node.js, và MongoDB.
+Hệ thống thương mại điện tử chuyên biệt cho ngành hoa kiểng, được xây dựng trên nền tảng **MERN Stack** (MongoDB, Express, React, Node.js). Dự án tập trung vào trải nghiệm người dùng mượt mà, quản trị linh hoạt và khả năng tiếp cận (accessibility) tối ưu.
 
-## 🌟 Tính năng
+## Các tính năng chính
 
-### Người dùng
-- 🏠 Trang chủ với banner tự động, sản phẩm nổi bật, bán chạy, testimonials
-- 🛍️ Cửa hàng với danh sách sản phẩm từ API
-- 🛒 Giỏ hàng với lưu trữ local và badge số lượng
-- 📝 Thanh toán với thông tin khách hàng
-- 📰 Bài viết hướng dẫn chăm sóc hoa
-- 🌓 Dark mode với lưu preferences
-- ♿ Accessibility: ARIA, skip links, keyboard nav, screen reader announcements
+### Giao diện người dùng
+- **Trình diễn sản phẩm**: Trang chủ tích hợp banner tự động, danh mục sản phẩm nổi bật và đánh giá từ khách hàng.
+- **Trải nghiệm mua sắm**: Giỏ hàng lưu trữ đồng bộ với LocalStorage, cập nhật số lượng thời gian thực.
+- **Tối ưu hóa hiển thị**: Hỗ trợ chế độ Dark Mode, hình ảnh tải chậm (Lazy-load) và thiết kế đáp ứng (Responsive).
+- **Tiêu chuẩn Accessibility**: Tuân thủ ARIA, hỗ trợ điều hướng bàn phím (Keyboard navigation) và trình đọc màn hình.
 
-### Quản trị viên
-- ✏️ CRUD sản phẩm với upload nhiều ảnh
-- ✏️ CRUD bài viết
-- 📦 Quản lý đơn hàng
-- 🔐 JWT authentication + role-based access
+### Hệ thống quản trị
+- **Quản lý nội dung**: CRUD sản phẩm (hỗ trợ tải lên nhiều ảnh) và bài viết hướng dẫn.
+- **Điều phối đơn hàng**: Theo dõi và cập nhật trạng thái đơn hàng tập trung.
+- **Bảo mật**: Xác thực qua JWT và phân quyền người dùng (Role-based access control).
 
-## 🚀 Cài đặt
+## Công nghệ sử dụng
+- **Frontend**: React, Vite, Tailwind CSS
+- **Backend**: Node.js, Express
+- **Database**: MongoDB (Mongoose ODM)
+- **DevOps**: Docker, Docker Compose, Nginx
 
-### Yêu cầu
-- Node.js 18+
-- MongoDB (local hoặc Atlas)
+## Cài đặt hệ thống
 
-### 1. Backend
+### Yêu cầu tiên quyết
+- Node.js phiên bản 18 trở lên
+- Cơ sở dữ liệu MongoDB (Local hoặc Atlas)
+
+### 1. Cấu hình Backend
 
 ```powershell
 cd backend
 npm install
-
-# Tạo .env
-copy .env.example .env
-# Sửa MONGO_URI và JWT_SECRET trong .env
-
-# Seed dữ liệu
+# Cấu hình MONGO_URI và JWT_SECRET trong file .env
 npm run seed
-
-# Chạy dev
 npm run dev
 ```
 
-Tài khoản admin: `admin@flower.local` / `admin123`  
-Backend: http://localhost:5000
+- Tài khoản mặc định: `admin@flower.local / admin123`
+- Endpoint: `http://localhost:5000`
 
-### 2. Frontend
+### 2. Cấu hình Frontend
 
 ```powershell
 cd frontend
@@ -53,81 +48,32 @@ npm install
 npm run dev
 ```
 
-Frontend: http://localhost:5173  
-(Vite proxy `/api` → backend)
+- Endpoint: `http://localhost:5173`
 
-### 3. Docker (tùy chọn)
+### 3. Triển khai với Docker
 
 ```powershell
 docker-compose up -d --build
 ```
 
-- Frontend (nginx): http://localhost:3000
-- Backend API: http://localhost:5000
-- MongoDB local container
+## Danh mục API
 
-## 📚 API Endpoints
+| Nhóm      | Phương thức | Endpoint           | Mô tả                               |
+|-----------|-------------|--------------------|-------------------------------------|
+| Xác thực  | POST        | /api/auth/login    | Đăng nhập hệ thống                  |
+| Sản phẩm  | GET         | /api/products      | Lấy danh sách sản phẩm              |
+| Sản phẩm  | POST        | /api/products      | Thêm sản phẩm mới (Admin)           |
+| Bài viết  | GET         | /api/articles      | Lấy danh sách bài viết              |
+| Đơn hàng  | POST        | /api/orders        | Khởi tạo đơn hàng                   |
+| Đơn hàng  | GET         | /api/orders        | Xem danh sách đơn hàng (Admin)      |
+| Tệp tin   | POST        | /api/upload        | Tải tệp lên hệ thống                |
 
-### Auth
-- `POST /api/auth/register` - Đăng ký
-- `POST /api/auth/login` - Đăng nhập (JWT)
+## Xử lý sự cố
 
-### Products
-- `GET /api/products` - Danh sách sản phẩm
-- `POST /api/products` - Tạo (admin)
-- `PUT /api/products/:id` - Cập nhật (admin)
-- `DELETE /api/products/:id` - Xóa (admin)
+### Xung đột cổng (Port conflict)
+Nếu cổng `5173` đã được sử dụng, thực hiện lệnh sau trên PowerShell để giải phóng:
 
-### Articles
-- `GET /api/articles` - Danh sách bài viết
-- `POST /api/articles` - Tạo (admin)
-- `PUT /api/articles/:id` - Cập nhật (admin)
-- `DELETE /api/articles/:id` - Xóa (admin)
-
-### Orders
-- `POST /api/orders` - Tạo đơn hàng
-- `GET /api/orders` - Danh sách (admin)
-- `PUT /api/orders/:id` - Cập nhật trạng thái (admin)
-
-### Upload
-- `POST /api/upload` - Upload file (admin)
-- `DELETE /api/upload/:filename` - Xóa file (admin)
-
-## 🎨 UI/UX Features
-
-- Banner carousel với play/pause + pause-on-hover
-- Card animations (hover lift)
-- Dark mode toggle
-- Cart badge hiển thị số lượng
-- Lazy-load images
-- Skip-to-content link
-- Keyboard navigation (Arrow keys)
-- Screen reader announcements (aria-live)
-- Mobile-first responsive
-
-## 🔧 Troubleshooting
-
-### Port đã được sử dụng
 ```powershell
 $pid = (Get-NetTCPConnection -LocalPort 5173 | Select -First 1).OwningProcess
 Stop-Process -Id $pid -Force
 ```
-
-### MongoDB Atlas Whitelist
-Thêm IP vào Network Access trong Atlas Console hoặc dùng `0.0.0.0/0` (dev only).
-
-## 📦 Scripts
-
-### Backend
-- `npm start` - Production
-- `npm run dev` - Development (nodemon)
-- `npm run seed` - Seed data
-
-### Frontend
-- `npm run dev` - Dev server
-- `npm run build` - Build production
-- `npm run preview` - Preview build
-
-## 📝 License
-
-MIT © 2025 Flower Shop Team
